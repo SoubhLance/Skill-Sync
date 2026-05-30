@@ -1,0 +1,89 @@
+# =========================
+# Core Backend
+# =========================
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+
+# =========================
+# Database
+# =========================
+sqlalchemy
+psycopg2-binary
+pgvector
+
+# =========================
+# NLP & ML
+# =========================
+sentence-transformers
+transformers
+torch
+numpy
+pandas
+scikit-learn
+scipy
+
+# =========================
+# Vector Search
+# =========================
+faiss-cpu
+
+# =========================
+# NLP Processing
+# =========================
+spacy
+
+# =========================
+# Resume Parsing
+# =========================
+pymupdf
+pdfplumber
+
+# =========================
+# Data Processing
+# =========================
+openpyxl
+
+# =========================
+# API Requests
+# =========================
+requests
+httpx
+
+# =========================
+# Environment Variables
+# =========================
+python-dotenv
+
+# =========================
+# Authentication
+# =========================
+python-jose[cryptography]
+passlib[bcrypt]
+
+# =========================
+# Validation & Utilities
+# =========================
+email-validator
+
+# =========================
+# DSA / Analytics
+# =========================
+matplotlib
+plotly
+
+# =========================
+# Jupyter
+# =========================
+jupyter
+ipykernel
+notebook
+
+# =========================
+# Development
+# =========================
+pytest
+black
+isort
