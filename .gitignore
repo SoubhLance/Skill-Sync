@@ -1,5 +1,30 @@
-## ENV
+# Environment
 .env
+.env.*
+!.env.example
 
-#VENV
-/venv
+# Virtual Environment
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/settings.json
+
+# Node
+node_modules/
+
+# Build
+dist/
+build/
+
+# OS Files
+.DS_Store
+Thumbs.db
