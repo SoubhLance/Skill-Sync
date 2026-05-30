@@ -1,0 +1,29 @@
+{
+  "winner": "BERT",
+  "model_id": "bert-base-uncased",
+  "dimensions": 768,
+  "num_jobs": 405,
+  "index_type": "IndexFlatIP (cosine, L2-normed)",
+  "scorecard": {
+    "BERT": {
+      "MRR": 0.8579,
+      "Hit@5": 0.9358,
+      "P@5": 0.7022,
+      "Intra_Sim": 0.9321,
+      "Docs_per_sec": 45.5,
+      "Dimensions": 768,
+      "Encode_Time_s": 8.9,
+      "Weighted_Score": 0.8611
+    },
+    "MiniLM": {
+      "MRR": 0.7972,
+      "Hit@5": 0.9284,
+      "P@5": 0.6533,
+      "Intra_Sim": 0.6683,
+      "Docs_per_sec": 338.3,
+      "Dimensions": 384,
+      "Encode_Time_s": 1.2,
+      "Weighted_Score": 0.7754
+    }
+  }
+}
