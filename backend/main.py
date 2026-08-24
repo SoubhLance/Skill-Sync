@@ -15,6 +15,11 @@ from __future__ import annotations
 import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -64,6 +69,7 @@ app = FastAPI(
 | `POST` | `/recommend/resume` | Paste resume text → auto-extract skills → ranked jobs |
 | `POST` | `/recommend/pdf` | Upload PDF resume → ranked jobs |
 | `POST` | `/extract-skills` | Preview which skills are extracted from text |
+| `POST` | `/extract-profile` | Extract GitHub, LeetCode, CodeChef, HackerRank stats & profile_score |
 | `GET`  | `/recommend/jobs` | Browse / filter all 415 indexed jobs |
 | `GET`  | `/recommend/domains` | List domains available for filtering |
 | `GET`  | `/health` | Engine status, model info, jobs indexed |
@@ -71,9 +77,9 @@ app = FastAPI(
 ### Scoring formula
 ```
 blended_score = 0.60 × cosine_similarity   (BERT mean-pool, IndexFlatIP)
-              + 0.25 × profile_score        (GitHub / LinkedIn — Part 2)
-              + 0.15 × dsa_score            (DSA tracker — Part 3)
+              + 0.40 × profile_score        (GitHub / LeetCode / CodeChef / HackerRank)
 ```
+
 Model used: **bert-base-uncased** (MRR 0.8579, Hit@5 0.9358, Intra-sim 0.9321)
 """,
     version     = "2.0.0",
@@ -143,8 +149,11 @@ async def health(request: Request):
 @app.get("/", tags=["System"])
 async def root():
     return {
-        "app":     "SkillSync API v2.0",
+        "message": "Backend is running! SkillSync Job Predictor API is working.",
+        "status":  "online",
+        "app":     "SkillSync Career Intelligence API v2.0",
         "model":   "bert-base-uncased",
         "docs":    "/docs",
         "health":  "/health",
     }
+

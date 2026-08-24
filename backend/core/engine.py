@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+# Fix Windows OpenMP DLL conflict (PyTorch + FAISS/numpy both load libiomp5md.dll)
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 """
 core/engine.py
 --------------
@@ -10,10 +16,7 @@ Singleton that owns:
 Exposes one method:  engine.recommend(...)
 """
 
-from __future__ import annotations
-
 import json
-import os
 import time
 from pathlib import Path
 from typing import Optional
@@ -33,10 +36,11 @@ FAISS_PATH  = EMBED_DIR / "faiss_index.bin"
 META_PATH   = EMBED_DIR / "job_metadata.json"
 MODEL_PATH  = EMBED_DIR / "model_info.json"
 
-# ── Scoring weights (match recommender.py and test cell) ─────────────────────
+# ── Scoring weights ──────────────────────────────────────────────────────────
+# blended_score = W_SEMANTIC * cosine_sim + W_PROFILE * profile_score
+# profile_score already incorporates LeetCode/CodeChef/HackerRank (no separate dsa_score).
 W_SEMANTIC = float(os.getenv("W_SEMANTIC", "0.60"))
-W_PROFILE  = float(os.getenv("W_PROFILE",  "0.25"))
-W_DSA      = float(os.getenv("W_DSA",      "0.15"))
+W_PROFILE  = float(os.getenv("W_PROFILE",  "0.40"))
 
 # ── BERT config (must match notebook) ────────────────────────────────────────
 BERT_MODEL_ID = "bert-base-uncased"
@@ -140,6 +144,7 @@ class Engine:
         self.tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_ID)
         self.bert      = BertModel.from_pretrained(BERT_MODEL_ID).to(self.device)
         self.bert.eval()
+        torch.set_num_threads(4)
         print(f"[Engine] BERT ready  |  hidden_size={self.bert.config.hidden_size}")
 
         # 2. FAISS index
@@ -177,11 +182,18 @@ class Engine:
         skills_str:       str,
         top_k:            int   = 10,
         profile_score:    float = 0.0,
-        dsa_score:        float = 0.0,
         domain_filter:    Optional[str]   = None,
         exp_filter:       Optional[float] = None,   # 0=Beginner 1=Entry 2=Mid 3=Senior
+        student_track:    Optional[str]   = None,   # 'cs' or 'non_cs'
     ) -> RecommendResult:
         t0 = time.perf_counter()
+
+        # TODO: Non-CS track currently reuses the same canonical skill vocabulary from core/extractor.py. A dedicated skill vocabulary for non-CS domains (mechanical, civil, finance, core electronics, biomedical, etc.) needs to be built.
+        if student_track is None:
+            student_track = "cs" if profile_score > 0 else "non_cs"
+        student_track = student_track.lower()
+        if student_track not in ("cs", "non_cs"):
+            student_track = "cs"
 
         # Build query text exactly like the notebook
         query_text = f"Skills: {skills_str}"
@@ -216,8 +228,13 @@ class Engine:
                 continue
 
             # ── scores ───────────────────────────────────────────────────────
-            sem     = float(np.clip(raw_score, 0, 1))
-            blended = W_SEMANTIC * sem + W_PROFILE * profile_score + W_DSA * dsa_score
+            sem = float(np.clip(raw_score, 0, 1))
+            if student_track == "non_cs":
+                # Non-CS track skips profile_score entirely (pure semantic similarity)
+                blended = sem
+            else:
+                blended = W_SEMANTIC * sem + W_PROFILE * profile_score
+
 
             # ── skill gap analysis ───────────────────────────────────────────
             job_skills = [s.strip().lower() for s in m.get("skills", "").split(",") if s.strip()]

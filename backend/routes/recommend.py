@@ -6,7 +6,8 @@ All recommendation endpoints.
 POST  /recommend              — comma-separated skills → ranked jobs
 POST  /recommend/resume       — raw resume text → ranked jobs
 POST  /recommend/pdf          — PDF file upload → ranked jobs
-POST  /extract-skills         — text → extracted skill list (debug / UI preview)
+POST  /extract-skills         — raw text → detailed skill extraction (primary / secondary)
+POST  /extract-skills/pdf     — PDF upload → detailed skill extraction + page count
 GET   /recommend/jobs         — browse / filter all indexed jobs
 GET   /recommend/domains      — list all domains available for filtering
 """
@@ -17,12 +18,28 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 
-from ..core.engine import Engine, W_SEMANTIC, W_PROFILE, W_DSA
-from ..core.extractor import extract_skills, skills_str
-from ..models.schemas import (
-    SkillsRequest, ResumeTextRequest, ExtractRequest,
-    JobMatchOut, RecommendOut, ExtractOut,
+from ..core.engine import Engine, W_SEMANTIC, W_PROFILE
+from ..core.extractor import extract_skills, extract_skills_from_resume, skills_str
+from ..core.profile_extractor import (
+    fetch_github_stats,
+    fetch_leetcode_stats,
+    fetch_codechef_stats,
+    fetch_hackerrank_stats,
+    compute_profile_score,
 )
+from ..core.resume_ocr import extract_resume_text
+from ..models.schemas import (
+    SkillsRequest,
+    ResumeTextRequest,
+    ExtractRequest,
+    ProfileRequest,
+    JobMatchOut,
+    RecommendOut,
+    ExtractDetailedOut,
+    ProfileOut,
+)
+
+
 
 router = APIRouter(tags=["Recommendations"])
 
@@ -33,10 +50,10 @@ def _engine() -> Engine:
 
 
 def _weights() -> dict[str, float]:
-    return {"semantic": W_SEMANTIC, "profile": W_PROFILE, "dsa": W_DSA}
+    return {"semantic": W_SEMANTIC, "profile": W_PROFILE}
 
 
-def _format(result) -> RecommendOut:
+def _format(result, student_track: str = "cs") -> RecommendOut:
     return RecommendOut(
         matches=[
             JobMatchOut(
@@ -67,6 +84,7 @@ def _format(result) -> RecommendOut:
         query_ms=         result.query_ms,
         total_jobs=       result.total_jobs,
         weights=          _weights(),
+        student_track=    student_track,
     )
 
 
@@ -78,9 +96,8 @@ async def recommend_from_skills(body: SkillsRequest):
     """
     Main recommendation endpoint.
 
-    Pass a comma-separated skill string (copy-paste from a resume skills section
-    or assembled by the profile aggregator).  Returns top_k ranked jobs with
-    skill gap analysis and blended score.
+    Pass a comma-separated skill string. Returns top_k ranked jobs with
+    skill gap analysis and blended score (0.60 semantic + 0.40 profile for CS track).
 
     Example payload:
     ```json
@@ -88,20 +105,24 @@ async def recommend_from_skills(body: SkillsRequest):
       "skills": "Python, Machine Learning, PyTorch, FastAPI, Docker",
       "top_k": 10,
       "profile_score": 0.75,
-      "dsa_score": 0.60
+      "student_track": "cs"
     }
     ```
     """
     try:
+        track = body.student_track
+        if track is None:
+            track = "cs" if body.profile_score > 0 else "non_cs"
+
         result = _engine().recommend(
             skills_str=    body.skills,
             top_k=         body.top_k,
             profile_score= body.profile_score,
-            dsa_score=     body.dsa_score,
             domain_filter= body.domain_filter,
             exp_filter=    body.exp_filter,
+            student_track= track,
         )
-        return _format(result)
+        return _format(result, student_track=track)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
@@ -112,11 +133,7 @@ async def recommend_from_skills(body: SkillsRequest):
              summary="Raw resume text → job recommendations")
 async def recommend_from_resume(body: ResumeTextRequest):
     """
-    Paste raw resume text (or text extracted from a PDF elsewhere).
-    Skills are auto-extracted then sent to the BERT encoder.
-
-    The response includes `candidate_skills` so the frontend can show
-    the user exactly which skills were picked up.
+    Paste raw resume text. Skills are auto-extracted then sent to the BERT encoder.
     """
     try:
         extracted = extract_skills(body.resume_text)
@@ -126,89 +143,174 @@ async def recommend_from_resume(body: ResumeTextRequest):
                 detail="No recognisable skills found in resume text. "
                        "Try /extract-skills first to see what was detected.",
             )
+
+        track = body.student_track
+        if track is None:
+            track = "cs" if body.profile_score > 0 else "non_cs"
+
         result = _engine().recommend(
             skills_str=    skills_str(extracted),
             top_k=         body.top_k,
             profile_score= body.profile_score,
-            dsa_score=     body.dsa_score,
             domain_filter= body.domain_filter,
             exp_filter=    body.exp_filter,
+            student_track= track,
         )
-        return _format(result)
+        return _format(result, student_track=track)
     except HTTPException:
         raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-# ── POST /recommend/pdf ────────────────────────────────────────────────────────
+# ── POST /recommend/pdf (and file uploads: PDF, JPG, PNG) ──────────────────────
 
 @router.post("/recommend/pdf", response_model=RecommendOut,
-             summary="Upload PDF resume → job recommendations")
+             summary="Upload PDF or photo resume → job recommendations")
 async def recommend_from_pdf(
     file:          UploadFile = File(...),
     top_k:         int   = Query(10, ge=1, le=30),
     profile_score: float = Query(0.0, ge=0.0, le=1.0),
-    dsa_score:     float = Query(0.0, ge=0.0, le=1.0),
     domain_filter: Optional[str]  = Query(None),
     exp_filter:    Optional[float] = Query(None),
+    student_track: Optional[str]  = Query(None, description="'cs' or 'non_cs'"),
 ):
     """
-    Upload a PDF resume.  Text is extracted with pdfplumber, skills are
-    auto-identified, then recommendations are returned.
+    Upload a resume file (digital PDF, scanned PDF, or photo: JPG, PNG, WEBP).
+    Hybrid parser tries fast text-layer first, then falls back to OCR if scanned/image.
     """
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files accepted.")
     try:
-        import pdfplumber
         contents = await file.read()
-        text = ""
-        with pdfplumber.open(io.BytesIO(contents)) as pdf:
-            for page in pdf.pages:
-                text += (page.extract_text() or "") + "\n"
+        ocr_res = extract_resume_text(file.filename, contents)
 
-        if len(text.strip()) < 30:
-            raise HTTPException(status_code=422, detail="Could not extract text from PDF.")
+        if ocr_res.method == "failed" or not ocr_res.text.strip():
+            err_msg = ocr_res.warnings[0] if ocr_res.warnings else "Could not extract text from uploaded file."
+            raise HTTPException(status_code=422, detail=err_msg)
 
-        extracted = extract_skills(text)
+        extracted = extract_skills(ocr_res.text)
         if not extracted:
-            raise HTTPException(status_code=422, detail="No skills detected in PDF text.")
+            raise HTTPException(status_code=422, detail="No skills detected in uploaded file.")
+
+        track = student_track
+        if track is None:
+            track = "cs" if profile_score > 0 else "non_cs"
 
         result = _engine().recommend(
             skills_str=    skills_str(extracted),
             top_k=         top_k,
             profile_score= profile_score,
-            dsa_score=     dsa_score,
             domain_filter= domain_filter,
             exp_filter=    exp_filter,
+            student_track= track,
         )
-        return _format(result)
+        return _format(result, student_track=track)
     except HTTPException:
         raise
-    except ImportError:
-        raise HTTPException(
-            status_code=501,
-            detail="pdfplumber not installed. Run: pip install pdfplumber",
-        )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-# ── POST /extract-skills ───────────────────────────────────────────────────────
+# ── POST /extract-skills ─────────────────────────────────────────────────────────────
 
-@router.post("/extract-skills", response_model=ExtractOut,
-             summary="Preview skill extraction from text")
+@router.post("/extract-skills", response_model=ExtractDetailedOut,
+             summary="Preview skill extraction from plain text")
 async def extract_skills_endpoint(body: ExtractRequest):
     """
-    Debug / UI helper.  Shows what skills the extractor picks up from text
-    before committing to a recommendation call.  Use this to let the user
-    confirm/edit the extracted skill list in the frontend.
+    Debug / UI helper. Returns detailed breakdown of extracted skills.
     """
-    skills = extract_skills(body.text)
-    return ExtractOut(skills=skills, skill_count=len(skills))
+    result = extract_skills_from_resume(body.text)
+    return ExtractDetailedOut(**result)
+
+
+# ── POST /extract-skills/pdf ────────────────────────────────────────────────────────
+
+@router.post("/extract-skills/pdf", response_model=ExtractDetailedOut,
+             summary="Upload a PDF or image resume and preview extracted skills with OCR metadata")
+async def extract_skills_from_pdf(file: UploadFile = File(...)):
+    """
+    Upload a resume file (PDF, JPG, PNG, WEBP). Dispatches to hybrid text-layer + OCR parser.
+    Returns primary/secondary skills, page count, and OCR confidence metadata.
+    """
+    try:
+        contents = await file.read()
+        ocr_res = extract_resume_text(file.filename, contents)
+
+        if ocr_res.method == "failed" or not ocr_res.text.strip():
+            err_msg = ocr_res.warnings[0] if ocr_res.warnings else "Could not extract text from file."
+            raise HTTPException(status_code=422, detail=err_msg)
+
+        result = extract_skills_from_resume(ocr_res.text)
+        return ExtractDetailedOut(
+            **result,
+            pages=ocr_res.pages_total,
+            method=ocr_res.method,
+            is_low_confidence=ocr_res.is_low_confidence,
+            ocr_confidence=ocr_res.avg_ocr_confidence,
+            warnings=ocr_res.warnings,
+            github_url=ocr_res.github_url,
+            linkedin_url=ocr_res.linkedin_url,
+            emails=ocr_res.emails,
+            phone_numbers=ocr_res.phone_numbers,
+            achievements=ocr_res.achievements,
+            projects=ocr_res.projects,
+            projects_summary=ocr_res.projects_summary,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+
+# ── POST /extract-profile ────────────────────────────────────────────────────────────
+
+@router.post("/extract-profile", response_model=ProfileOut,
+             summary="Extract signals from GitHub, LeetCode, CodeChef, HackerRank & compute profile_score")
+async def extract_profile_endpoint(body: ProfileRequest):
+    """
+    Pass usernames for GitHub, LeetCode, CodeChef, and/or HackerRank plus self-reported bonuses.
+    Fetches public profile stats and computes normalized profile_score (0.0 to 1.0).
+    """
+    try:
+        gh = fetch_github_stats(body.github) if body.github else None
+        lc = fetch_leetcode_stats(body.leetcode) if body.leetcode else None
+        cc = fetch_codechef_stats(body.codechef) if body.codechef else None
+        hr = fetch_hackerrank_stats(body.hackerrank) if body.hackerrank else None
+
+        score_res = compute_profile_score(
+            github=gh,
+            leetcode=lc,
+            codechef=cc,
+            hackerrank=hr,
+            hackathon_wins=body.hackathon_wins,
+            papers_published=body.papers_published,
+            return_details=True,
+        )
+
+        active = []
+        if gh: active.append("github")
+        if lc: active.append("leetcode")
+        if cc: active.append("codechef")
+        if hr: active.append("hackerrank")
+
+        return ProfileOut(
+            github=gh,
+            leetcode=lc,
+            codechef=cc,
+            hackerrank=hr,
+            profile_score=score_res["profile_score"],
+            base_score=score_res["base_score"],
+            bonus_applied=score_res["bonus_applied"],
+            active_platforms=active,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Profile extraction error: {str(exc)}")
+
 
 
 # ── GET /recommend/jobs ────────────────────────────────────────────────────────
+
 
 @router.get("/recommend/jobs", summary="Browse all indexed jobs")
 async def list_jobs(

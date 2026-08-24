@@ -7,6 +7,7 @@ Same vocabulary used in the notebook test cell.
 
 from __future__ import annotations
 import re
+from typing import TYPE_CHECKING
 
 # Master vocab — pulled from the 415-job dataset + common extras
 SKILL_VOCAB: set[str] = {
@@ -97,6 +98,78 @@ def extract_skills(text: str) -> list[str]:
     # Deduplicate preserving order
     seen: set[str] = set()
     return [s for s in found if not (s in seen or seen.add(s))]   # type: ignore[func-returns-value]
+
+
+# ── Section-header vocabulary for resume-aware extraction ────────────────────
+SKILL_SECTIONS: list[str] = [
+    "skills", "technical skills", "technologies", "tools", "frameworks",
+    "languages", "competencies", "expertise", "proficiencies", "tech stack",
+]
+
+
+def extract_skills_from_resume(text: str) -> dict:
+    """
+    Resume-aware skill extraction.
+
+    Returns a dict with:
+      all_skills      — every skill found anywhere in the text (deduped, ordered)
+      primary_skills  — skills found on lines that belong to a skill-section header
+                        (higher confidence: dedicated skills block)
+      secondary_skills— skills found elsewhere (experience / project descriptions)
+      skill_count     — len(all_skills)
+    """
+    if not text or not text.strip():
+        return {
+            "all_skills": [], "primary_skills": [],
+            "secondary_skills": [], "skill_count": 0,
+        }
+
+    # 1. Full-text extraction
+    all_skills: list[str] = extract_skills(text)
+
+    # 2. Identify skill-section lines
+    #    A line is "primary" when it (or an adjacent header line) contains a
+    #    SKILL_SECTIONS keyword.  We look at each line and flag runs of lines
+    #    that follow a skill-section header until the next blank-ish boundary.
+    lines = text.splitlines()
+    primary_line_indices: set[int] = set()
+    in_skill_section = False
+
+    for i, line in enumerate(lines):
+        stripped = line.strip().lower()
+        # Detect a header line: short line that matches a section keyword
+        is_header = any(
+            re.search(r"\b" + re.escape(kw) + r"\b", stripped)
+            for kw in SKILL_SECTIONS
+        ) and len(stripped) < 60  # headers are typically short
+
+        if is_header:
+            in_skill_section = True
+            primary_line_indices.add(i)
+            continue
+
+        # Exit skill section on a blank line or an all-caps heading-like line
+        # that is NOT a skill keyword (e.g. "EXPERIENCE", "EDUCATION")
+        if in_skill_section:
+            if stripped == "":
+                in_skill_section = False
+            else:
+                primary_line_indices.add(i)
+
+    # 3. Extract skills from primary lines only
+    primary_text = "\n".join(lines[i] for i in sorted(primary_line_indices))
+    primary_skills: list[str] = extract_skills(primary_text)
+
+    # 4. Secondary = skills in all_skills that are NOT in primary_skills
+    primary_set = set(primary_skills)
+    secondary_skills: list[str] = [s for s in all_skills if s not in primary_set]
+
+    return {
+        "all_skills":      all_skills,
+        "primary_skills":  primary_skills,
+        "secondary_skills": secondary_skills,
+        "skill_count":     len(all_skills),
+    }
 
 
 def skills_str(skills: list[str]) -> str:
