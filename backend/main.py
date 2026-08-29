@@ -70,6 +70,7 @@ app = FastAPI(
 | `POST` | `/recommend/pdf` | Upload PDF resume → ranked jobs |
 | `POST` | `/extract-skills` | Preview which skills are extracted from text |
 | `POST` | `/extract-profile` | Extract GitHub, LeetCode, CodeChef, HackerRank stats & profile_score |
+| `POST` | `/jd-match` | Direct pairwise resume vs job description match & skill gap |
 | `GET`  | `/recommend/jobs` | Browse / filter all 415 indexed jobs |
 | `GET`  | `/recommend/domains` | List domains available for filtering |
 | `GET`  | `/health` | Engine status, model info, jobs indexed |

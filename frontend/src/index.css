@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Light Mode Palette: Warm Cream Background, Deep Navy Text, Vibrant Orange Accent */
+    --bg-paper: #FAF7F2;
+    --bg-surface: #FFFFFF;
+    --text-main: #0A192F;
+    --text-muted: #475569;
+    --accent-color: #FF6B00;
+    --accent-hover: #EA580C;
+    --border-hairline: #E2E8F0;
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Git diff indicator utility tokens */
+    --diff-add: #2DA44E;
+    --diff-add-bg: #DAFBE1;
+    --diff-del: #CF222E;
+    --diff-del-bg: #FFEBE9;
+    --accent-blue: #3B5BDB;
+
+    /* Backward compatibility mappings */
+    --bg-main: #FAF7F2;
+    --accent-primary: #FF6B00;
+    --accent-secondary: #0A192F;
+    --border-color: #E2E8F0;
+    --badge-bg: rgba(255, 107, 0, 0.12);
+    --badge-text: #EA580C;
+  }
+
+  .dark {
+    /* Dark Mode Palette: Near-Black Background, Off-White Text, Muted Ochre/Amber Accent */
+    --bg-paper: #0B0F17;
+    --bg-surface: #131B2E;
+    --text-main: #F1F5F9;
+    --text-muted: #94A3B8;
+    --accent-color: #F59E0B;
+    --accent-hover: #D97706;
+    --border-hairline: #1E293B;
+
+    --bg-main: #0B0F17;
+    --accent-primary: #F59E0B;
+    --accent-secondary: #FBBF24;
+    --border-color: #1E293B;
+    --badge-bg: rgba(245, 158, 11, 0.15);
+    --badge-text: #FBBF24;
+  }
+}
+
+body {
+  background-color: var(--bg-paper);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Custom hairline dev-tool UI classes */
+.bg-paper { background-color: var(--bg-paper); }
+.bg-surface { background-color: var(--bg-surface); }
+.text-main { color: var(--text-main); }
+.text-muted { color: var(--text-muted); }
+.border-hairline { border: 1px solid var(--border-hairline); }
+
+/* Accent styling */
+.btn-accent {
+  background-color: var(--accent-color);
+  color: #0A192F;
+  font-weight: 700;
+  transition: background-color 0.15s ease;
+}
+.dark .btn-accent {
+  background-color: #F59E0B;
+  color: #0B0F17;
+}
+.btn-accent:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Custom hairline scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-hairline);
+  border-radius: 2px;
+}
+
+

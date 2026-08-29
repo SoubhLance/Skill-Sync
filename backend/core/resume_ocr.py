@@ -23,6 +23,8 @@ from __future__ import annotations
 import io
 import logging
 import re
+import xml.etree.ElementTree as ET
+import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, Optional
@@ -77,6 +79,7 @@ class ExtractionResult:
     # ── Extracted Structured Signals ──
     github_url: str | None = None
     linkedin_url: str | None = None
+    leetcode_url: str | None = None
     emails: list[str] = field(default_factory=list)
     phone_numbers: list[str] = field(default_factory=list)
     skills: list[str] = field(default_factory=list)
@@ -114,6 +117,7 @@ def _extract_structured_data(
     # 1. Contact & Social Links
     github_url: str | None = None
     linkedin_url: str | None = None
+    leetcode_url: str | None = None
 
     for link in clean_links:
         link_lower = link.lower()
@@ -132,7 +136,12 @@ def _extract_structured_data(
             if m:
                 linkedin_url = f"https://linkedin.com/in/{m.group(1)}"
 
-    # Text regex fallbacks for GitHub & LinkedIn
+        if "leetcode.com" in link_lower and not leetcode_url:
+            m = re.search(r"https?://(?:www\.)?leetcode\.com/(?:u/)?([a-zA-Z0-9_-]+)", link, re.I)
+            if m and m.group(1).lower() not in ("problems", "contest", "explore", "discuss", "studyplan"):
+                leetcode_url = f"https://leetcode.com/u/{m.group(1)}"
+
+    # Text regex fallbacks for GitHub, LinkedIn & LeetCode
     if not github_url:
         m = re.search(r"(?:https?://)?(?:www\.)?github\.com/([a-zA-Z0-9_-]+)", raw_text, re.I)
         if m and m.group(1).lower() not in ("features", "explore", "topics", "pulls"):
@@ -142,6 +151,11 @@ def _extract_structured_data(
         m = re.search(r"(?:https?://)?(?:www\.)?linkedin\.com/in/([a-zA-Z0-9_-]+)", raw_text, re.I)
         if m:
             linkedin_url = f"https://linkedin.com/in/{m.group(1)}"
+
+    if not leetcode_url:
+        m = re.search(r"(?:https?://)?(?:www\.)?leetcode\.com/(?:u/)?([a-zA-Z0-9_-]+)", raw_text, re.I)
+        if m and m.group(1).lower() not in ("problems", "contest", "explore", "discuss", "studyplan"):
+            leetcode_url = f"https://leetcode.com/u/{m.group(1)}"
 
     emails = sorted(list(set(re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", raw_text))))
     phone_numbers = sorted(list(set(re.findall(r"\+?\d[\d\s-]{8,}\d", raw_text))))
@@ -277,6 +291,7 @@ def _extract_structured_data(
     return {
         "github_url": github_url,
         "linkedin_url": linkedin_url,
+        "leetcode_url": leetcode_url,
         "emails": emails,
         "phone_numbers": phone_numbers,
         "skills": extracted_skills,
@@ -471,6 +486,62 @@ def _ocr_single_image(image) -> tuple[str, float | None]:
     return text.strip(), avg_conf
 
 
+# ── DOCX Extraction Engine ───────────────────────────────────────────────────
+
+def extract_from_docx(path: str | Path | None = None, file_bytes: bytes | None = None) -> ExtractionResult:
+    """
+    Extract text and structured signals from a Microsoft Word (.docx) file.
+    Uses Python standard library (zipfile + xml.etree.ElementTree) to extract text from word/document.xml.
+    """
+    if path is None and file_bytes is None:
+        return ExtractionResult(text="", method="failed", warnings=["No path or file_bytes provided"])
+
+    try:
+        data = file_bytes if file_bytes is not None else Path(path).read_bytes()
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            xml_content = z.read("word/document.xml")
+
+        tree = ET.fromstring(xml_content)
+        paragraphs: list[str] = []
+        for elem in tree.iter():
+            if elem.tag.endswith("p"):
+                texts = [node.text for node in elem.iter() if node.tag.endswith("t") and node.text]
+                if texts:
+                    paragraphs.append("".join(texts))
+
+        full_text = "\n\n".join(paragraphs).strip()
+
+        hyperlinks: list[str] = []
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as z:
+                if "word/_rels/document.xml.rels" in z.namelist():
+                    rels_xml = z.read("word/_rels/document.xml.rels")
+                    rels_tree = ET.fromstring(rels_xml)
+                    for rel in rels_tree.iter():
+                        target = rel.attrib.get("Target", "")
+                        if target.startswith(("http://", "https://", "mailto:")):
+                            hyperlinks.append(target)
+        except Exception:
+            pass
+
+        structured = _extract_structured_data(full_text, hyperlinks)
+        return ExtractionResult(
+            text=full_text,
+            method="text_layer",
+            pages_total=1,
+            pages_ocr=0,
+            warnings=[],
+            **structured,
+        )
+    except Exception as exc:
+        logger.warning(f"[resume_ocr] DOCX parsing error: {exc}")
+        return ExtractionResult(
+            text="",
+            method="failed",
+            warnings=[f"DOCX parsing error: {exc}"],
+        )
+
+
 # ── Unified Route Entry Point ────────────────────────────────────────────────
 
 def extract_resume_text(
@@ -479,18 +550,20 @@ def extract_resume_text(
 ) -> ExtractionResult:
     """
     Single entry point for FastAPI routes. Dispatches based on file extension.
-    Extensive support for .pdf, .jpg, .jpeg, .png, .webp, .bmp, .tiff files.
+    Extensive support for .pdf, .docx, .jpg, .jpeg, .png, .webp, .bmp, .tiff files.
     """
     ext = Path(filename).suffix.lower()
 
     if ext == ".pdf":
         return extract_from_pdf(file_bytes=file_bytes)
+    elif ext == ".docx":
+        return extract_from_docx(file_bytes=file_bytes)
     elif ext in (".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"):
         return extract_from_image(file_bytes=file_bytes)
     else:
         return ExtractionResult(
             text="", method="failed",
-            warnings=[f"Unsupported file type: {ext}. Supported: .pdf, .jpg, .jpeg, .png, .webp, .bmp, .tiff"],
+            warnings=[f"Unsupported file type: {ext}. Supported: .pdf, .docx, .jpg, .jpeg, .png, .webp, .bmp, .tiff"],
         )
 
 

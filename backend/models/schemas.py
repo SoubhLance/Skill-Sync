@@ -63,7 +63,7 @@ class ExtractRequest(BaseModel):
 
 class ProfileRequest(BaseModel):
     """POST /extract-profile"""
-    github:           Optional[str] = Field(None, description="GitHub username", example="soubhlance")
+    github:           Optional[str] = Field(None, description="GitHub username", example="tourist")
     leetcode:         Optional[str] = Field(None, description="LeetCode username", example="tourist")
     codechef:         Optional[str] = Field(None, description="CodeChef username", example="tourist")
     hackerrank:       Optional[str] = Field(None, description="HackerRank username", example="tourist")
@@ -71,7 +71,31 @@ class ProfileRequest(BaseModel):
     papers_published: int           = Field(0, ge=0, description="Self-reported research papers (+0.08 bonus)")
 
 
+class JDMatchRequest(BaseModel):
+    """POST /jd-match request schema"""
+    resume_text: Optional[str] = Field(None, description="Raw resume text. If omitted, pulls stored resume text from recent upload.")
+    jd_text: Optional[str] = Field(None, description="Pasted job description raw text.")
+
+    @field_validator("resume_text", "jd_text")
+    @classmethod
+    def _validate_non_empty(cls, v: Optional[str], info) -> Optional[str]:
+        if v is not None:
+            s = v.strip()
+            if not s or s.lower() == "string":
+                return None
+            return s
+        return v
+
+
 # ── Responses ─────────────────────────────────────────────────────────────────
+
+
+class JDMatchOut(BaseModel):
+    """POST /jd-match response schema"""
+    match_percent: float = Field(..., description="Pairwise cosine similarity match percentage (0-100 scale, 1 decimal)")
+    skill_overlap: list[str] = Field(..., description="Intersection of skills present in both resume and job description")
+    skill_gap: list[str] = Field(..., description="Skills present in job description but missing from resume")
+
 
 
 class JobMatchOut(BaseModel):
@@ -129,6 +153,7 @@ class ExtractDetailedOut(BaseModel):
     # ── Extracted Structured Signals & Project Link Quality ──
     github_url:         Optional[str]  = Field(None, description="Extracted GitHub profile URL")
     linkedin_url:       Optional[str]  = Field(None, description="Extracted LinkedIn profile URL")
+    leetcode_url:       Optional[str]  = Field(None, description="Extracted LeetCode profile URL")
     emails:             list[str]      = Field(default_factory=list, description="Extracted email addresses")
     phone_numbers:      list[str]      = Field(default_factory=list, description="Extracted phone numbers")
     achievements:       list[str]      = Field(default_factory=list, description="Extracted achievements & honors")

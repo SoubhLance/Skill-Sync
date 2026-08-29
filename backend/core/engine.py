@@ -66,16 +66,18 @@ def _encode_bert(
     tokenizer: BertTokenizer,
     model: BertModel,
     device: str,
+    max_length: Optional[int] = None,
 ) -> np.ndarray:
     """
     Encode texts → L2-normalised float32 embeddings of shape (N, 768).
     Mirrors notebook Cell 9 encode_bert() exactly.
     """
+    max_len = max_length if max_length is not None else MAX_LENGTH
     encoded = tokenizer(
         texts,
         padding=True,
         truncation=True,
-        max_length=MAX_LENGTH,
+        max_length=max_len,
         return_tensors="pt",
     ).to(device)
 
@@ -176,6 +178,10 @@ class Engine:
         return cls._instance
 
     # ── public API ───────────────────────────────────────────────────────────
+
+    def encode(self, texts: list[str], max_length: Optional[int] = None) -> np.ndarray:
+        """Encode list of raw text strings into L2-normalized float32 embeddings."""
+        return _encode_bert(texts, self.tokenizer, self.bert, self.device, max_length=max_length)
 
     def recommend(
         self,

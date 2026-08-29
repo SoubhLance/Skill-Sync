@@ -1,239 +1,276 @@
 # SkillSync — Career Intelligence Platform
 
-> **Semantic job matching, profile aggregation, DSA tracking, and AI-powered interview simulation — in one platform.**
+> **Semantic job matching, multi-format OCR resume extraction, multi-platform profile aggregation, and AI-powered career intelligence — built with BERT & FAISS.**
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-2.0.0-green?logo=fastapi)](https://fastapi.tiangolo.com)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch)](https://pytorch.org)
-[![HuggingFace](https://img.shields.io/badge/Transformer-bert--base--uncased-yellow?logo=huggingface)](https://huggingface.co/bert-base-uncased)
-[![FAISS](https://img.shields.io/badge/VectorSearch-FAISS-0055FF)](https://github.com/facebookresearch/faiss)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Implementation & Verification Status](#implementation--verification-status)
-- [Project Directory Structure](#project-directory-structure)
-- [Jupyter Notebook Analysis & Model Evaluation](#jupyter-notebook-analysis--model-evaluation)
-- [Dataset Description](#dataset-description)
-- [NLP Architecture & Blended Scoring](#nlp-architecture--blended-scoring)
-- [Backend API Endpoints](#backend-api-endpoints)
-- [Getting Started & Verification](#getting-started--verification)
-- [Tech Stack](#tech-stack)
-- [Contact](#contact)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-v0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![PyTorch](https://img.shields.io/badge/PyTorch-v2.3.1-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
+[![HuggingFace](https://img.shields.io/badge/BERT-bert--base--uncased-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/bert-base-uncased)
+[![FAISS](https://img.shields.io/badge/FAISS-768--dim%20VectorSearch-0055FF?style=for-the-badge)](https://github.com/facebookresearch/faiss)
+[![OCR](https://img.shields.io/badge/OCR-Tesseract%20%2B%20pdfplumber-22C55E?style=for-the-badge)](https://github.com/tesseract-ocr/tesseract)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 ---
 
-## Overview
+## 📌 Table of Contents
 
-SkillSync is a full-stack career intelligence platform designed for students and early-career professionals. It bridges the gap between a candidate's actual skills and job market expectations using **semantic NLP matching** (BERT + FAISS), multi-platform profile aggregation, and structured preparation tools.
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Implementation & Module Verification Status](#-implementation--module-verification-status)
+- [Project Directory Structure](#-project-directory-structure)
+- [Machine Learning R&D & Benchmarking](#-machine-learning-rd--benchmarking)
+- [Dataset Description](#-dataset-description)
+- [NLP Architecture & Blended Scoring](#-nlp-architecture--blended-scoring)
+- [Backend API Reference](#-backend-api-reference)
+- [Getting Started & Local Verification](#-getting-started--local-verification)
+- [Tech Stack & Dependencies](#-tech-stack--dependencies)
+- [Author & License](#-author--license)
 
 ---
 
-## Implementation & Verification Status
+## 🌐 Overview
+
+**SkillSync** is a full-stack career intelligence platform engineered for students, early-career professionals, and recruiters. It bridges candidate qualifications with job market expectations by combining **dense vector semantic search (BERT + FAISS)**, multi-format resume signal extraction (digital PDFs, scanned document OCR, image uploads), multi-platform coding profile aggregation (GitHub, LeetCode, CodeChef, HackerRank), and detailed skill gap diagnostics.
+
+> [!NOTE]
+> SkillSync goes beyond basic keyword matching. It uses deep transformer embeddings (`bert-base-uncased`) to understand contextual relationships between candidate skills, job roles, and domain requirements.
+
+---
+
+## ✨ Key Features
+
+- 🎯 **Semantic Vector Retrieval**: 768-dimensional FAISS inner-product vector search (`IndexFlatIP`) matching candidate skills with 405+ precomputed job embeddings.
+- 📄 **Multi-Format Resume Signal Parsing**:
+  - **Digital PDFs**: High-speed text and embedded hyperlink extraction (`mailto:`, GitHub, LinkedIn, live demo links) via `pdfplumber`.
+  - **Scanned PDFs & Photos**: Robust OCR processing pipeline using `pdf2image` and `pytesseract` for scanned documents or image uploads (PNG/JPG/WEBP).
+- 🔗 **Project Link Quality Analysis**: Automatically evaluates candidate project links for repository quality (`good` vs `bad` link status) and provides actionable feedback.
+- 📊 **Multi-Platform Profile Aggregation**: Automatically fetches stats from GitHub, LeetCode, CodeChef, and HackerRank to calculate a unified candidate **Profile Score**.
+- 🧮 **Blended Recommendation Scoring**: Combines semantic skill similarity ($60\%$) with candidate profile metrics ($40\%$) to rank matches accurately.
+- 🔍 **Skill Gap Diagnostics**: Provides line-item analysis of candidate skill overlaps, missing skills, and overall percentage readiness per job match.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Candidate Inputs
+        A1[Digital PDF Resume] -->|pdfplumber| B1[Hyperlinks & Text Layer]
+        A2[Scanned PDF / Image] -->|pdf2image + Tesseract OCR| B2[Extracted Text]
+        A3[Raw Text / Skills] --> B3[Skill Tokenizer]
+    end
+
+    subgraph Skill Extraction & Profile Scoring
+        B1 & B2 & B3 --> C1[Canonical Skill Extractor]
+        C1 -->|Skill Vocabulary Mapping| D1[Candidate Skill Vector]
+        
+        P1[GitHub / LeetCode / CodeChef Stats] -->|Aggregator| P2[Profile Score 0.0 - 1.0]
+    end
+
+    subgraph BERT + FAISS Search Engine
+        D1 -->|bert-base-uncased| E1[768-dim Embedding]
+        E1 -->|Inner Product Cosine Sim| F1[FAISS Index 405 Jobs]
+        F1 -->|Top-K Matches| G1[Semantic Sim Score 0.0 - 1.0]
+    end
+
+    subgraph Recommendation Pipeline
+        G1 & P2 --> H1["Blended Score = 0.60(Semantic) + 0.40(Profile)"]
+        H1 --> I1[Skill Gap & Overlap Analysis]
+        I1 --> J1[Ranked Job Matches JSON Response]
+    end
+```
+
+---
+
+## 📋 Implementation & Module Verification Status
 
 | Module | Sub-component | Status | Implementation Details |
-|--------|--------------|--------|------------------------|
+| :--- | :--- | :---: | :--- |
 | **Data Pipeline** | Dataset Preprocessing | ✅ **Completed** | Cleaned 415 raw job postings → 405 unique rows (`jobs_clean.csv`). Applied alias expansion, IQR salary Winsorisation, and experience mapping. |
-| **ML Engine** | Model Evaluation | ✅ **Completed** | Evaluated `bert-base-uncased` vs `all-MiniLM-L6-v2` across MRR, Hit@5, Precision@5, and Intra-Domain Similarity. `bert-base-uncased` selected as winner. |
-| **Vector Index** | FAISS Indexing | ✅ **Completed** | Built 768-dimensional `IndexFlatIP` vector index containing 405 precomputed job embeddings saved at `ml/notebooks/ml/embeddings/faiss_index.bin`. |
-| **Model Testing** | Notebook Validation Suite | ✅ **Completed** | 12-test suite (`T1`–`T8`) verifying single skill, multi-skill, noisy input, domain filtering, and edge cases. All assertions passing. |
-| **Backend API** | FastAPI Service (`v2.0.0`) | ✅ **Completed** | Production-ready FastAPI app (`backend/main.py`) with singleton engine, CORS middleware, PDF resume parser, skill extractor, and recommendation endpoints. |
-| **Frontend UI** | React + TypeScript App | ⏳ *Planned* | Directory created (`frontend/`). UI components for resume upload, job match breakdown, and skill gap visualization to be built. |
-| **Documentation** | Technical Reports & Specs | ⏳ *In Progress* | Base OpenAPI schemas generated via FastAPI (`/docs`); formal documentation in `docs/` pending final UI integration. |
+| **ML Engine** | Model Evaluation | ✅ **Completed** | Benchmarked `bert-base-uncased` vs `all-MiniLM-L6-v2`. `bert-base-uncased` selected as production winner (MRR: `0.8579`, P@5: `0.7022`). |
+| **Vector Index** | FAISS Indexing | ✅ **Completed** | 768-dimensional `IndexFlatIP` vector index containing 405 job embeddings saved at `ml/notebooks/ml/embeddings/faiss_index.bin`. |
+| **Resume & OCR** | Multi-Format Parser | ✅ **Completed** | Digital PDF link parsing (`pdfplumber`) + OCR fallback (`pytesseract`) + project link quality validator (`backend/core/resume_ocr.py`). |
+| **Backend API** | FastAPI Service (`v2.0.0`) | ✅ **Completed** | Production FastAPI app (`backend/main.py`) with singleton engine, CORS middleware, Pydantic v2 schemas, and health checks. |
+| **Validation Suite**| Notebook Test Suite | ✅ **Completed** | 12-test suite (`T1`–`T8`) verifying single skill, multi-skill, noisy input, domain filtering, and edge cases. All assertions passing. |
+| **Frontend UI** | React + TypeScript App | ⏳ *Planned* | Frontend structure initiated (`frontend/`). UI components for resume upload and interactive match breakdown to be finalized. |
 
 ---
 
-## Project Directory Structure
+## 📁 Project Directory Structure
 
 ```
 Skill-Sync/
 ├── backend/
 │   ├── core/
 │   │   ├── __init__.py
-│   │   ├── engine.py              # Singleton loading BERT model, FAISS index & candidate matching logic
-│   │   └── extractor.py           # Skill vocabulary (100+ canonical skills), alias mapper & section-aware extractor
+│   │   ├── engine.py              # Singleton loading BERT model, FAISS index & matching logic
+│   │   ├── extractor.py           # Skill vocabulary (100+ canonical skills) & section-aware parser
+│   │   ├── profile_extractor.py   # Aggregates stats from GitHub, LeetCode, CodeChef, HackerRank
+│   │   └── resume_ocr.py          # PDF text/hyperlink extraction & Tesseract OCR for scanned docs
 │   ├── models/
 │   │   ├── __init__.py
 │   │   └── schemas.py             # Pydantic v2 schemas for requests, responses & health status
 │   ├── routes/
 │   │   ├── __init__.py
-│   │   └── recommend.py           # Endpoints for /recommend, /recommend/resume, /recommend/pdf, /extract-skills, /recommend/jobs
-│   ├── main.py                    # FastAPI application entry point, CORS, lifespan startup & exception handlers
+│   │   └── recommend.py           # REST endpoints for recommendations, OCR, skill extraction & filtering
+│   ├── main.py                    # FastAPI app entry point, CORS, lifespan startup & error handlers
 │   └── requirements.txt           # Python backend dependencies
 ├── ml/
 │   ├── datasets/
-│   │   ├── jobs_clean.csv         # Cleaned & preprocessed dataset (405 job postings)
-│   │   ├── preprocess.md          # Data preprocessing specification documentation
-│   │   ├── preprocess.py          # 9-step automated dataset cleaning pipeline script
-│   │   └── skillsync_final_dataset.csv # Raw job dataset (415 records across 14 domains)
+│   │   ├── jobs_clean.csv         # Preprocessed dataset (405 job postings)
+│   │   ├── preprocess.md          # Preprocessing specification document
+│   │   ├── preprocess.py          # 9-step dataset cleaning pipeline script
+│   │   └── skillsync_final_dataset.csv # Raw dataset (415 records across 14 domains)
 │   └── notebooks/
-│       ├── ml/
-│       │   └── embeddings/        # Saved model artifacts
-│       │       ├── faiss_index.bin      # FAISS vector index (405 vectors x 768 dim)
-│       │       ├── job_embeddings.npy   # Precomputed NumPy embedding matrix
-│       │       ├── job_metadata.json    # Serialized job metadata dictionary
-│       │       └── model_info.json      # Model metadata (BERT 768-dim config)
-│       └── skillsync_model.ipynb  # Main ML notebook: data loading, BERT vs MiniLM evaluation, FAISS build, 12-test suite
-├── docs/                          # Project documentation directory
-├── frontend/                      # Frontend UI application directory
-├── .gitignore                     # Git ignore file
-└── README.md                      # Project documentation and status verification report
+│       ├── ml/embeddings/         # Saved model artifacts
+│       │   ├── faiss_index.bin    # FAISS vector index (405 vectors x 768 dimensions)
+│       │   ├── job_embeddings.npy # Precomputed NumPy embedding matrix
+│       │   ├── job_metadata.json  # Serialized job metadata dictionary
+│       │   └── model_info.json    # Model metadata & configuration
+│       └── skillsync_model.ipynb  # R&D notebook: evaluation, FAISS indexing & 12-test validation suite
+├── docs/                          # Technical specifications and API documentations
+├── frontend/                      # React + TypeScript frontend codebase
+├── .env.example                   # Environment configuration template
+├── .gitignore                     # Git ignore rules
+└── README.md                      # Project documentation and system architecture guide
 ```
 
 ---
 
-## Jupyter Notebook Analysis & Model Evaluation
+## 🧪 Machine Learning R&D & Benchmarking
 
-The notebook `ml/notebooks/skillsync_model.ipynb` contains the full machine learning R&D, model comparison, vector index construction, and validation suite.
+The notebook [`ml/notebooks/skillsync_model.ipynb`](file:///d:/Skill-Sync/ml/notebooks/skillsync_model.ipynb) documents model architecture selection, vector index construction, and validation.
 
-### Model Benchmarking Results
+### Model Benchmarking Comparison
 
-Two transformer architectures were benchmarked on the 405-job dataset:
-1. **Model A:** `bert-base-uncased` with mean-pooling over non-padding tokens (768 dimensions).
-2. **Model B:** `all-MiniLM-L6-v2` with default sentence-transformers pooling (384 dimensions).
+Two transformer models were evaluated on the 405-job dataset:
+1. **Model A (`bert-base-uncased`):** Mean-pooling over non-padding tokens (768 dimensions).
+2. **Model B (`all-MiniLM-L6-v2`):** Default sentence-transformers pooling (384 dimensions).
 
 | Metric | Model A (`bert-base-uncased`) | Model B (`all-MiniLM-L6-v2`) | Winner / Advantage |
-|--------|-------------------------------|------------------------------|--------------------|
-| **Mean Reciprocal Rank (MRR)** | **0.8579** | 0.7972 | 🏆 BERT (+7.6%) |
-| **Hit Rate @ K=5** | **0.9358** | 0.9284 | 🏆 BERT (+0.8%) |
-| **Precision @ K=5 (P@5)** | **0.7022** | 0.6533 | 🏆 BERT (+7.5%) |
-| **Intra-Domain Cosine Similarity** | **0.9321** | 0.8845 | 🏆 BERT (Higher domain coherence) |
-| **Embedding Dimensions** | 768 | 384 | MiniLM (Smaller vector footprint) |
-| **Encoding Speed (CPU)** | 45.5 docs/sec | 338.3 docs/sec | MiniLM (Faster batch encoding) |
+| :--- | :---: | :---: | :--- |
+| **Mean Reciprocal Rank (MRR)** | **0.8579** | 0.7972 | 🏆 **BERT (+7.6%)** |
+| **Hit Rate @ K=5** | **0.9358** | 0.9284 | 🏆 **BERT (+0.8%)** |
+| **Precision @ K=5 (P@5)** | **0.7022** | 0.6533 | 🏆 **BERT (+7.5%)** |
+| **Intra-Domain Cosine Similarity** | **0.9321** | 0.8845 | 🏆 **BERT (Higher domain coherence)** |
+| **Embedding Dimensions** | 768 | 384 | MiniLM (Smaller vector size) |
+| **Encoding Speed (CPU)** | 45.5 docs/sec | 338.3 docs/sec | MiniLM (Faster encoding) |
 
-**Conclusion:** `bert-base-uncased` significantly outperformed MiniLM in retrieval accuracy (MRR & P@5) and semantic domain coherence. Since dataset retrieval precision is critical for job recommendations, **BERT was selected as the production model**.
-
-### FAISS Indexing & Validation Suite
-
-- **Index Type:** `faiss.IndexFlatIP` wrapped with `faiss.IndexIDMap` (Inner Product on L2-normalized vectors = Cosine Similarity).
-- **Indexed Vectors:** 405 vectors of size 768.
-- **Testing Suite:** 12 automated test cases (`T1` through `T8`) executed in Cell 35–47 covering:
-  - `T1`: Single-skill query precision
-  - `T2`: Multi-skill complex query parsing
-  - `T3`: Noisy / conversational input resilience
-  - `T4`: Empty / gibberish handling (graceful degradation)
-  - `T5`: Cross-domain queries
-  - `T6`: Out-of-vocabulary skill extraction
-  - `T7`: Salary filter & experience mapping constraints
-  - `T8`: Strict domain filtering assertions (100% pass)
+> [!IMPORTANT]
+> **Decision**: `bert-base-uncased` significantly outperformed MiniLM in retrieval accuracy (MRR & P@5) and semantic domain coherence. Since recommendation quality is paramount, **BERT 768-dim was selected as the production model**.
 
 ---
 
-## Dataset Description
+## 📊 Dataset Description
 
-- **Source File:** `ml/datasets/skillsync_final_dataset.csv`
-- **Cleaned Dataset:** `ml/datasets/jobs_clean.csv` (405 rows)
+- **Raw Dataset**: `ml/datasets/skillsync_final_dataset.csv` (415 records)
+- **Cleaned Production Dataset**: `ml/datasets/jobs_clean.csv` (405 records across 14 domain categories)
 
-### Key Fields & Schema
+### Key Schema Fields
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `Job_ID` | `int` | Unique job identifier |
+| Column Name | Type | Description |
+| :--- | :--- | :--- |
+| `Job_ID` | `int` | Unique job record identifier |
 | `Job_Role` | `str` | Title-cased job title |
-| `Skills` | `str` | Comma-separated list of required skills |
+| `Skills` | `str` | Raw comma-separated skill requirements |
 | `Skills_Normalised` | `str` | Alias-expanded, canonical skill string |
 | `Domain` | `str` | 14 domains (`Technical`, `Finance`, `Medical`, `Research`, etc.) |
-| `Experience_Level` | `float` | `0.0` (Beginner/Intern), `1.0` (Entry), `2.0` (Mid), `3.0` (Senior) |
-| `Experience_Label` | `str` | Human-readable experience band |
-| `Salary_Min` / `Salary_Max` / `Salary_Avg` | `int` | Salary in USD (Winsorised via IQR bounds) |
-| `Has_Salary_Data` | `bool` | Flag indicating non-zero salary record |
-| `Embedding_Text` | `str` | Pre-constructed text block encoded into SBERT embeddings |
+| `Experience_Level` | `float` | `0.0` (Intern/Beginner), `1.0` (Entry), `2.0` (Mid), `3.0` (Senior) |
+| `Salary_Min` / `Salary_Max` / `Salary_Avg` | `int` | USD Salary (IQR Winsorised) |
+| `Embedding_Text` | `str` | Structured text representation encoded into vector space |
 
 ---
 
-## NLP Architecture & Blended Scoring
+## 📐 NLP Architecture & Blended Scoring
 
-### Blended Recommendation Formula
+### Recommendation Scoring Formula
 
-Recommendation ranking combines semantic similarity with candidate readiness scores:
+To produce balanced job recommendations, candidate scores are calculated using a blended formula:
 
 $$\text{Blended Score} = 0.60 \times \text{Semantic Sim} + 0.40 \times \text{Profile Score}$$
 
-- **Semantic Sim ($0.60$):** Cosine similarity between candidate skill vector and indexed job vector via BERT + FAISS.
-- **Profile Score ($0.40$):** Candidate readiness score aggregated across GitHub, LeetCode, CodeChef, and HackerRank (including hackathon & publication bonuses).
-
-
-### Skill Gap Analysis
-
-For every retrieved job match, the engine returns:
-- `skill_overlap`: List of skills the candidate possesses that the job requires.
-- `skill_gap`: List of missing skills required by the job role.
-- `match_pct`: Percentage ratio of candidate skills vs required job skills.
+- **Semantic Similarity ($60\%$ weight):** L2-normalized Inner Product Cosine Similarity between candidate vector and indexed FAISS job vectors.
+- **Profile Score ($40\%$ weight):** Aggregated readiness score from GitHub activity, LeetCode problem breakdown, CodeChef rating, and HackerRank badges.
 
 ---
 
-## Backend API Endpoints
+## 🔌 Backend API Reference
 
-FastAPI server runs on `http://localhost:8000`. Interactive documentation is available at `/docs`.
+The FastAPI backend runs on `http://localhost:8000`. Interactive OpenAPI documentation is accessible at `http://localhost:8000/docs`.
 
-### Key Endpoints
+### Primary Endpoints
 
-| Method | Path | Summary / Description |
-|--------|------|-----------------------|
-| `GET` | `/health` | Server status, loaded model ID, dimensions, and total jobs indexed |
-| `POST` | `/recommend` | Pass comma-separated skill string & weights → ranked job matches |
-| `POST` | `/recommend/resume` | Paste raw resume text → auto-extract skills → ranked job matches |
-| `POST` | `/recommend/pdf` | Upload PDF resume file → auto-extract skills via `pdfplumber` → ranked job matches |
-| `POST` | `/extract-skills` | Extract canonical skills from text (`primary_skills` vs `secondary_skills`) |
-| `POST` | `/extract-skills/pdf` | Extract skills directly from uploaded PDF resume |
-| `POST` | `/extract-profile` | Extract GitHub, LeetCode, CodeChef, HackerRank stats & compute `profile_score` |
-| `GET` | `/recommend/jobs` | Browse and filter all 405 indexed jobs by domain, experience level, or search keyword |
-| `GET` | `/recommend/domains` | Get list of available domain filter categories |
+| Method | Path | Description |
+| :---: | :--- | :--- |
+| `GET` | `/health` | Server readiness status, loaded model ID, dimensions, and indexed job count |
+| `POST` | `/recommend` | Direct skill string query → Ranked job recommendations |
+| `POST` | `/recommend/resume` | Raw text resume string → Auto-extract skills → Ranked job recommendations |
+| `POST` | `/recommend/pdf` | PDF/Image file upload → PDF text/OCR extraction → Ranked job matches |
+| `POST` | `/extract-skills` | Extract canonical skills from text (returns `primary_skills` and `secondary_skills`) |
+| `POST` | `/extract-skills/pdf` | Upload PDF/Image → Extract canonical skills and structural metadata |
+| `POST` | `/extract-profile` | Fetch GitHub/LeetCode/CodeChef/HackerRank stats & calculate `profile_score` |
+| `GET` | `/recommend/jobs` | Search & filter 405 indexed jobs by keyword, domain, or experience level |
+| `GET` | `/recommend/domains` | Retrieve all available domain category filters |
 
 ---
 
-## Getting Started & Verification
+## 🚀 Getting Started & Local Verification
 
 ### 1. Prerequisites
-
-- Python 3.11+
-- Virtual environment (`venv`)
+- Python 3.11 or higher
+- Git & virtualenv (`venv` or `conda`)
 
 ### 2. Environment Setup
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/soubhlance/skillsync.git
 cd Skill-Sync
 
 # Create and activate virtual environment
 python -m venv venv
-venv\Scripts\activate       # On Linux/macOS: source venv/bin/activate
+
+# Windows PowerShell:
+venv\Scripts\activate
+
+# Linux / macOS:
+source venv/bin/activate
 
 # Install dependencies
 pip install -r backend/requirements.txt
 ```
 
-### 3. Run Preprocessing & Index Generation (Optional / Verification)
+### 3. Launching the Backend Server
 
-The dataset and FAISS vector index are pre-built. To re-run the pipeline:
+Depending on your current shell working directory, execute:
 
-```bash
-# Re-run dataset preprocessing
-python ml/datasets/preprocess.py
-
-# Re-run notebook or verify index generation in ml/notebooks/skillsync_model.ipynb
-```
-
-### 4. Launch FastAPI Server
-
-```bash
+#### Option A: From the project root (`Skill-Sync/`)
+```powershell
 uvicorn backend.main:app --reload --port 8000
 ```
 
-- **Swagger UI:** `http://localhost:8000/docs`
-- **Health Check:** `http://localhost:8000/health`
+#### Option B: From the `backend/` folder (`Skill-Sync/backend/`)
+```powershell
+cd backend
+uvicorn main:app --reload --port 8000
+```
 
-### 5. Verify Health Endpoint
+> [!TIP]
+> The server warms up the BERT model and FAISS vector index during startup. Once ready, you'll see:
+> `[SkillSync] Ready [OK] (405 jobs, device=cpu)`
+
+---
+
+### 4. Verify Server Health
+
+You can verify the backend status using `curl` or opening `http://localhost:8000/health` in your browser:
 
 ```bash
 curl http://localhost:8000/health
 ```
 
-**Expected Response:**
+**Expected JSON Output:**
 ```json
 {
   "status": "ok",
@@ -247,16 +284,17 @@ curl http://localhost:8000/health
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack & Dependencies
 
-- **ML & NLP:** PyTorch, Transformers (`bert-base-uncased`), FAISS (`faiss-cpu`), scikit-learn, pandas, numpy
-- **Backend:** FastAPI, Pydantic v2, Uvicorn, pdfplumber, PyMuPDF
-- **Frontend (Planned):** React, TypeScript, Tailwind CSS
-- **Dataset:** 405 curated job postings across 14 technical and non-technical domains
+- **Machine Learning & NLP**: PyTorch, HuggingFace Transformers (`bert-base-uncased`), FAISS (`faiss-cpu`), Scikit-Learn, Pandas, NumPy
+- **OCR & Document Processing**: Tesseract OCR (`pytesseract`), `pdfplumber`, `pdf2image`, Pillow
+- **Backend Infrastructure**: FastAPI, Pydantic v2, Uvicorn, Python-Dotenv
+- **Frontend Stack (Planned)**: React 18, TypeScript, Vite, Tailwind CSS
 
 ---
 
-## Contact
+## 👤 Author & License
 
-- **Author:** SoubhLance
-- **Repository:** [Skill-Sync](https://github.com/soubhlance/skillsync)
+- **Author**: SoubhLance
+- **Repository**: [Skill-Sync](https://github.com/soubhlance/skillsync)
+- **License**: Released under the [MIT License](LICENSE).
