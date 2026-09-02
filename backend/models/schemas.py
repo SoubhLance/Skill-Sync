@@ -67,6 +67,7 @@ class ProfileRequest(BaseModel):
     leetcode:         Optional[str] = Field(None, description="LeetCode username", example="tourist")
     codechef:         Optional[str] = Field(None, description="CodeChef username", example="tourist")
     hackerrank:       Optional[str] = Field(None, description="HackerRank username", example="tourist")
+    portfolio_url:    Optional[str] = Field(None, description="Candidate portfolio website link", example="https://myportfolio.dev")
     hackathon_wins:   int           = Field(0, ge=0, description="Self-reported hackathon wins (+0.05 bonus)")
     papers_published: int           = Field(0, ge=0, description="Self-reported research papers (+0.08 bonus)")
 
@@ -169,6 +170,7 @@ class ProfileOut(BaseModel):
     leetcode:         Optional[dict] = Field(None, description="LeetCode stats or null if failed/not provided")
     codechef:         Optional[dict] = Field(None, description="CodeChef stats or null if failed/not provided")
     hackerrank:       Optional[dict] = Field(None, description="HackerRank stats or null if failed/not provided")
+    portfolio:        Optional[dict] = Field(None, description="Portfolio link details and bonus applied")
     profile_score:    float          = Field(..., description="Normalized profile readiness score in [0.0, 1.0]")
     base_score:       float          = Field(0.0, description="Base score prior to self-reported bonuses")
     bonus_applied:    dict           = Field(default_factory=dict, description="Bonuses applied (self_reported: True)")

@@ -127,6 +127,9 @@ async def _global_exc(request: Request, exc: Exception):
 from backend.routes.recommend import router as rec_router
 app.include_router(rec_router)
 
+from backend.core.api import router as linkedin_router
+app.include_router(linkedin_router, prefix="/api/optimizer")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Health check

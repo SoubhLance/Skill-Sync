@@ -14,6 +14,7 @@ numpy==1.26.4
 
 # ── PDF & OCR parsing ─────────────────────────────────────────────────────────
 pdfplumber==0.11.4             # used by /recommend/pdf
+pymupdf>=1.24.0                # PyMuPDF fitz used by LinkedIn Optimizer
 pytesseract>=0.3.10            # Tesseract OCR wrapper
 pdf2image>=1.16                # PDF page rasterisation for OCR
 Pillow>=10.0                   # Image loading & pre-processing

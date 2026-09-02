@@ -47,7 +47,12 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 text-xs font-mono">
-          <span className="text-[var(--text-muted)]">handle: <strong className="text-[var(--text-main)]">@{username}</strong></span>
+          <span className="text-[var(--text-muted)]">
+            handle: <strong className="text-[var(--text-main)]">@{username}</strong>
+            <span className="ml-1.5 text-[9px] font-mono font-bold text-[var(--text-muted)] bg-[var(--bg-paper)] border border-[var(--border-hairline)] px-1.5 py-0.5 rounded-sm uppercase tracking-wider align-middle">
+              demo data
+            </span>
+          </span>
           <span className="font-mono text-xs font-bold text-[#1A7F37] bg-[#DAFBE1] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] px-2.5 py-1 border border-[#2DA44E]/30 rounded-[2px]">
             +{(readinessScore * 100).toFixed(0)}% ready
           </span>
@@ -68,6 +73,9 @@ export const DashboardPage: React.FC = () => {
           <p className="text-[11px] font-sans text-[var(--text-muted)]">
             Blended semantic cosine + DSA signal
           </p>
+          <span className="inline-block text-[9px] font-mono font-bold text-[var(--text-muted)] bg-[var(--bg-paper)] border border-[var(--border-hairline)] px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
+            demo data
+          </span>
         </div>
 
         {/* KPI 2: Resume Signal */}
@@ -160,6 +168,21 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <p className="text-[11px] font-sans text-[var(--text-muted)]">
                   Access student skill-building or working pro advancement roadmaps.
+                </p>
+              </Link>
+
+              <Link
+                to="/optimizer"
+                className="p-5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-2 hover:border-[var(--accent-color)] transition-colors group block"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-sm text-[var(--text-main)] font-sans group-hover:text-[var(--accent-color)] transition-colors">
+                    Optimize LinkedIn Profile
+                  </span>
+                  <FileCheck2 className="w-4 h-4 text-[var(--accent-color)]" />
+                </div>
+                <p className="text-[11px] font-sans text-[var(--text-muted)]">
+                  Upload your LinkedIn PDF export for live scoring, keyword gaps, and section analysis.
                 </p>
               </Link>
             </div>

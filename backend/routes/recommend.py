@@ -355,6 +355,7 @@ async def extract_profile_endpoint(body: ProfileRequest):
             leetcode=lc,
             codechef=cc,
             hackerrank=hr,
+            portfolio_url=body.portfolio_url,
             hackathon_wins=body.hackathon_wins,
             papers_published=body.papers_published,
             return_details=True,
@@ -365,12 +366,14 @@ async def extract_profile_endpoint(body: ProfileRequest):
         if lc: active.append("leetcode")
         if cc: active.append("codechef")
         if hr: active.append("hackerrank")
+        if score_res.get("portfolio", {}).get("has_portfolio"): active.append("portfolio")
 
         return ProfileOut(
             github=gh,
             leetcode=lc,
             codechef=cc,
             hackerrank=hr,
+            portfolio=score_res.get("portfolio"),
             profile_score=score_res["profile_score"],
             base_score=score_res["base_score"],
             bonus_applied=score_res["bonus_applied"],

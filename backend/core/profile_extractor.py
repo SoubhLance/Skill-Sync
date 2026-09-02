@@ -215,6 +215,8 @@ def fetch_github_stats(username: str) -> dict[str, Any] | None:
         user_data = user_resp.json()
 
         public_repos = int(user_data.get("public_repos", 0))
+        followers = int(user_data.get("followers", 0))
+        following = int(user_data.get("following", 0))
         created_at_str = user_data.get("created_at")
         account_age_years = 0.0
         if created_at_str:
@@ -254,6 +256,8 @@ def fetch_github_stats(username: str) -> dict[str, Any] | None:
 
         return {
             "public_repos": public_repos,
+            "followers": followers,
+            "following": following,
             "total_stars": total_stars,
             "top_3_languages": top_3_languages,
             "account_age_years": account_age_years,
@@ -297,6 +301,9 @@ def fetch_leetcode_stats(username: str) -> dict[str, Any] | None:
     query getUserProfile($username: String!) {
       matchedUser(username: $username) {
         username
+        profile {
+          ranking
+        }
         submitStats: submitStatsGlobal {
           acSubmissionNum {
             difficulty
@@ -307,6 +314,7 @@ def fetch_leetcode_stats(username: str) -> dict[str, Any] | None:
       userContestRanking(username: $username) {
         rating
         globalRanking
+        attendedContestsCount
       }
     }
     """
@@ -326,6 +334,7 @@ def fetch_leetcode_stats(username: str) -> dict[str, Any] | None:
             logger.warning("LeetCode user '%s' not found or matchedUser is null", username)
             return None
 
+        ranking = matched_user.get("profile", {}).get("ranking")
         submit_stats = matched_user.get("submitStats", {}).get("acSubmissionNum", [])
         solved_map: dict[str, int] = {}
         for item in submit_stats:
@@ -340,17 +349,31 @@ def fetch_leetcode_stats(username: str) -> dict[str, Any] | None:
 
         contest_ranking = data.get("data", {}).get("userContestRanking")
         contest_rating: float | None = None
+        contest_global_rank: int | None = None
+        contests_attended: int = 0
         if contest_ranking and isinstance(contest_ranking, dict):
             raw_rating = contest_ranking.get("rating")
             if raw_rating is not None:
                 contest_rating = round(float(raw_rating), 1)
+            raw_global = contest_ranking.get("globalRanking")
+            if raw_global is not None:
+                contest_global_rank = int(raw_global)
+            raw_contests = contest_ranking.get("attendedContestsCount")
+            if raw_contests is not None:
+                contests_attended = int(raw_contests)
+
+        has_cp = bool((contest_rating and contest_rating > 0) or contests_attended > 0)
 
         return {
             "total_solved": total_solved,
             "easy_solved": easy_solved,
             "medium_solved": medium_solved,
             "hard_solved": hard_solved,
+            "ranking": ranking,
             "contest_rating": contest_rating,
+            "contest_global_rank": contest_global_rank,
+            "contests_attended": contests_attended,
+            "has_cp_signal": has_cp,
         }
 
     except Exception as exc:
@@ -422,7 +445,20 @@ def fetch_codechef_stats(username: str) -> dict[str, Any] | None:
             if m:
                 highest_rating = int(m.group(1))
 
-        # 4. Problems solved — works for both rated and unrated users
+        # 4. Ranks & CP Signals
+        global_rank: int | None = None
+        country_rank: int | None = None
+        ranks_section = soup.select_one(".rating-ranks")
+        if ranks_section:
+            links = ranks_section.select("a strong")
+            if len(links) >= 1:
+                m_g = re.search(r"\d+", links[0].text.replace(",", ""))
+                if m_g: global_rank = int(m_g.group(0))
+            if len(links) >= 2:
+                m_c = re.search(r"\d+", links[1].text.replace(",", ""))
+                if m_c: country_rank = int(m_c.group(0))
+
+        # 5. Problems solved — works for both rated and unrated users
         problems_solved = 0
         ps_sections = soup.select(".rating-data-section.problems-solved")
         for section in ps_sections:
@@ -431,19 +467,22 @@ def fetch_codechef_stats(username: str) -> dict[str, Any] | None:
                 problems_solved = int(total_match.group(1))
                 break
 
-        # If we got nothing at all, the user page may be empty/invalid
         if rating is None and problems_solved == 0:
-            # Check if the page is a valid user page at all
             user_details = soup.select_one(".user-details-container, .user-details")
             if not user_details:
                 logger.warning("CodeChef page for '%s' has no recognizable user data", username)
                 return None
+
+        has_cp = bool((rating and rating > 0) or (stars_count and stars_count > 0))
 
         return {
             "rating": rating,
             "stars_count": stars_count,
             "problems_solved": problems_solved,
             "highest_rating": highest_rating,
+            "global_rank": global_rank,
+            "country_rank": country_rank,
+            "has_cp_signal": has_cp,
         }
 
     except Exception as exc:
@@ -458,13 +497,6 @@ def fetch_codechef_stats(username: str) -> dict[str, Any] | None:
 def fetch_hackerrank_stats(username: str) -> dict[str, Any] | None:
     """
     Fetch HackerRank badge count & problem solving activity.
-
-    Access Method: Internal REST API (https://www.hackerrank.com/rest/hackers/{username}/badges)
-    Falls back to HTML page inspection if REST returns empty data.
-
-    Returns:
-        Dict with badges (list of names), badges_count, problems_solved,
-        or None on failure.
     """
     if not username or not username.strip():
         return None
@@ -494,7 +526,6 @@ def fetch_hackerrank_stats(username: str) -> dict[str, Any] | None:
                     if isinstance(solved, int):
                         problems_solved += solved
 
-        # Fallback: HTML page embedded JSON
         if not badges and problems_solved == 0:
             profile_url = f"https://www.hackerrank.com/{username}"
             profile_resp = requests.get(
@@ -514,10 +545,17 @@ def fetch_hackerrank_stats(username: str) -> dict[str, Any] | None:
                     except Exception:
                         pass
 
+        has_cp = any(
+            kw in str(b).lower()
+            for b in badges
+            for kw in ["problem solving", "algorithm", "data structure", "c++", "cpp", "python"]
+        ) or (problems_solved >= 20)
+
         return {
             "badges": badges,
             "badges_count": len(badges),
             "problems_solved": problems_solved,
+            "has_cp_signal": has_cp,
         }
 
     except Exception as exc:
@@ -534,10 +572,111 @@ def compute_profile_score(
     leetcode: dict[str, Any] | None = None,
     codechef: dict[str, Any] | None = None,
     hackerrank: dict[str, Any] | None = None,
+    portfolio_url: str | None = None,
     hackathon_wins: int = 0,
     papers_published: int = 0,
     return_details: bool = False,
 ) -> float | dict[str, Any]:
+    """
+    Compute a normalized profile_score in [0.0, 1.0] from platform statistics
+    plus capped additive bonuses for self-reported achievements and portfolio link.
+    """
+    platform_scores: dict[str, float] = {}
+
+    # ── GitHub sub-score ──
+    if github and isinstance(github, dict):
+        r = REFERENCE_RANGES["github"]
+        s_repos = _min_max_normalize(float(github.get("public_repos", 0)), *r["public_repos"])
+        s_stars = _min_max_normalize(float(github.get("total_stars", 0)), *r["total_stars"])
+        s_age = _min_max_normalize(float(github.get("account_age_years", 0)), *r["account_age_years"])
+        s_pinned = _min_max_normalize(float(github.get("pinned_with_desc", 0)), *r["pinned_with_desc"])
+
+        gh_score = 0.30 * s_pinned + 0.25 * s_stars + 0.25 * s_repos + 0.20 * s_age
+        platform_scores["github"] = max(0.0, min(1.0, gh_score))
+
+    # ── LeetCode sub-score ──
+    if leetcode and isinstance(leetcode, dict):
+        r = REFERENCE_RANGES["leetcode"]
+        s_total = _min_max_normalize(float(leetcode.get("total_solved", 0)), *r["total_solved"])
+        s_medium = _min_max_normalize(float(leetcode.get("medium_solved", 0)), *r["medium_solved"])
+        s_hard = _min_max_normalize(float(leetcode.get("hard_solved", 0)), *r["hard_solved"])
+        rating = leetcode.get("contest_rating")
+
+        if rating is not None and float(rating) > 0:
+            s_rating = _min_max_normalize(float(rating), *r["contest_rating"])
+            lc_score = 0.30 * s_total + 0.25 * s_medium + 0.20 * s_hard + 0.25 * s_rating
+        else:
+            lc_score = 0.40 * s_total + 0.35 * s_medium + 0.25 * s_hard
+        platform_scores["leetcode"] = max(0.0, min(1.0, lc_score))
+
+    # ── CodeChef sub-score ──
+    if codechef and isinstance(codechef, dict):
+        r = REFERENCE_RANGES["codechef"]
+        s_problems = _min_max_normalize(float(codechef.get("problems_solved", 0)), *r["problems_solved"])
+
+        rating = codechef.get("rating")
+        stars = codechef.get("stars_count")
+
+        if rating is not None and int(rating) > 0:
+            s_rating = _min_max_normalize(float(rating), *r["rating"])
+            s_stars = _min_max_normalize(float(stars or 0), *r["stars_count"])
+            cc_score = 0.40 * s_rating + 0.25 * s_stars + 0.35 * s_problems
+        else:
+            cc_score = s_problems
+        platform_scores["codechef"] = max(0.0, min(1.0, cc_score))
+
+    # ── HackerRank sub-score ──
+    if hackerrank and isinstance(hackerrank, dict):
+        r = REFERENCE_RANGES["hackerrank"]
+        s_badges = _min_max_normalize(float(hackerrank.get("badges_count", 0)), *r["badges_count"])
+        s_probs = _min_max_normalize(float(hackerrank.get("problems_solved", 0)), *r["problems_solved"])
+        hr_score = 0.45 * s_badges + 0.55 * s_probs
+        platform_scores["hackerrank"] = max(0.0, min(1.0, hr_score))
+
+    # Proportional reweighting among available platforms
+    if not platform_scores:
+        base_score = 0.0
+    else:
+        total_base_weight = sum(PLATFORM_WEIGHTS[p] for p in platform_scores)
+        if total_base_weight <= 0:
+            base_score = 0.0
+        else:
+            base_score = sum(
+                platform_scores[p] * (PLATFORM_WEIGHTS[p] / total_base_weight)
+                for p in platform_scores
+            )
+
+    # ── Additive Capped Bonuses ──
+    hackathon_bonus = 0.05 if hackathon_wins > 0 else 0.0
+    paper_bonus = 0.08 if papers_published > 0 else 0.0
+    has_portfolio_link = bool(portfolio_url and isinstance(portfolio_url, str) and len(portfolio_url.strip()) > 3)
+    portfolio_bonus = 0.03 if has_portfolio_link else 0.0
+
+    portfolio_info = {
+        "url": portfolio_url.strip() if has_portfolio_link and portfolio_url else None,
+        "has_portfolio": has_portfolio_link,
+        "bonus": portfolio_bonus,
+    }
+
+    bonus_applied = {
+        "hackathon_bonus": hackathon_bonus,
+        "paper_bonus": paper_bonus,
+        "portfolio_bonus": portfolio_bonus,
+        "self_reported": True,
+    }
+
+    final_score = base_score + hackathon_bonus + paper_bonus + portfolio_bonus
+    clamped_score = round(float(max(0.0, min(1.0, final_score))), 4)
+
+    if return_details:
+        return {
+            "profile_score": clamped_score,
+            "base_score": round(float(base_score), 4),
+            "bonus_applied": bonus_applied,
+            "portfolio": portfolio_info,
+        }
+
+    return clamped_score
     """
     Compute a normalized profile_score in [0.0, 1.0] from platform statistics
     plus capped additive bonuses for self-reported achievements.

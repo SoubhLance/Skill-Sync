@@ -215,26 +215,26 @@ export const ResumeBuilderPage: React.FC = () => {
                 <span className="text-[10px] text-[var(--accent-color)]">LaTeX Draft</span>
               </div>
 
-              {/* Rendered Document Mock Box */}
-              <div className="p-6 bg-[#FFFFFF] text-[#0A192F] rounded-sm border border-[#E2E8F0] space-y-3 font-sans text-xs">
-                <div className="border-b border-[#0A192F] pb-2 text-center space-y-0.5">
+              {/* Rendered Document Mock Box — uses CSS vars so it respects dark mode */}
+              <div className="p-6 bg-[var(--bg-paper)] text-[var(--text-main)] rounded-sm border border-[var(--border-hairline)] space-y-3 font-sans text-xs">
+                <div className="border-b border-[var(--border-hairline)] pb-2 text-center space-y-0.5">
                   <h3 className="font-extrabold text-base tracking-tight">{fullName}</h3>
-                  <p className="text-[10px] text-slate-600">{email} • {phone} • {githubUrl}</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{email} • {phone} • {githubUrl}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-[11px] uppercase border-b border-slate-300 pb-0.5">Summary</h4>
-                  <p className="text-[11px] text-slate-700 leading-tight">{summary}</p>
+                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5">Summary</h4>
+                  <p className="text-[11px] text-[var(--text-muted)] leading-tight">{summary}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-[11px] uppercase border-b border-slate-300 pb-0.5">Skills</h4>
-                  <p className="text-[11px] font-mono text-emerald-700">{skills}</p>
+                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5">Skills</h4>
+                  <p className="text-[11px] font-mono text-[#1A7F37] dark:text-[#2DA44E]">{skills}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-[11px] uppercase border-b border-slate-300 pb-0.5">Experience</h4>
-                  <pre className="text-[10px] font-mono text-slate-800 whitespace-pre-wrap">{experience}</pre>
+                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5">Experience</h4>
+                  <pre className="text-[10px] font-mono text-[var(--text-muted)] whitespace-pre-wrap">{experience}</pre>
                 </div>
               </div>
             </div>
@@ -262,37 +262,42 @@ export const ResumeBuilderPage: React.FC = () => {
               <button className="px-3 py-1.5 rounded-sm bg-[var(--bg-paper)] text-[var(--text-main)] border border-[var(--border-hairline)] font-bold flex items-center gap-1.5">
                 <Code className="w-3.5 h-3.5" /> View Raw LaTeX
               </button>
-              <button className="px-3 py-1.5 rounded-sm btn-accent font-bold flex items-center gap-1.5">
+              <button
+                disabled
+                title="PDF export coming soon"
+                className="px-3 py-1.5 rounded-sm btn-accent font-bold flex items-center gap-1.5 opacity-50 cursor-not-allowed"
+              >
                 <Download className="w-3.5 h-3.5" /> Download PDF
               </button>
             </div>
           </div>
 
-          <div className="p-8 bg-[#FFFFFF] text-[#0A192F] rounded-sm border border-[#E2E8F0] space-y-4 font-sans max-w-3xl mx-auto shadow-sm">
-            <div className="border-b-2 border-[#0A192F] pb-3 text-center space-y-1">
+          {/* Rendered document mock — uses CSS vars so it respects dark mode */}
+          <div className="p-8 bg-[var(--bg-paper)] text-[var(--text-main)] rounded-sm border border-[var(--border-hairline)] space-y-4 font-sans max-w-3xl mx-auto shadow-sm">
+            <div className="border-b-2 border-[var(--border-hairline)] pb-3 text-center space-y-1">
               <h2 className="font-extrabold text-xl tracking-tight uppercase">{fullName}</h2>
-              <p className="text-xs text-slate-600">{email} | {phone} | {githubUrl}</p>
+              <p className="text-xs text-[var(--text-muted)]">{email} | {phone} | {githubUrl}</p>
             </div>
 
             <div className="space-y-1">
-              <h3 className="font-extrabold text-xs uppercase border-b border-slate-300 pb-0.5 text-slate-800">
+              <h3 className="font-extrabold text-xs uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">
                 Professional Overview
               </h3>
-              <p className="text-xs text-slate-700 leading-relaxed">{summary}</p>
+              <p className="text-xs text-[var(--text-main)] leading-relaxed">{summary}</p>
             </div>
 
             <div className="space-y-1">
-              <h3 className="font-extrabold text-xs uppercase border-b border-slate-300 pb-0.5 text-slate-800">
+              <h3 className="font-extrabold text-xs uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">
                 Technical Proficiencies
               </h3>
-              <p className="text-xs font-mono text-slate-800 bg-slate-100 p-2 rounded-sm">{skills}</p>
+              <p className="text-xs font-mono text-[var(--text-main)] bg-[var(--bg-surface)] p-2 rounded-sm">{skills}</p>
             </div>
 
             <div className="space-y-1">
-              <h3 className="font-extrabold text-xs uppercase border-b border-slate-300 pb-0.5 text-slate-800">
+              <h3 className="font-extrabold text-xs uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">
                 Work Experience & Engineering Achievements
               </h3>
-              <pre className="text-xs font-sans text-slate-800 whitespace-pre-wrap leading-relaxed">{experience}</pre>
+              <pre className="text-xs font-sans text-[var(--text-main)] whitespace-pre-wrap leading-relaxed">{experience}</pre>
             </div>
           </div>
         </div>

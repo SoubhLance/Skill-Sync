@@ -67,29 +67,57 @@ export interface RecommendResponse {
 
 export interface ProfileExtractResponse {
   github?: {
-    username: string;
-    repos: number;
-    stars: number;
-    languages: string[];
+    username?: string;
+    public_repos?: number;
+    repos?: number;
+    followers?: number;
+    following?: number;
+    total_stars?: number;
+    stars?: number;
+    top_3_languages?: string[];
+    languages?: string[];
+    account_age_years?: number;
+    pinned_with_desc?: number;
   } | null;
   leetcode?: {
-    username: string;
-    solved: number;
-    easy: number;
-    medium: number;
-    hard: number;
-    ranking: number;
+    username?: string;
+    total_solved?: number;
+    solved?: number;
+    easy_solved?: number;
+    easy?: number;
+    medium_solved?: number;
+    medium?: number;
+    hard_solved?: number;
+    hard?: number;
+    ranking?: number;
+    contest_rating?: number;
+    contest_global_rank?: number;
+    contests_attended?: number;
+    has_cp_signal?: boolean;
   } | null;
   codechef?: {
-    username: string;
-    rating: number;
-    stars: string;
-    global_rank: number;
+    username?: string;
+    rating?: number;
+    stars_count?: number;
+    stars?: string | number;
+    problems_solved?: number;
+    highest_rating?: number;
+    global_rank?: number;
+    country_rank?: number;
+    has_cp_signal?: boolean;
   } | null;
   hackerrank?: {
-    username: string;
-    badges: number;
-    stars: number;
+    username?: string;
+    badges_count?: number;
+    badges?: string[] | number;
+    problems_solved?: number;
+    stars?: number;
+    has_cp_signal?: boolean;
+  } | null;
+  portfolio?: {
+    url?: string | null;
+    has_portfolio?: boolean;
+    bonus?: number;
   } | null;
   profile_score: number;
   base_score: number;
@@ -122,6 +150,13 @@ export interface ExtractSkillsResponse {
   leetcode_url?: string;
 }
 
+export interface LinkedInScoreResponse {
+  score: number;
+  breakdown: Record<string, number>;
+  gaps: string[];
+  sections_detected: string[];
+}
+
 // Backend API Service Functions
 export const api = {
   getHealth: async (): Promise<HealthResponse> => {
@@ -130,13 +165,13 @@ export const api = {
   },
 
   getDomains: async (): Promise<string[]> => {
-    const res = await apiClient.get<string[]>('/recommend/domains');
-    return res.data;
+    const res = await apiClient.get<any>('/recommend/domains');
+    return Array.isArray(res.data) ? res.data : (res.data?.domains || []);
   },
 
-  getJobs: async (params?: { domain?: string; limit?: number }): Promise<JobMatch[]> => {
-    const res = await apiClient.get<JobMatch[]>('/recommend/jobs', { params });
-    return res.data;
+  getJobs: async (params?: { domain?: string; limit?: number; search?: string }): Promise<JobMatch[]> => {
+    const res = await apiClient.get<any>('/recommend/jobs', { params });
+    return Array.isArray(res.data) ? res.data : (res.data?.jobs || []);
   },
 
   recommendSkills: async (skills: string, top_k = 10, profile_score = 0.0, domain_filter?: string): Promise<RecommendResponse> => {
@@ -191,6 +226,7 @@ export const api = {
     leetcode?: string;
     codechef?: string;
     hackerrank?: string;
+    portfolio_url?: string;
     hackathon_wins?: number;
     papers_published?: number;
   }): Promise<ProfileExtractResponse> => {
@@ -198,8 +234,25 @@ export const api = {
     return res.data;
   },
 
-  jdMatch: async (payload: { resume_text?: string; jd_text?: string }): Promise<JDMatchResponse> => {
-    const res = await apiClient.post<JDMatchResponse>('/jd-match', payload);
+  jdMatch: async (payload: { resume_text?: string; jd_text?: string } | FormData): Promise<JDMatchResponse> => {
+    let res;
+    if (payload instanceof FormData) {
+      res = await apiClient.post<JDMatchResponse>('/jd-match', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    } else {
+      res = await apiClient.post<JDMatchResponse>('/jd-match', payload);
+    }
+    return res.data;
+  },
+
+  optimizeLinkedinPdf: async (file: File): Promise<LinkedInScoreResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await apiClient.post<LinkedInScoreResponse>('/api/optimizer/linkedin', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return res.data;
   },
 };
+

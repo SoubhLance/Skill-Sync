@@ -28,13 +28,16 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
 
-from linkedin_scorer import score_linkedin_pdf
-from ocr_fallback import is_pdf_text_extractable
+try:
+    from backend.core.linkedin_scorer import score_linkedin_pdf
+    from backend.core.ocr_fallback import is_pdf_text_extractable
+except ImportError:
+    from linkedin_scorer import score_linkedin_pdf
+    from ocr_fallback import is_pdf_text_extractable
 
 router = APIRouter(tags=["optimizer"])
 
 MAX_FILE_SIZE_MB = 10
-ALLOWED_CONTENT_TYPES = {"application/pdf"}
 
 
 class LinkedInScoreResponse(BaseModel):
@@ -46,8 +49,28 @@ class LinkedInScoreResponse(BaseModel):
 
 @router.post("/linkedin", response_model=LinkedInScoreResponse)
 async def score_linkedin_profile(file: UploadFile = File(...)):
-    if file.content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=400, detail="File must be a PDF.")
+    # Accept the file if:
+    #   (a) content-type is application/pdf  — standard PDF upload, OR
+    #   (b) content-type is application/octet-stream AND the filename ends in .pdf
+    #       — some browser/OS combos (e.g. Firefox on macOS, some Windows builds) label
+    #         a valid LinkedIn PDF export as generic binary; the filename extension acts
+    #         as a secondary guard.  We do NOT blindly accept all octet-stream uploads
+    #         because that would allow arbitrary binary files through.
+    filename = (file.filename or "").lower()
+    is_pdf_content_type = file.content_type == "application/pdf"
+    is_octet_stream_pdf = (
+        file.content_type == "application/octet-stream" and filename.endswith(".pdf")
+    )
+
+    if not (is_pdf_content_type or is_octet_stream_pdf):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "File must be a PDF (.pdf). "
+                "Received content-type: " + str(file.content_type) +
+                (f", filename: {file.filename}" if file.filename else "") + "."
+            ),
+        )
 
     contents = await file.read()
     size_mb = len(contents) / (1024 * 1024)
