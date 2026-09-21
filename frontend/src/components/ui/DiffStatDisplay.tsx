@@ -8,49 +8,37 @@ interface DiffStatDisplayProps {
 
 export const DiffStatDisplay: React.FC<DiffStatDisplayProps> = React.memo(({
   score,
-  label = "PROFILE READINESS",
-  className = "",
+  label = 'Profile readiness',
+  className = '',
 }) => {
   const percentage = score <= 1 ? Math.round(score * 100) : Math.min(100, Math.round(score));
-  const gapPercentage = 100 - percentage;
-  
-  // Calculate visual block representation (e.g. 10 total blocks: +++++++---)
-  const totalBlocks = 15;
-  const addBlocks = Math.round((percentage / 100) * totalBlocks);
-  const delBlocks = totalBlocks - addBlocks;
 
   return (
-    <div className={`p-5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono ${className}`}>
-      {/* Title */}
-      <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-between">
-        <span>{label}</span>
-        <span className="text-[var(--accent-color)] font-semibold">diff stat</span>
+    <div className={`p-5 md:p-6 card ${className}`}>
+      <p className="text-[13px] font-semibold text-[var(--text-main)]">{label}</p>
+
+      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 mt-1.5">
+        <span className="text-4xl font-bold tracking-tight tabular-nums text-[var(--success)]">
+          {percentage}%
+        </span>
+        <span className="caption">overall match</span>
       </div>
 
-      {/* Main Diff Stat Score Line */}
-      <div className="flex items-baseline gap-3 my-1">
-        <span className="text-3xl md:text-4xl font-extrabold text-[var(--diff-add)] tracking-tight">
-          +{percentage}% ready
-        </span>
-        <span className="text-sm text-[var(--diff-del)] font-medium">
-          -{gapPercentage}% gap
-        </span>
+      <div
+        className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[var(--bg-elevated)]"
+        role="progressbar"
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`${label}: ${percentage} out of 100`}
+      >
+        <div
+          className="h-full rounded-full transition-[width] duration-700 ease-out"
+          style={{ width: `${percentage}%`, background: 'var(--grad-accent)' }}
+        />
       </div>
 
-      {/* Visual Diff Stat Block Line */}
-      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--border-hairline)]">
-        <div className="flex items-center gap-[3px]">
-          {Array.from({ length: addBlocks }).map((_, i) => (
-            <span key={`add-${i}`} className="w-2.5 h-4 bg-[var(--diff-add)] rounded-[2px]" />
-          ))}
-          {Array.from({ length: delBlocks }).map((_, i) => (
-            <span key={`del-${i}`} className="w-2.5 h-4 bg-[var(--diff-del)] rounded-[2px]" />
-          ))}
-        </div>
-        <span className="text-xs text-[var(--text-muted)] font-semibold ml-auto">
-          {percentage}/100 score
-        </span>
-      </div>
+      <p className="caption mt-3 tabular-nums">{percentage} of 100</p>
     </div>
   );
 });

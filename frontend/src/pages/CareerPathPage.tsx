@@ -5,8 +5,7 @@ import {
   GraduationCap, 
   Briefcase, 
   UploadCloud, 
-  CheckCircle2, 
-  ArrowRight, 
+  CheckCircle2,
   Target, 
   Plus, 
   X, 
@@ -297,41 +296,30 @@ export const CareerPathPage: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
-      {/* Top Header */}
-      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 text-[var(--text-main)] animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5 mb-1">
-            <Compass className="w-3.5 h-3.5 text-[var(--accent-color)]" /> $ skillsync career-path --interactive
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-sans">
-            Personalized Career Path Engine
+          <h1 className="h-section text-2xl md:text-3xl">
+            Career path
           </h1>
+          <p className="caption mt-1">Tell us your skills — get five ranked roles and a roadmap.</p>
         </div>
 
-        {/* Audience Track Toggle Control */}
-        <div className="flex p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
+        {/* Audience picker — quiet segmented control */}
+        <div className="segment">
           <button
             type="button"
             onClick={() => setAudience('student')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-              audience === 'student'
-                ? 'btn-accent shadow-sm'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-            }`}
+            className={`segment-btn ${audience === 'student' ? 'segment-btn-active' : ''}`}
           >
-            <GraduationCap className="w-4 h-4" /> College Student
+            <GraduationCap className="w-4 h-4" /> Student
           </button>
           <button
             type="button"
             onClick={() => setAudience('pro')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-              audience === 'pro'
-                ? 'btn-accent shadow-sm'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-            }`}
+            className={`segment-btn ${audience === 'pro' ? 'segment-btn-active' : ''}`}
           >
-            <Briefcase className="w-4 h-4" /> Working Professional
+            <Briefcase className="w-4 h-4" /> Professional
           </button>
         </div>
       </div>
@@ -340,141 +328,135 @@ export const CareerPathPage: React.FC = () => {
       {/* GATED STEP 1: CONFIGURE INPUT FORM (When hasGenerated === false) */}
       {/* ========================================================================= */}
       {!hasGenerated ? (
-        <form onSubmit={handleGenerate} className="space-y-8 font-mono text-xs">
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-6">
-            <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-4 font-sans">
+        <form onSubmit={handleGenerate} className="space-y-8">
+          <div className="card p-6 md:p-8 space-y-7">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <span className="text-xs font-mono font-bold text-[var(--accent-color)] uppercase tracking-wider block">
-                  [01. CONFIGURE CAREER SIGNAL INPUTS]
-                </span>
-                <h2 className="text-xl font-extrabold text-[var(--text-main)]">
-                  Add your skills or upload a resume to generate top 5 ranked career paths
+                <h2 className="font-semibold text-lg tracking-tight">
+                  What are you aiming for?
                 </h2>
+                <p className="caption mt-0.5">Name a role and list your skills — we rank five fits.</p>
               </div>
-              <span className="hidden sm:inline-block px-3 py-1 rounded-lg bg-[var(--badge-bg)] text-[var(--badge-text)] font-mono text-xs font-bold border border-[var(--border-hairline)]">
-                Track: {audience === 'student' ? 'College Student' : 'Working Pro'}
+              <span className="chip hidden sm:inline-flex">
+                {audience === 'student' ? 'Student' : 'Professional'}
               </span>
             </div>
 
-            {/* Input 1: Target Role Selection & Suggestions */}
-            <div className="space-y-2">
-              <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-[var(--accent-color)]" /> Preferred Target Role / Direction *
+            <div className="field">
+              <label className="field-label">
+                <Target className="w-4 h-4 text-[var(--accent-color)]" /> Target role
               </label>
               <input
                 type="text"
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
-                placeholder="e.g. Machine Learning Engineer, Backend Developer"
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                placeholder="e.g. Machine Learning Engineer"
+                className="input-glow px-4 py-2.5"
                 required
               />
 
-              {/* Quick Role Suggestion Pills */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase self-center mr-1">Suggestions:</span>
+                <span className="caption self-center mr-1">Try:</span>
                 {COMMON_ROLE_SUGGESTIONS.map((role) => (
                   <button
                     key={role}
                     type="button"
                     onClick={() => setTargetRole(role)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] border transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-full text-[12px] font-medium border transition-all cursor-pointer ${
                       targetRole === role
-                        ? 'btn-accent font-bold border-transparent'
-                        : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-color)] hover:text-[var(--text-main)]'
+                        ? 'bg-[var(--text-main)] text-[var(--bg-paper)] border-transparent'
+                        : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-main)] hover:border-[var(--border-strong)]'
                     }`}
                   >
-                    + {role}
+                    {role}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Input 2: Resume PDF Upload (Auto-extracts skills via API) */}
-            <div className="space-y-2">
-              <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5">
-                <UploadCloud className="w-4 h-4 text-sky-500" /> Option A: Resume PDF Upload (Auto Skill Extractor)
-              </label>
+            {/* Progressive disclosure: resume import is optional */}
+            <details className="disclosure">
+              <summary>
+                <UploadCloud className="w-4 h-4 text-[var(--accent-color)]" />
+                Import skills from a resume
+                <span className="caption ml-auto">optional</span>
+              </summary>
+              <div className="disclosure-body space-y-3">
+                <div className="border border-dashed border-[var(--border-strong)] rounded-xl p-6 text-center bg-[var(--bg-paper)] cursor-pointer transition-all hover:border-[var(--accent-color)]">
+                  <input
+                    type="file"
+                    accept=".pdf,.docx"
+                    onChange={(e) => e.target.files && e.target.files[0] && handleFileUpload(e.target.files[0])}
+                    className="hidden"
+                    id="career-resume-pdf-input"
+                  />
+                  <label htmlFor="career-resume-pdf-input" className="cursor-pointer block space-y-1.5">
+                    {isExtractingResume ? (
+                      <div className="flex items-center justify-center gap-2 text-[var(--accent-color)]">
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        <span className="font-semibold text-sm">Reading your resume…</span>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-7 h-7 text-[var(--accent-color)] mx-auto" />
+                        <p className="font-semibold text-sm">
+                          {resumeFile ? `Attached: ${resumeFile.name}` : 'Drop a resume PDF here or browse'}
+                        </p>
+                        <p className="caption">
+                          Skills are extracted automatically into the list below.
+                        </p>
+                      </>
+                    )}
+                  </label>
+                </div>
 
-              <div className="border-2 border-dashed border-[var(--border-hairline)] hover:border-[var(--accent-color)] rounded-xl p-6 text-center bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all">
-                <input
-                  type="file"
-                  accept=".pdf,.docx"
-                  onChange={(e) => e.target.files && e.target.files[0] && handleFileUpload(e.target.files[0])}
-                  className="hidden"
-                  id="career-resume-pdf-input"
-                />
-                <label htmlFor="career-resume-pdf-input" className="cursor-pointer block space-y-1.5">
-                  {isExtractingResume ? (
-                    <div className="flex items-center justify-center gap-2 text-[var(--accent-color)]">
-                      <RefreshCw className="w-5 h-5 animate-spin" />
-                      <span className="font-bold">$ parsing resume PDF vector skills...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <UploadCloud className="w-7 h-7 text-[var(--accent-color)] mx-auto" />
-                      <p className="font-bold text-[var(--text-main)] text-xs">
-                        {resumeFile ? `Attached: ${resumeFile.name}` : "Drop resume PDF here or click to browse"}
-                      </p>
-                      <p className="text-[10px] text-[var(--text-muted)] font-sans">
-                        Automatically extracts skills into the chip list below using backend /extract-skills/pdf
-                      </p>
-                    </>
-                  )}
-                </label>
-              </div>
-
-              {extractStatusMessage && (
-                <p className="text-[11px] text-[var(--diff-add)] font-mono font-semibold">
+                {extractStatusMessage && (
+                  <p className="caption font-medium text-[var(--success)]">
                   {extractStatusMessage}
                 </p>
               )}
-            </div>
+              </div>
+            </details>
 
-            {/* Input 3: Structured Tag-style Skill Chips */}
-            <div className="space-y-3">
+            <div className="field">
               <div className="flex items-center justify-between">
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5">
-                  <Code2 className="w-4 h-4 text-[var(--diff-add)]" /> Option B: Interactive Skill Chips Input ({skills.length} added) *
+                <label className="field-label">
+                  <Code2 className="w-4 h-4" /> Your skills ({skills.length})
                 </label>
-                <span className="text-[10px] text-[var(--text-muted)]">Type skill & press Enter or comma</span>
+                <span className="caption">Type and press Enter</span>
               </div>
 
-              {/* Skill Input Bar */}
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={skillInputBuffer}
                   onChange={(e) => setSkillInputBuffer(e.target.value)}
                   onKeyDown={handleKeyDownSkill}
-                  placeholder="e.g. PyTorch, Docker, FastAPI, Kubernetes"
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  placeholder="e.g. PyTorch, Docker, FastAPI"
+                  className="input-glow flex-1 px-4 py-2.5"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddSkill()}
-                  className="px-5 py-2.5 rounded-xl btn-accent font-bold text-xs flex items-center gap-1 cursor-pointer shadow-md"
+                  className="btn-secondary px-5 py-2.5 text-sm"
                 >
                   <Plus className="w-4 h-4" /> Add
                 </button>
               </div>
 
-              {/* Added Skills Chip Container */}
-              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] min-h-[50px] space-y-2">
-                <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Active Skills List:</div>
-
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] min-h-[50px]">
                 {skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {skills.map((skill) => (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border-hairline)] text-xs font-bold shadow-2xs group"
+                        className="chip !text-[12.5px] !py-1 !bg-[var(--bg-surface)] !text-[var(--text-main)]"
                       >
                         {skill}
                         <button
                           type="button"
                           onClick={() => handleRemoveSkill(skill)}
-                          className="hover:text-[var(--diff-del)] p-0.5 rounded-sm transition-colors cursor-pointer"
+                          className="hover:text-[var(--diff-del)] transition-colors cursor-pointer"
                           title={`Remove ${skill}`}
                         >
                           <X className="w-3 h-3" />
@@ -483,15 +465,14 @@ export const CareerPathPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-[var(--text-muted)] font-sans italic">
-                    No skills added yet. Type a skill above or click one of the quick presets below.
+                  <p className="caption italic">
+                    No skills yet — type one above or pick from below.
                   </p>
                 )}
               </div>
 
-              {/* Quick Preset Skill Chips */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase mr-1">Quick Add:</span>
+                <span className="caption mr-1">Popular:</span>
                 {PRESET_SKILLS.map((preset) => {
                   const isAdded = skills.some(s => s.toLowerCase() === preset.toLowerCase());
                   return (
@@ -500,10 +481,10 @@ export const CareerPathPage: React.FC = () => {
                       type="button"
                       disabled={isAdded}
                       onClick={() => handleAddSkill(preset)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] border transition-colors cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-full text-[12px] font-medium border transition-colors cursor-pointer ${
                         isAdded
-                          ? 'opacity-40 bg-[var(--bg-paper)] text-[var(--text-muted)] border-transparent cursor-not-allowed'
-                          : 'bg-[var(--bg-surface)] text-[var(--text-main)] border-[var(--border-hairline)] hover:border-[var(--accent-color)]'
+                          ? 'opacity-40 cursor-not-allowed border-transparent'
+                          : 'border-[var(--border-hairline)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--border-strong)]'
                       }`}
                     >
                       + {preset}
@@ -513,19 +494,19 @@ export const CareerPathPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Action Submit Button */}
+            {/* The single primary action on this view */}
             <button
               type="submit"
               disabled={isGenerating || !targetRole.trim() || skills.length === 0}
-              className="w-full py-4 px-6 rounded-xl btn-accent font-mono font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+              className="btn-primary w-full py-4 px-6 text-[15px]"
             >
               {isGenerating ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> $ computing trajectory & top 5 role alignment matrix...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Finding your roles…
                 </>
               ) : (
                 <>
-                  <Compass className="w-4 h-4" /> $ generate --career-path <ArrowRight className="w-4 h-4" />
+                  <Compass className="w-4 h-4" /> Generate career path
                 </>
               )}
             </button>
@@ -535,28 +516,28 @@ export const CareerPathPage: React.FC = () => {
         /* ========================================================================= */
         /* STEP 2: GENERATED RECOMMENDATION ROADMAP VIEW */
         /* ========================================================================= */
-        <div className="space-y-8 font-mono text-xs">
+        <div className="space-y-10">
           {/* Header Action Bar: Reconfigure Inputs Button */}
-          <div className="p-4 rounded-xl glass-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans">
+          <div className="card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono text-[var(--accent-color)] font-bold uppercase">
-                  [RECOMMENDATION GENERATED FROM YOUR INPUTS]
+                <span className="font-semibold text-[14px] tracking-tight">
+                  Your top roles
                 </span>
-                <span className="text-[9px] font-mono font-bold text-[var(--text-muted)] bg-[var(--bg-paper)] border border-[var(--border-hairline)] px-2 py-0.5 rounded-md uppercase tracking-wider">
-                  demo - ranked options
+                <span className="chip">
+                  5 ranked options
                 </span>
               </div>
               <p className="text-xs font-bold text-[var(--text-main)]">
-                Input Target Direction: <span className="text-[var(--accent-color)]">{targetRole}</span> • Track: <span className="capitalize">{audience === 'student' ? 'College Student' : 'Working Professional'}</span> • Skills: {skills.length} provided
+                Target: <span className="text-[var(--accent-color)]">{targetRole}</span> • Track: <span className="capitalize">{audience === 'student' ? 'College Student' : 'Working Professional'}</span> • Skills: {skills.length} provided
               </p>
             </div>
 
             <button
               onClick={() => setHasGenerated(false)}
-              className="px-4 py-2 rounded-xl bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] text-[var(--text-main)] border border-[var(--border-hairline)] font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shrink-0 transition-colors"
+              className="btn-secondary px-4 py-2 text-[13px] shrink-0"
             >
-              <Edit3 className="w-3.5 h-3.5 text-[var(--accent-color)]" /> Edit / Re-configure Inputs
+              <Edit3 className="w-3.5 h-3.5 text-[var(--accent-color)]" /> Edit inputs
             </button>
           </div>
 
@@ -568,25 +549,25 @@ export const CareerPathPage: React.FC = () => {
               <div className="space-y-1 font-sans">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-[var(--accent-color)]" />
-                  <span className="text-xs font-mono font-bold text-[var(--accent-color)] uppercase tracking-wider">
-                    [TOP 5 RANKED ROLE RECOMMENDATIONS LEADERBOARD]
+                  <span className="font-semibold text-[14px] tracking-tight">
+                    Top 5 roles
                   </span>
                 </div>
                 <h2 className="text-lg font-extrabold text-[var(--text-main)]">
-                  Top 5 Candidate Roles Ranked by Alignment %
+                  Ranked by fit
                 </h2>
                 <p className="text-xs text-[var(--text-muted)]">
-                  Select any of the 5 candidate roles below to inspect its detailed milestone roadmap. (Rank #1 auto-expanded)
+                  Select a role to see its roadmap.
                 </p>
               </div>
 
-              <span className="px-3 py-1 rounded-lg bg-[var(--bg-surface)] text-[var(--text-muted)] font-mono text-[10px] border border-[var(--border-hairline)] self-start sm:self-auto">
-                5 Candidates Evaluated
+              <span className="px-3 py-1 rounded-lg caption self-start sm:self-auto">
+                5 evaluated
               </span>
             </div>
 
             {/* Ranked List / Cards Set */}
-            <div className="grid grid-cols-1 gap-3.5 font-mono stagger-children">
+            <div className="grid grid-cols-1 gap-3.5 stagger-children">
               {rankedRoles.map((role, idx) => {
                 const isSelected = selectedRoleIndex === idx;
                 const isTop1 = idx === 0;
@@ -597,8 +578,8 @@ export const CareerPathPage: React.FC = () => {
                     onClick={() => setSelectedRoleIndex(idx)}
                     className={`card-lift p-5 rounded-2xl transition-all cursor-pointer border relative ${
                       isSelected
-                        ? 'glass-card border-[var(--accent-color)] shadow-md ring-1 ring-[var(--accent-color)]/40'
-                        : 'glass-card hover:border-[var(--accent-color)]/40'
+                        ? 'card card-elevated !border-[var(--accent-color)]'
+                        : 'card hover:border-[var(--border-strong)]'
                     }`}
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -607,14 +588,15 @@ export const CareerPathPage: React.FC = () => {
                         <div className="flex items-center gap-2.5 flex-wrap">
                           {/* Rank Badge */}
                           <span
-                            className={`px-2.5 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1 ${
+                            className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold flex items-center gap-1 ${
                               isTop1
-                                ? 'btn-accent shadow-2xs font-bold border border-transparent'
+                                ? 'text-white border border-transparent'
                                 : 'bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border-hairline)]'
                             }`}
+                            style={isTop1 ? { background: 'var(--grad-accent)' } : undefined}
                           >
                             {isTop1 ? <Sparkles className="w-3 h-3" /> : null}
-                            #{role.rank} {isTop1 ? 'TOP MATCH' : 'CANDIDATE'}
+                            #{role.rank} {isTop1 ? 'Top match' : 'Option'}
                           </span>
 
                           <h3 className="text-base font-extrabold text-[var(--text-main)] font-sans flex items-center gap-2">
@@ -622,8 +604,8 @@ export const CareerPathPage: React.FC = () => {
                           </h3>
 
                           {isSelected && (
-                            <span className="px-2.5 py-0.5 rounded-md bg-[var(--diff-add-bg)] text-[var(--diff-add)] font-bold text-[10px] border border-[var(--diff-add)]/30 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> ACTIVE ROADMAP VIEW
+                            <span className="chip chip-success">
+                              <CheckCircle2 className="w-3 h-3" /> Showing roadmap
                             </span>
                           )}
                         </div>
@@ -631,14 +613,14 @@ export const CareerPathPage: React.FC = () => {
                         {/* Why this fits line */}
                         <div className="text-[11px] font-sans text-[var(--text-muted)] flex items-center gap-1.5 pt-0.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[var(--diff-add)] shrink-0" />
-                          <span className="font-mono text-[var(--text-main)] font-semibold">
+                          <span className="font-semibold">
                             {role.whyItFits}
                           </span>
                         </div>
 
                         {/* Critical Skill Gaps */}
                         <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
-                          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                          <span className="caption font-medium">
                             Gaps ({role.skillGaps.length}):
                           </span>
                           {role.skillGaps.length > 0 ? (
@@ -663,24 +645,13 @@ export const CareerPathPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Right: Alignment % Badge & Action */}
-                      <div className="flex md:flex-col items-center md:items-end justify-between gap-2 shrink-0 border-t md:border-t-0 pt-2 md:pt-0 border-[var(--border-hairline)]">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`px-3 py-1.5 rounded-lg font-mono font-bold text-xs md:text-sm border ${
-                              role.alignmentPercent >= 70
-                                ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border-[var(--diff-add)]/30'
-                                : role.alignmentPercent >= 50
-                                ? 'bg-sky-500/10 text-sky-500 border-sky-500/30'
-                                : 'bg-amber-500/10 text-amber-500 border-amber-500/30'
-                            }`}
-                          >
-                            {role.alignmentPercent}% Alignment
-                          </span>
-                        </div>
+                      <div className="flex md:flex-col items-center md:items-end justify-between gap-2 shrink-0 pt-2 md:pt-0">
+                        <span className="chip chip-success tabular-nums">
+                          {role.alignmentPercent}% fit
+                        </span>
 
-                        <span className="text-[11px] text-[var(--accent-color)] font-mono font-bold flex items-center gap-1">
-                          {isSelected ? 'Viewing Detailed Roadmap' : 'Select to view roadmap'} <ChevronRight className="w-3.5 h-3.5" />
+                        <span className="caption flex items-center gap-1">
+                          {isSelected ? 'Showing roadmap' : 'Select for roadmap'} <ChevronRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </div>
@@ -693,100 +664,90 @@ export const CareerPathPage: React.FC = () => {
           {/* ========================================================================= */}
           {/* DRILL-DOWN VIEW: SELECTED TARGET ROLE ALIGNMENT & MILESTONE ROADMAP */}
           {/* ========================================================================= */}
-          {/* Target Alignment Summary Box */}
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-4">
+          <div className="card p-6 md:p-8 space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <span className="text-[11px] font-mono font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                  [DRILL-DOWN: SELECTED TARGET ROLE ALIGNMENT - RANK #{activeRole.rank} OF 5]
-                </span>
-                <h2 className="text-xl font-extrabold text-[var(--text-main)] flex items-center gap-2 font-sans">
+                <p className="caption">Selected role · #{activeRole.rank} of 5</p>
+                <h2 className="font-bold text-xl tracking-tight flex items-center gap-2">
                   <Target className="w-5 h-5 text-[var(--accent-color)]" /> {activeRole.title}
                 </h2>
               </div>
 
-              <div className="flex items-center gap-3 font-mono">
-                <span className="text-xs text-[var(--text-muted)]">Track: {audience === 'student' ? 'Skill Building' : 'Career Transition'}</span>
-                <span className="px-3 py-1 bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 rounded-lg font-bold text-xs">
-                  {activeRole.alignmentPercent}% Alignment
+              <div className="flex items-center gap-3">
+                <span className="caption">{audience === 'student' ? 'Skill building' : 'Career transition'}</span>
+                <span className="chip chip-success tabular-nums">
+                  {activeRole.alignmentPercent}% fit
                 </span>
               </div>
             </div>
 
-            {/* Identified Skill Gaps List */}
-            <div className="space-y-2 font-mono text-xs">
-              <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                Critical Skill Gaps to Bridge ({activeRole.skillGaps.length}):
-              </div>
+            <div className="space-y-2">
+              <p className="caption font-medium">
+                Skills to close ({activeRole.skillGaps.length})
+              </p>
 
               {activeRole.skillGaps.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {activeRole.skillGaps.map((gap, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-1 rounded-md bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold"
-                    >
-                      - {gap}
+                    <span key={idx} className="chip chip-danger">
+                      {gap}
                     </span>
                   ))}
                 </div>
               ) : (
-                <span className="px-3 py-1 rounded-lg bg-[var(--diff-add-bg)] text-[var(--diff-add)] font-bold text-xs">
-                  ✓ All core baseline skills present in your input profile!
+                <span className="chip chip-success">
+                  All core skills present
                 </span>
               )}
             </div>
           </div>
 
-          {/* Sequential Milestone Roadmap Steps */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between font-mono">
-              <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider flex items-center gap-1.5">
-                <Compass className="w-4 h-4" /> [RECOMMENDED MILESTONE ROADMAP FOR {activeRole.title.toUpperCase()}]
-              </span>
-              <span className="text-xs text-[var(--text-muted)]">3 Phases • {audience === 'student' ? '12 Weeks' : '3 Months'}</span>
+          <div className="space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-[15px] tracking-tight flex items-center gap-1.5">
+                <Compass className="w-4 h-4 text-[var(--accent-color)]" /> Roadmap for {activeRole.title}
+              </h3>
+              <span className="caption">{audience === 'student' ? '12 weeks' : '3 months'}</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs stagger-children">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 stagger-children">
               {roadmapSteps.map((step) => (
                 <div
                   key={step.stepNumber}
-                  className="card-lift p-6 rounded-2xl glass-card space-y-4 flex flex-col justify-between"
+                  className="card card-lift p-6 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-2">
-                      <span className="font-bold text-[var(--accent-color)] text-xs">
-                        STEP 0{step.stepNumber}
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-[13px] text-[var(--accent-color)]">
+                        Phase {step.stepNumber}
                       </span>
-                      <span className="text-[11px] text-[var(--text-muted)] bg-[var(--bg-paper)] px-2.5 py-0.5 border border-[var(--border-hairline)] rounded-md">
+                      <span className="chip">
                         {step.duration}
                       </span>
                     </div>
 
-                    <h3 className="font-extrabold text-sm text-[var(--text-main)] font-sans leading-tight">
+                    <h3 className="font-semibold text-sm tracking-tight leading-snug">
                       {step.title}
                     </h3>
 
-                    <p className="text-[11px] font-sans text-[var(--text-muted)] leading-relaxed">
+                    <p className="caption">
                       {step.description}
                     </p>
 
-                    {/* Skills to Learn */}
-                    <div className="space-y-1 pt-1">
-                      <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Focus Skills:</div>
-                      <div className="space-y-1">
+                    <div className="space-y-1.5 pt-1">
+                      <p className="caption font-medium">Focus</p>
+                      <div className="flex flex-wrap gap-1">
                         {step.skillsToLearn.map((skill, sIdx) => (
-                          <div key={sIdx} className="text-[var(--diff-add)] bg-[var(--diff-add-bg)] px-2.5 py-1 border border-[var(--diff-add)]/30 rounded-md text-[11px] font-semibold">
-                            + {skill}
-                          </div>
+                          <span key={sIdx} className="chip chip-success">
+                            {skill}
+                          </span>
                         ))}
                       </div>
                     </div>
 
-                    {/* Deliverables */}
                     <div className="space-y-1 pt-1">
-                      <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Key Deliverables:</div>
-                      <ul className="list-disc list-inside text-[11px] text-[var(--text-muted)] font-sans space-y-0.5">
+                      <p className="caption font-medium">Deliverables</p>
+                      <ul className="caption list-disc list-inside space-y-0.5">
                         {step.deliverables.map((del, dIdx) => (
                           <li key={dIdx}>{del}</li>
                         ))}

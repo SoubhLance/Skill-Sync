@@ -70,34 +70,26 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
   );
 
   return (
-    <div className={`p-5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs ${className}`}>
-      {/* Commit Graph Header line */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[var(--border-hairline)] mb-3 gap-2">
-        <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 bg-[var(--diff-add)] rounded-full animate-pulse shrink-0" />
-          <span className="font-bold text-[var(--text-main)] tracking-tight">
-            @{username}: {totalCommits} engineering signals in last 196 days
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-[11px]">
-          <span className="text-[var(--text-muted)]">src: github.com/{username}</span>
-          <span className="text-[var(--diff-add)] bg-[var(--diff-add-bg)] px-2 py-0.5 border border-[var(--diff-add)]/30 rounded-md font-bold">
-            +{Math.round(additions / 10)}% activity
-          </span>
-        </div>
+    <div className={`p-5 md:p-6 card ${className}`}>
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-4 gap-1">
+        <p className="font-semibold text-[14px] tracking-tight truncate">
+          @{username}
+          <span className="caption font-normal"> · {totalCommits.toLocaleString()} contributions · 28 weeks</span>
+        </p>
+        <p className="caption tabular-nums shrink-0">+{Math.round(additions / 10)}% activity</p>
       </div>
 
       {/* Grid Canvas */}
-      <div className="overflow-x-auto pb-2">
-        <div className="flex gap-[3px] min-w-max">
+      <div className="overflow-x-auto pb-2 scroll-thin">
+        <div className="flex gap-1 min-w-max py-1">
           {matrix.map((week, wIdx) => (
-            <div key={`week-${wIdx}`} className="flex flex-col gap-[3px]">
+            <div key={`week-${wIdx}`} className="flex flex-col gap-1">
               {week.map((level, dIdx) => (
                 <div
                   key={`cell-${username}-${wIdx}-${dIdx}`}
                   style={level > 0 ? { backgroundColor: GREEN_LEVELS_HEX[level]! } : undefined}
-                  className={`w-[11px] h-[11px] rounded-[2px] transition-all cursor-pointer hover:ring-1 hover:ring-[var(--text-main)] ${
-                    level === 0 ? 'bg-[var(--border-hairline)]' : ''
+                  className={`w-3 h-3 rounded-[4px] transition-transform duration-150 cursor-pointer hover:scale-125 hover:ring-1 hover:ring-[var(--accent-color)] hover:ring-offset-1 hover:ring-offset-[var(--bg-surface)] ${
+                    level === 0 ? 'bg-[var(--bg-paper)] border border-[var(--border-hairline)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
                   }`}
                   title={`Week ${wIdx + 1}, Day ${dIdx + 1}: ${level * 2} commits`}
                 />
@@ -107,22 +99,20 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
         </div>
       </div>
 
-      {/* Footer Legend & Diff stat */}
-      <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] pt-3 border-t border-[var(--border-hairline)] mt-1">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
+        <div className="flex items-center gap-2 caption">
           <span>Less</span>
-          <div className="flex gap-[3px]">
-            <div className="w-[10px] h-[10px] rounded-[2px] bg-[var(--border-hairline)]" />
+          <div className="flex gap-1">
+            <div className="w-2.5 h-2.5 rounded-[3px] bg-[var(--bg-elevated)] border border-[var(--border-hairline)]" />
             {GREEN_LEVELS_HEX.slice(1).map((col, i) => (
-              <div key={`legend-${i}`} style={{ backgroundColor: col! }} className="w-[10px] h-[10px] rounded-[2px]" />
+              <div key={`legend-${i}`} style={{ backgroundColor: col! }} className="w-2.5 h-2.5 rounded-[3px]" />
             ))}
           </div>
           <span>More</span>
         </div>
-        <div className="flex items-center gap-3 font-mono text-[11px]">
-          <span className="text-[var(--diff-add)] font-semibold">+{additions} additions</span>
-          <span className="text-[var(--diff-del)] font-semibold">-{gaps} gaps</span>
-        </div>
+        <p className="caption tabular-nums">
+          {additions.toLocaleString()} additions · {gaps} quiet days
+        </p>
       </div>
     </div>
   );

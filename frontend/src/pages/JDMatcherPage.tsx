@@ -4,18 +4,15 @@ import { DiffStatDisplay } from '../components/ui/DiffStatDisplay';
 import { FileUpload } from '../components/ui/FileUpload';
 import { 
   FileCheck2, 
-  UploadCloud, 
   CheckCircle2, 
   AlertCircle, 
   RefreshCw,
-  Terminal,
   GitCompare,
   Briefcase,
   Search,
   Filter,
   Building2,
   Sparkles,
-  ArrowRight,
   Code2,
   BriefcaseIcon,
   Layers
@@ -568,41 +565,35 @@ export const JDMatcherPage: React.FC = () => {
     : [...TECH_PRESET_SKILLS, ...NON_TECH_PRESET_SKILLS.slice(0, 4)];
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 font-sans text-[var(--text-main)] animate-fade-in">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 text-[var(--text-main)] animate-fade-in">
       {/* Header */}
-      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5 mb-1">
-            <FileCheck2 className="w-3.5 h-3.5 text-[var(--accent-color)]" /> $ skillsync jd-match --unified
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-sans">
-            Unified JD Matcher & Career Recommendations
+          <h1 className="h-section text-2xl md:text-3xl">
+            Job matcher
           </h1>
+          <p className="caption mt-1">Compare your resume against a role, or browse matching jobs.</p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
+        {/* Tab Switcher — quiet segmented control */}
+        <div className="segment">
           <button
             onClick={() => setActiveTab('pairwise')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-              activeTab === 'pairwise' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-            }`}
+            className={`segment-btn ${activeTab === 'pairwise' ? 'segment-btn-active' : ''}`}
           >
-            <GitCompare className="w-3.5 h-3.5" /> Pairwise JD Analysis
+            <GitCompare className="w-3.5 h-3.5" /> Compare
           </button>
           <button
             onClick={() => setActiveTab('browse')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-              activeTab === 'browse' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-            }`}
+            className={`segment-btn ${activeTab === 'browse' ? 'segment-btn-active' : ''}`}
           >
-            <Briefcase className="w-3.5 h-3.5" /> Browse Job Matches ({jobs.length})
+            <Briefcase className="w-3.5 h-3.5" /> Browse jobs ({jobs.length})
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] font-mono text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] text-[var(--diff-del)] text-sm flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -612,102 +603,97 @@ export const JDMatcherPage: React.FC = () => {
         <div className="space-y-8">
           {/* Two-Panel Pairwise Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Panel: Input Specs */}
-            <div className="space-y-6 font-mono text-xs">
-              <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
-                <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-3">
-                  <h2 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-[var(--accent-color)]" /> Input Resume & JD Text
-                  </h2>
+            {/* Left Panel: inputs */}
+            <div className="space-y-6">
+              <div className="card p-6 md:p-8 space-y-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 className="font-semibold text-[16px] tracking-tight">Your documents</h2>
+                    <p className="caption mt-0.5">Paste text or upload files — either works.</p>
+                  </div>
 
-                  <div className="flex p-0.5 rounded-lg bg-[var(--bg-paper)] border border-[var(--border-hairline)]">
+                  <div className="segment">
                     <button
                       type="button"
                       onClick={() => setInputMode('paste')}
-                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
-                        inputMode === 'paste' ? 'btn-accent' : 'text-[var(--text-muted)]'
-                      }`}
+                      className={`segment-btn ${inputMode === 'paste' ? 'segment-btn-active' : ''}`}
                     >
-                      Paste Text
+                      Paste text
                     </button>
                     <button
                       type="button"
                       onClick={() => setInputMode('upload')}
-                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
-                        inputMode === 'upload' ? 'btn-accent' : 'text-[var(--text-muted)]'
-                      }`}
+                      className={`segment-btn ${inputMode === 'upload' ? 'segment-btn-active' : ''}`}
                     >
-                      PDF Upload
+                      Upload
                     </button>
                   </div>
                 </div>
 
                 {inputMode === 'paste' ? (
                   <>
-                    <div>
-                      <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">
-                        Candidate Resume Content
+                    <div className="field">
+                      <label className="field-label">
+                        Your resume
                       </label>
                       <textarea
                         rows={4}
                         value={resumeText}
                         onChange={(e) => setResumeText(e.target.value)}
-                        placeholder="Paste full candidate resume text..."
-                        className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                        placeholder="Paste your resume text…"
+                        className="input-glow p-3.5"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">
-                        Target Job Description (JD) Requirements
+                    <div className="field">
+                      <label className="field-label">
+                        Job description
                       </label>
                       <textarea
                         rows={6}
                         value={jdText}
                         onChange={(e) => setJdText(e.target.value)}
-                        placeholder="Paste target job description requirements..."
-                        className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                        placeholder="Paste the job requirements…"
+                        className="input-glow p-3.5"
                       />
                     </div>
                   </>
                 ) : (
-                  <div className="space-y-5 font-mono">
+                  <div className="space-y-5">
                     <FileUpload
-                      label="Candidate Resume PDF / DOCX"
-                      subLabel="Upload candidate's resume document (PDF, DOCX, TXT)"
+                      label="Resume file"
+                      subLabel="PDF, DOCX or TXT"
                       file={resumeFile}
                       onFileSelect={setResumeFile}
                       icon={<FileCheck2 className="w-4 h-4 text-[var(--accent-color)]" />}
                     />
 
                     <FileUpload
-                      label="Target Job Description (JD) PDF / DOCX"
-                      subLabel="Upload job specification document (PDF, DOCX, TXT)"
+                      label="Job description file"
+                      subLabel="PDF, DOCX or TXT"
                       file={jdFile}
                       onFileSelect={setJdFile}
                       icon={<Briefcase className="w-4 h-4 text-emerald-500" />}
                     />
 
-                    <div className="pt-2 border-t border-[var(--border-hairline)]">
-                      <p className="text-[10px] text-[var(--text-muted)] italic leading-relaxed">
-                        💡 Note: You can upload PDF/DOCX files for both Resume & JD, or mix uploading a file with pasted text. If no file is attached, pasted text will be used automatically.
-                      </p>
-                    </div>
+                    <p className="caption">
+                      You can mix a file with pasted text — pasted text is used wherever no file is attached.
+                    </p>
                   </div>
                 )}
 
                 <button
                   onClick={handleCalculateMatch}
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-md"
+                  className="btn-primary w-full py-3.5 px-4 text-sm"
                 >
                   {loading ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" /> $ computing pairwise cosine diff...
+                      <RefreshCw className="w-4 h-4 animate-spin" /> Comparing…
                     </>
                   ) : (
                     <>
-                      <FileCheck2 className="w-4 h-4" /> $ calculate --pairwise-match
+                      <FileCheck2 className="w-4 h-4" /> Calculate match
                     </>
                   )}
                 </button>
@@ -715,47 +701,47 @@ export const JDMatcherPage: React.FC = () => {
             </div>
 
             {/* Right Panel: Results */}
-            <div className="space-y-6 font-mono text-xs">
+            <div className="space-y-6">
               {result ? (
                 <div className="space-y-6">
-                  <DiffStatDisplay score={result.match_percent} label="Pairwise BERT Alignment Score" />
+                  <DiffStatDisplay score={result.match_percent} label="Resume and role similarity" />
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl bg-[var(--diff-add-bg)] border border-[var(--diff-add)]/30 space-y-2">
-                      <p className="font-bold text-[var(--diff-add)] flex items-center gap-1.5 border-b border-[var(--diff-add)]/20 pb-2">
-                        <CheckCircle2 className="w-4 h-4" /> Matching Overlap ({result.skill_overlap.length})
+                    <div className="card p-4 space-y-2">
+                      <p className="font-semibold text-[13.5px] text-[var(--success)] flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" /> Matching skills ({result.skill_overlap.length})
                       </p>
-                      <div className="space-y-1 font-mono">
+                      <div className="flex flex-wrap gap-1.5">
                         {result.skill_overlap.map((skill, idx) => (
-                          <div key={idx} className="text-[var(--diff-add)] bg-[var(--bg-surface)] px-2.5 py-1 border border-[var(--diff-add)]/30 rounded-md">
-                            + {skill}
-                          </div>
+                          <span key={idx} className="chip chip-success">
+                            {skill}
+                          </span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/30 space-y-2">
-                      <p className="font-bold text-[var(--diff-del)] flex items-center gap-1.5 border-b border-[var(--diff-del)]/20 pb-2">
-                        <AlertCircle className="w-4 h-4" /> Missing Skill Gap ({result.skill_gap.length})
+                    <div className="card p-4 space-y-2">
+                      <p className="font-semibold text-[13.5px] text-[var(--diff-del)] flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4" /> Skills to learn ({result.skill_gap.length})
                       </p>
-                      <div className="space-y-1 font-mono">
+                      <div className="flex flex-wrap gap-1.5">
                         {result.skill_gap.map((skill, idx) => (
-                          <div key={idx} className="text-[var(--diff-del)] bg-[var(--bg-surface)] px-2.5 py-1 border border-[var(--diff-del)]/30 rounded-md">
-                            - {skill}
-                          </div>
+                          <span key={idx} className="chip chip-danger">
+                            {skill}
+                          </span>
                         ))}
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="p-8 rounded-2xl glass-card text-center space-y-3 text-xs text-[var(--text-muted)] min-h-[350px] flex flex-col items-center justify-center font-mono">
-                  <GitCompare className="w-8 h-8 text-[var(--text-muted)]/40 mx-auto" />
-                  <p className="font-bold text-[var(--text-main)]">
-                    No active pairwise calculation.
+                <div className="card p-8 text-center min-h-[350px] flex flex-col items-center justify-center">
+                  <GitCompare className="w-8 h-8 text-[var(--text-subtle)] mx-auto" />
+                  <p className="font-semibold text-[15px] mt-3">
+                    No comparison yet
                   </p>
-                  <p className="max-w-xs font-sans text-[11px]">
-                    Paste job requirements and click "$ calculate --pairwise-match" to inspect exact percentage match and skill gap diff lists.
+                  <p className="caption max-w-xs mt-1">
+                    Add your resume and a job description, then calculate the match.
                   </p>
                 </div>
               )}
@@ -764,29 +750,27 @@ export const JDMatcherPage: React.FC = () => {
 
           {/* Unified Job Recommendations Section below Matcher */}
           {jobs.length > 0 && (
-            <div className="border-t border-[var(--border-hairline)] pt-8 space-y-4 font-mono text-xs">
+            <div className="pt-8 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider block">
-                  [SUGGESTED JOB MATCHES FROM OVERLAPPING SKILLS]
-                </span>
+                <h3 className="font-semibold text-[15px] tracking-tight">Suggested roles</h3>
                 <button
                   onClick={() => setActiveTab('browse')}
-                  className="text-xs text-[var(--accent-color)] font-bold hover:underline cursor-pointer"
+                  className="btn-tertiary"
                 >
-                  View All Matching Roles ({jobs.length}) →
+                  View all ({jobs.length}) →
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans stagger-children">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 stagger-children">
                 {jobs.slice(0, 3).map((job) => (
-                  <div key={job.job_id} className="card-lift p-5 rounded-2xl glass-card space-y-3 font-mono text-xs">
-                    <div className="flex items-start justify-between">
+                  <div key={job.job_id} className="card card-lift p-5">
+                    <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h4 className="font-extrabold text-sm text-[var(--text-main)] font-sans">{job.job_role}</h4>
-                        <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{job.domain} • {job.experience_label}</p>
+                        <h4 className="font-semibold text-sm tracking-tight">{job.job_role}</h4>
+                        <p className="caption mt-0.5">{job.domain} • {job.experience_label}</p>
                       </div>
-                      <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 shrink-0">
-                        +{job.match_pct}% match
+                      <span className="chip chip-success shrink-0 tabular-nums">
+                        {job.match_pct}%
                       </span>
                     </div>
                   </div>
@@ -797,58 +781,43 @@ export const JDMatcherPage: React.FC = () => {
         </div>
       ) : (
         /* Full Browse Job Recommendations Tab */
-        <div className="space-y-6 font-mono text-xs">
-          {/* Tech vs Non-Tech Track Switcher Header */}
-          <div className="p-4 rounded-2xl glass-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-sans">
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-mono text-[var(--accent-color)] font-bold uppercase tracking-wider block">
-                [DATASET ACCESS: 415+ INDEXED ROLES VIA BERT + FAISS]
-              </span>
-              <p className="text-xs font-extrabold text-[var(--text-main)]">
-                Filter by Technical vs Non-Technical Track
+        <div className="space-y-6">
+          <div className="card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p className="font-semibold text-[14px] tracking-tight">
+                Browse 415+ roles
               </p>
+              <p className="caption mt-0.5">Filter by track, then search your skills.</p>
             </div>
 
             {/* Track Switcher Control */}
-            <div className="flex p-1 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] font-mono text-xs">
+            <div className="segment">
               <button
                 type="button"
                 onClick={() => handleTrackChange('all')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-                  trackFilter === 'all'
-                    ? 'btn-accent shadow-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                }`}
+                className={`segment-btn ${trackFilter === 'all' ? 'segment-btn-active' : ''}`}
               >
-                <Layers className="w-3.5 h-3.5" /> All (415+)
+                <Layers className="w-3.5 h-3.5" /> All
               </button>
               <button
                 type="button"
                 onClick={() => handleTrackChange('technical')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-                  trackFilter === 'technical'
-                    ? 'btn-accent shadow-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                }`}
+                className={`segment-btn ${trackFilter === 'technical' ? 'segment-btn-active' : ''}`}
               >
-                <Code2 className="w-3.5 h-3.5 text-emerald-500" /> Technical Track
+                <Code2 className="w-3.5 h-3.5" /> Technical
               </button>
               <button
                 type="button"
                 onClick={() => handleTrackChange('general')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
-                  trackFilter === 'general'
-                    ? 'btn-accent shadow-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                }`}
+                className={`segment-btn ${trackFilter === 'general' ? 'segment-btn-active' : ''}`}
               >
-                <BriefcaseIcon className="w-3.5 h-3.5 text-sky-500" /> Non-Technical Track
+                <BriefcaseIcon className="w-3.5 h-3.5" /> Non-technical
               </button>
             </div>
           </div>
 
           {/* Search Controls Form */}
-          <div className="p-5 rounded-2xl glass-card space-y-4">
+          <div className="card p-5 space-y-4">
             <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-center gap-3">
               <div className="relative flex-1 w-full">
                 <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-3.5" />
@@ -856,8 +825,8 @@ export const JDMatcherPage: React.FC = () => {
                   type="text"
                   value={skillsQuery}
                   onChange={(e) => setSkillsQuery(e.target.value)}
-                  placeholder="Enter candidate skill(s) e.g. Java, Python, Excel, PyTorch, React, Docker..."
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  placeholder="Your skills, e.g. Python, React, Docker…"
+                  className="input-glow pl-10 pr-3 py-2.5"
                 />
               </div>
 
@@ -866,11 +835,11 @@ export const JDMatcherPage: React.FC = () => {
                 <select
                   value={selectedDomain}
                   onChange={(e) => setSelectedDomain(e.target.value)}
-                  className="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none cursor-pointer"
+                  className="input-glow pl-10 pr-8 py-2.5"
                 >
                   {domains.map((dom) => (
                     <option key={dom} value={dom}>
-                      {dom === 'All' ? 'All Domains' : dom}
+                      {dom === 'All' ? 'All domains' : dom}
                     </option>
                   ))}
                 </select>
@@ -879,16 +848,16 @@ export const JDMatcherPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={jobsLoading}
-                className="w-full md:w-auto px-6 py-2.5 rounded-xl btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+                className="btn-primary w-full md:w-auto px-6 py-2.5 text-sm"
               >
-                {jobsLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <span>$ search</span>}
+                {jobsLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Search'}
               </button>
             </form>
 
             {/* Quick Skill Search Chips with Multi-Select Toggling */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[var(--border-hairline)]">
-              <span className="text-[10px] text-[var(--text-muted)] uppercase mr-1">
-                {trackFilter === 'general' ? 'Non-Tech Presets:' : trackFilter === 'technical' ? 'Tech Presets:' : 'Popular Presets:'}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="caption mr-1">
+                {trackFilter === 'general' ? 'Suggestions' : trackFilter === 'technical' ? 'Suggestions' : 'Popular'}
               </span>
               {activePresets.map((preset) => {
                 const isSelected = skillsQuery
@@ -901,10 +870,10 @@ export const JDMatcherPage: React.FC = () => {
                     key={preset}
                     type="button"
                     onClick={() => handlePresetClick(preset)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] border transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-full text-[12px] font-medium border transition-all cursor-pointer ${
                       isSelected
-                        ? 'btn-accent font-bold border-transparent shadow-2xs'
-                        : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-color)] hover:text-[var(--text-main)]'
+                        ? 'bg-[var(--text-main)] text-[var(--bg-paper)] border-transparent'
+                        : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-main)] hover:border-[var(--border-strong)]'
                     }`}
                   >
                     {isSelected ? '✓ ' : '+ '}{preset}
@@ -914,120 +883,97 @@ export const JDMatcherPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Results Summary Header */}
-          <div className="flex items-center justify-between font-mono pb-1 border-b border-[var(--border-hairline)]">
-            <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" /> [MATCHED JOB RECOMMENDATIONS & SKILL GAPS ({jobs.length} FOUND)]
-            </span>
-            <span className="text-xs text-[var(--text-muted)]">
-              Track: <strong className="text-[var(--text-main)] uppercase">{trackFilter}</strong> • {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'} Matched
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-[15px] tracking-tight flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[var(--accent-color)]" /> Results ({jobs.length})
+            </h3>
+            <span className="caption capitalize">
+              {trackFilter} track · {jobs.length} {jobs.length === 1 ? 'role' : 'roles'}
             </span>
           </div>
 
           {/* Job Recommendation Cards Grid */}
           {jobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans stagger-children">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 stagger-children">
               {jobs.map((job) => (
                 <div
                   key={job.job_id}
-                  className="card-lift p-5 rounded-2xl glass-card space-y-4 font-mono text-xs flex flex-col justify-between"
+                  className="card card-lift p-5 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
-                    {/* Role Title & Domain */}
-                    <div className="flex items-start justify-between border-b border-[var(--border-hairline)] pb-3 gap-2">
-                      <div className="space-y-1">
-                        <h4 className="font-extrabold text-sm text-[var(--text-main)] font-sans leading-tight">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-semibold text-sm tracking-tight leading-snug">
                           {job.job_role}
                         </h4>
-                        <p className="text-[11px] text-[var(--text-muted)] flex items-center gap-1">
+                        <p className="caption flex items-center gap-1 mt-0.5">
                           <Building2 className="w-3.5 h-3.5 shrink-0" /> {job.domain} • {job.experience_label}
                         </p>
                       </div>
 
-                      <span
-                        className={`px-2.5 py-1 rounded-md text-[11px] font-bold border shrink-0 font-mono ${
-                          job.match_pct >= 70
-                            ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border-[var(--diff-add)]/30'
-                            : job.match_pct >= 50
-                            ? 'bg-sky-500/10 text-sky-500 border-sky-500/30'
-                            : 'bg-amber-500/10 text-amber-500 border-amber-500/30'
-                        }`}
-                      >
-                        +{job.match_pct}% match
+                      <span className="chip chip-success shrink-0 tabular-nums">
+                        {job.match_pct}%
                       </span>
                     </div>
 
-                    {/* Overlapping Skills Section */}
                     <div className="space-y-1.5">
-                      <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[var(--diff-add)]" /> Overlapping Skills ({job.skill_overlap.length}):
-                      </div>
+                      <p className="caption font-medium flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[var(--success)]" /> You have ({job.skill_overlap.length})
+                      </p>
                       {job.skill_overlap.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {job.skill_overlap.map((skill, sIdx) => (
-                            <span
-                              key={sIdx}
-                              className="px-2.5 py-0.5 rounded-md text-[10px] bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 font-semibold"
-                            >
-                              + {skill}
+                            <span key={sIdx} className="chip chip-success">
+                              {skill}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-[var(--text-muted)] italic">
-                          No direct overlap detected with input
+                        <span className="caption italic">
+                          No direct overlap with your input
                         </span>
                       )}
                     </div>
 
-                    {/* Critical Skill Gaps Section (Same treatment as Career Path) */}
-                    <div className="space-y-1.5 pt-1">
-                      <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5 text-[var(--diff-del)]" /> Critical Skill Gaps ({job.skill_gap.length}):
-                      </div>
+                    <div className="space-y-1.5">
+                      <p className="caption font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 text-[var(--diff-del)]" /> To learn ({job.skill_gap.length})
+                      </p>
                       {job.skill_gap.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {job.skill_gap.slice(0, 5).map((gap, gIdx) => (
-                            <span
-                              key={gIdx}
-                              className="px-2.5 py-0.5 rounded-md text-[10px] bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold"
-                            >
-                              - {gap}
+                            <span key={gIdx} className="chip chip-danger">
+                              {gap}
                             </span>
                           ))}
                           {job.skill_gap.length > 5 && (
-                            <span className="text-[10px] text-[var(--text-muted)] self-center">
+                            <span className="caption self-center">
                               +{job.skill_gap.length - 5} more
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-[var(--diff-add)] font-bold">
-                          ✓ All baseline skills present
+                        <span className="caption font-medium text-[var(--success)]">
+                          All baseline skills present
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Card Footer: Salary */}
-                  <div className="border-t border-[var(--border-hairline)] pt-2.5 flex items-center justify-between text-[11px] text-[var(--text-muted)] font-mono">
-                    <span>Est. Salary: <strong className="text-[var(--text-main)]">{job.salary_range}</strong></span>
-                    <span className="text-[var(--accent-color)] font-bold flex items-center gap-1">
-                      View Details <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
+                  <p className="caption pt-3 mt-3 border-t border-[var(--border-hairline)]">
+                    Est. salary <strong className="text-[var(--text-main)]">{job.salary_range}</strong>
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            /* Empty Search Results State */
-            <div className="p-10 rounded-2xl glass-card text-center space-y-3 text-xs text-[var(--text-muted)] font-mono">
-              <Search className="w-8 h-8 text-[var(--text-muted)]/40 mx-auto" />
-              <p className="font-bold text-[var(--text-main)] text-sm">
-                No matching jobs found for "{skillsQuery}".
+            <div className="card p-10 text-center">
+              <Search className="w-8 h-8 text-[var(--text-subtle)] mx-auto" />
+              <p className="font-semibold text-[15px] mt-3">
+                No matches for “{skillsQuery}”
               </p>
-              <p className="max-w-md mx-auto font-sans text-[11px]">
-                Try searching with popular skills like Java, Python, PyTorch, React, or Excel, or select "All (415+)" track above.
+              <p className="caption max-w-md mx-auto mt-1">
+                Try popular skills like Python, React, or Excel — or switch to the All track.
               </p>
             </div>
           )}

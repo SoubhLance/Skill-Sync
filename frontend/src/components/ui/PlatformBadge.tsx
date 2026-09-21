@@ -13,38 +13,27 @@ export const PlatformBadge: React.FC<PlatformBadgeProps> = React.memo(({
   status,
   detail,
   metric,
-  className = "",
+  className = '',
 }) => {
   const isPassed = status === 'passed' || status === 'connected' || status === 'ready';
 
   return (
-    <div className={`p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs flex items-center justify-between transition-all hover:border-[var(--accent-color)]/40 hover:bg-[var(--bg-elevated)] ${className}`}>
-      <div className="flex items-center gap-2.5">
-        {/* Status Badge Box */}
-        <span
-          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border ${
-            isPassed
-              ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border-[var(--diff-add)]/30'
-              : 'bg-[var(--diff-del-bg)] text-[var(--diff-del)] border-[var(--diff-del)]/30'
-          }`}
-        >
-          {isPassed ? '✓ PASSED' : '⌛ PENDING'}
-        </span>
-
-        <div>
-          <span className="font-bold text-[var(--text-main)] block leading-none">
+    <div className={`px-4 py-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-center justify-between gap-3 transition-all duration-200 hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-sm)] ${className}`}>
+      <div className="flex items-center gap-3 min-w-0">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${isPassed ? 'bg-[var(--success)]' : 'bg-[var(--warning)]'}`} />
+        <div className="min-w-0">
+          <p className="font-semibold text-[13.5px] tracking-tight truncate">
             {platform}
-          </span>
-          {detail && (
-            <span className="text-[11px] text-[var(--text-muted)] block mt-1">
-              {detail}
+            <span className={`ml-2 text-[11px] font-semibold ${isPassed ? 'text-[var(--success)]' : 'text-[var(--warning)]'}`}>
+              {isPassed ? 'Connected' : 'Pending'}
             </span>
-          )}
+          </p>
+          {detail && <p className="caption truncate mt-0.5">{detail}</p>}
         </div>
       </div>
 
       {metric && (
-        <span className="font-semibold text-[var(--text-main)] bg-[var(--bg-paper)] px-2 py-1 border border-[var(--border-hairline)] rounded-md">
+        <span className="caption shrink-0 tabular-nums bg-[var(--bg-elevated)] px-2 py-1 rounded-lg">
           {metric}
         </span>
       )}

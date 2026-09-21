@@ -78,15 +78,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   return (
-    <div className="w-full space-y-2 font-mono">
+    <div className="w-full space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-main)] flex items-center gap-1.5">
+        <label className="field-label">
           {icon || <FileUp className="w-4 h-4 text-[var(--accent-color)]" />}
           {label}
         </label>
         {file && (
-          <span className="text-[10px] text-[#1A7F37] dark:text-[#2DA44E] font-bold flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Ready for matching
+          <span className="caption font-medium text-[var(--success)] flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Attached
           </span>
         )}
       </div>
@@ -110,10 +110,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`relative group cursor-pointer overflow-hidden rounded-md border-2 border-dashed p-6 text-center transition-all duration-200 ${
+            className={`relative group cursor-pointer overflow-hidden rounded-2xl border-[1.5px] border-dashed p-6 md:p-7 text-center transition-all duration-200 ${
               isDragOver
-                ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/10 scale-[1.01] shadow-lg'
-                : 'border-[var(--border-hairline)] hover:border-[var(--accent-color)]/60 bg-[var(--bg-paper)] hover:bg-[var(--bg-surface)]'
+                ? 'border-[var(--accent-color)] bg-[var(--badge-bg)] scale-[1.01] shadow-[var(--shadow-md)]'
+                : 'border-[var(--border-hairline)] hover:border-[var(--accent-color)]/60 bg-[var(--bg-paper)] hover:bg-[var(--bg-surface)] hover:shadow-[var(--shadow-sm)]'
             }`}
           >
             {/* Aceternity Grid Accent Background Pattern */}
@@ -123,7 +123,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               <motion.div
                 animate={{ y: isDragOver ? -4 : 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="w-12 h-12 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-center justify-center shadow-xs text-[var(--accent-color)] group-hover:scale-110 transition-transform"
+                className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-[var(--shadow-sm)] text-white group-hover:scale-105 transition-transform"
+                style={{ background: 'var(--grad-accent)' }}
               >
                 <UploadCloud className="w-6 h-6" />
               </motion.div>
@@ -132,7 +133,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 <p className="text-xs font-bold text-[var(--text-main)] font-sans">
                   Drag & drop your document here, or <span className="text-[var(--accent-color)] underline decoration-dashed underline-offset-4">browse</span>
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)] font-mono">
+                <p className="caption">
                   {subLabel}
                 </p>
               </div>
@@ -144,10 +145,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="p-4 rounded-md border border-[#2DA44E]/40 bg-[#DAFBE1]/20 dark:bg-[#2DA44E]/10 flex items-center justify-between font-mono text-xs shadow-xs"
+            className="p-4 card p-4 flex items-center justify-between"
           >
             <div className="flex items-center space-x-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-sm bg-[#DAFBE1] dark:bg-[#2DA44E]/20 text-[#1A7F37] dark:text-[#2DA44E] flex items-center justify-center shrink-0 border border-[#2DA44E]/30 font-bold">
+              <div className="w-10 h-10 rounded-xl bg-[var(--bg-surface)] text-[var(--diff-add)] flex items-center justify-center shrink-0 border border-[var(--diff-add)]/30 font-bold">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="truncate">
@@ -179,7 +180,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         <motion.p
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-[10px] text-[#CF222E] flex items-center gap-1 font-mono pt-1"
+          className="caption text-[var(--diff-del)] flex items-center gap-1 pt-1"
         >
           <AlertCircle className="w-3 h-3 shrink-0" />
           {errorMsg}

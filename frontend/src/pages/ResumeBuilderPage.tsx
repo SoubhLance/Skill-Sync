@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  FileText, 
-  Download, 
-  Code, 
-  Check, 
+import {
+  Download,
+  Code,
+  Check,
   Eye,
-  User,
-  Sparkles
+  User
 } from 'lucide-react';
 
 interface ResumeTemplate {
@@ -43,44 +41,34 @@ export const ResumeBuilderPage: React.FC = () => {
   );
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 text-[var(--text-main)] animate-fade-in">
       {/* Header */}
-      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5 mb-1">
-            <FileText className="w-3.5 h-3.5 text-[var(--accent-color)]" /> $ skillsync resume-builder --generate
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-sans">
-            LaTeX Resume Builder
+          <h1 className="h-section text-2xl md:text-3xl">
+            Resume builder
           </h1>
+          <p className="caption mt-1">Pick a template, fill in your details, preview the result.</p>
         </div>
 
-        {/* Form vs Live Preview Tab Switcher */}
-        <div className="flex p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
+        <div className="segment">
           <button
             onClick={() => setActiveTab('form')}
-            className={`px-4 py-2 font-bold rounded-lg transition-all cursor-pointer ${
-              activeTab === 'form' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-            }`}
+            className={`segment-btn ${activeTab === 'form' ? 'segment-btn-active' : ''}`}
           >
-            Form & Details
+            Details
           </button>
           <button
             onClick={() => setActiveTab('preview')}
-            className={`px-4 py-2 font-bold rounded-lg transition-all cursor-pointer ${
-              activeTab === 'preview' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-            }`}
+            className={`segment-btn ${activeTab === 'preview' ? 'segment-btn-active' : ''}`}
           >
-            Live Rendered Preview
+            Preview
           </button>
         </div>
       </div>
 
-      {/* 5 Template Selector Cards Bar */}
-      <div className="space-y-3 font-mono">
-        <div className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider">
-          [SELECT FROM 5 PRE-DESIGNED TEMPLATES]
-        </div>
+      <div className="space-y-3">
+        <p className="font-semibold text-[14px] tracking-tight">Choose a template</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 stagger-children">
           {RESUME_TEMPLATES.map((tmpl) => {
@@ -89,10 +77,10 @@ export const ResumeBuilderPage: React.FC = () => {
               <div
                 key={tmpl.id}
                 onClick={() => setSelectedTemplate(tmpl.id)}
-                className={`p-4 rounded-xl glass-card cursor-pointer transition-all flex flex-col justify-between space-y-2 card-lift ${
+                className={`card card-lift p-4 cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? 'border-[var(--accent-color)] ring-2 ring-[var(--accent-color)]/30'
-                    : 'hover:border-[var(--accent-color)]/40'
+                    ? '!border-[var(--accent-color)] ring-2 ring-[var(--accent-color)]/25'
+                    : 'hover:border-[var(--border-strong)]'
                 }`}
               >
                 <div className="space-y-1">
@@ -121,94 +109,94 @@ export const ResumeBuilderPage: React.FC = () => {
 
       {/* Main Content Area: Form vs Live Preview */}
       {activeTab === 'form' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-mono text-xs">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Form Fields Section */}
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-4">
-            <div className="border-b border-[var(--border-hairline)] pb-3 font-bold text-[var(--text-main)] uppercase flex items-center gap-2">
+          <div className="card p-6 md:p-8 space-y-5">
+            <div className="font-semibold text-[15px] tracking-tight flex items-center gap-2">
               <User className="w-4 h-4 text-[var(--accent-color)]" /> Personal & Contact Info
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Full Name</label>
+                <label className="field-label mb-1">Full Name</label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="w-full px-3.5 py-2.5 input-glow"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Email</label>
+                <label className="field-label mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="w-full px-3.5 py-2.5 input-glow"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Phone</label>
+                <label className="field-label mb-1">Phone</label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="w-full px-3.5 py-2.5 input-glow"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">GitHub URL</label>
+                <label className="field-label mb-1">GitHub URL</label>
                 <input
                   type="text"
                   value={githubUrl}
                   onChange={(e) => setGithubUrl(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="w-full px-3.5 py-2.5 input-glow"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Professional Summary</label>
+              <label className="field-label mb-1">Professional Summary</label>
               <textarea
                 rows={3}
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
-                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                className="w-full p-3.5 input-glow"
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Skills Array (Comma Separated)</label>
+              <label className="field-label mb-1">Skills Array (Comma Separated)</label>
               <textarea
                 rows={2}
                 value={skills}
                 onChange={(e) => setSkills(e.target.value)}
-                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                className="w-full p-3.5 input-glow"
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Work Experience & Projects</label>
+              <label className="field-label mb-1">Work Experience & Projects</label>
               <textarea
                 rows={4}
                 value={experience}
                 onChange={(e) => setExperience(e.target.value)}
-                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                className="w-full p-3.5 input-glow"
               />
             </div>
           </div>
 
           {/* Quick Rendered Draft Box */}
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-4 flex flex-col justify-between">
+          <div className="card p-6 md:p-8 space-y-5 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="border-b border-[var(--border-hairline)] pb-3 font-bold text-[var(--text-main)] uppercase flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-[var(--accent-color)]" /> Template Preview: {selectedTemplate}
                 </span>
-                <span className="text-[10px] text-[var(--accent-color)] font-mono">LaTeX Draft</span>
+                <span className="caption">Draft</span>
               </div>
 
               {/* Rendered Document Mock Box */}
@@ -237,15 +225,15 @@ export const ResumeBuilderPage: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('preview')}
-              className="w-full py-3 px-4 rounded-xl btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md"
+              className="btn-primary w-full py-3 px-4 text-sm"
             >
-              $ render --template={selectedTemplate}
+              Continue to preview
             </button>
           </div>
         </div>
       ) : (
         /* Rendered Document & Mock Code Screen */
-        <div className="p-8 rounded-2xl glass-card space-y-6 font-mono text-xs">
+        <div className="card p-6 md:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-hairline)] pb-4 gap-3">
             <div>
               <span className="font-bold text-sm text-[var(--text-main)] block font-sans">
@@ -255,13 +243,13 @@ export const ResumeBuilderPage: React.FC = () => {
             </div>
 
             <div className="flex gap-2">
-              <button className="px-4 py-2 rounded-xl bg-[var(--bg-paper)] text-[var(--text-main)] border border-[var(--border-hairline)] hover:bg-[var(--bg-elevated)] font-bold flex items-center gap-1.5 transition-colors cursor-pointer">
+              <button className="btn-secondary px-4 py-2 text-[13px]">
                 <Code className="w-3.5 h-3.5" /> View Raw LaTeX
               </button>
               <button
                 disabled
                 title="PDF export coming soon"
-                className="px-4 py-2 rounded-xl btn-accent font-bold flex items-center gap-1.5 opacity-50 cursor-not-allowed"
+                className="btn-primary px-4 py-2 text-[13px] opacity-50 cursor-not-allowed"
               >
                 <Download className="w-3.5 h-3.5" /> Download PDF
               </button>

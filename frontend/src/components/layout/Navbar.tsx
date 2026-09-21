@@ -58,19 +58,21 @@ export const Navbar: React.FC = () => {
         <div className="absolute left-0 top-0 bottom-0 w-0.5 accent-strip" />
 
         {/* Brand Header */}
-        <div className="pl-4 pr-3 py-4 border-b border-[var(--border-hairline)] flex items-center justify-between font-mono">
+        <div className="pl-4 pr-3 py-[18px] border-b border-[var(--border-hairline)] flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 overflow-hidden group min-w-0">
-            <img
-              src="/logo.png"
-              alt="SkillSync Mark"
-              className="w-8 h-8 object-contain shrink-0 group-hover:scale-105 transition-transform"
-            />
+            <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-[var(--shadow-sm)] group-hover:scale-[1.03] transition-transform overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)]">
+              <img
+                src="/logo.png"
+                alt="SkillSync Mark"
+                className="w-6 h-6 object-contain"
+              />
+            </span>
             {!collapsed && (
               <div className="truncate">
-                <span className="font-extrabold text-sm tracking-tight text-[var(--text-main)] block leading-none">
-                  Skill<span className="text-[var(--accent-color)]">Sync</span>
+                <span className="font-extrabold text-[15px] tracking-tight text-[var(--text-main)] block leading-none font-sans">
+                  Skill<span className="text-gradient">Sync</span>
                 </span>
-                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider block mt-0.5">
+                <span className="caption block mt-1 !text-[11px]">
                   Learn • Upskill • Grow
                 </span>
               </div>
@@ -79,7 +81,7 @@ export const Navbar: React.FC = () => {
 
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg border border-[var(--border-hairline)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--accent-color)] transition-all shrink-0"
+            className="p-1.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--accent-color)]/50 hover:shadow-[var(--shadow-xs)] transition-all shrink-0"
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed
@@ -89,10 +91,10 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Nav Links */}
-        <div className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto font-mono text-xs">
+        <div className="flex-1 px-2.5 py-4 space-y-1 overflow-y-auto scroll-thin">
           {!collapsed && (
-            <div className="px-3 py-1 text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">
-              Navigation
+            <div className="caption px-3 pb-2">
+              Workspace
             </div>
           )}
 
@@ -105,20 +107,23 @@ export const Navbar: React.FC = () => {
                 to={item.path}
                 id={`nav-${item.path.replace('/', '')}`}
                 title={collapsed ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
+                className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 border border-transparent ${
                   active
-                    ? 'btn-accent shadow-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-paper)]'
+                    ? 'bg-[var(--badge-bg)] border-[var(--accent-color)]/25 text-[var(--text-main)] shadow-[var(--shadow-xs)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hairline)]'
                 } ${collapsed ? 'justify-center' : ''}`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-[var(--text-muted)]'}`} />
+                {active && !collapsed && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full" style={{ background: 'var(--grad-accent)' }} />
+                )}
+                <Icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${active ? 'text-[var(--accent-color)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-main)]'}`} />
                 {!collapsed && (
-                  <span className="truncate flex-1 font-sans text-xs">
+                  <span className="truncate flex-1 font-sans text-[13px] tracking-tight">
                     {item.label}
                   </span>
                 )}
                 {!collapsed && item.badge && (
-                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-[var(--badge-bg)] text-[var(--badge-text)] rounded-md">
+                  <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--badge-bg)] text-[var(--badge-text)] border border-[var(--accent-color)]/20 rounded-md">
                     {item.badge}
                   </span>
                 )}
@@ -128,12 +133,12 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Bottom: Theme + User */}
-        <div className="p-2 border-t border-[var(--border-hairline)] space-y-1.5">
+        <div className="p-2.5 border-t border-[var(--border-hairline)] space-y-2 bg-[var(--bg-surface)]/60">
           {/* Theme switcher */}
           <button
             onClick={toggleTheme}
             id="nav-theme-toggle"
-            className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-[var(--border-hairline)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--accent-color)] transition-all ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--accent-color)]/50 hover:shadow-[var(--shadow-xs)] transition-all ${
               collapsed ? 'justify-center' : ''
             }`}
             title="Toggle theme"
@@ -142,8 +147,8 @@ export const Navbar: React.FC = () => {
               ? <Moon className="w-4 h-4 text-amber-400 shrink-0" />
               : <Sun className="w-4 h-4 text-orange-500 shrink-0" />}
             {!collapsed && (
-              <span className="text-xs font-mono font-semibold">
-                {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+              <span className="text-[13px] font-medium font-sans">
+                {theme === 'dark' ? 'Dark' : 'Light'}
               </span>
             )}
           </button>
@@ -153,27 +158,27 @@ export const Navbar: React.FC = () => {
             <div
               onClick={handlePfpClick}
               title="View Profile (/profile)"
-              className="flex items-center justify-between p-2 rounded-xl border border-[var(--border-hairline)] cursor-pointer hover:border-[var(--accent-color)] transition-all group card-lift"
+              className="flex items-center justify-between p-2 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer hover:border-[var(--accent-color)]/50 hover:shadow-[var(--shadow-sm)] transition-all group"
             >
-              <div className="flex items-center gap-2 overflow-hidden">
+              <div className="flex items-center gap-2.5 overflow-hidden">
                 {user.photoURL ? (
                   <img
                     src={user.photoURL}
                     alt="Avatar"
-                    className="w-7 h-7 rounded-lg object-cover border border-[var(--border-hairline)] shrink-0"
+                    className="w-8 h-8 rounded-xl object-cover border border-[var(--border-hairline)] shrink-0"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 text-white"
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-[13px] shrink-0 text-white shadow-[var(--shadow-xs)]"
                        style={{ background: 'var(--grad-accent)' }}>
                     {user.displayName?.charAt(0).toUpperCase() || <UserIcon className="w-3.5 h-3.5" />}
                   </div>
                 )}
                 {!collapsed && (
                   <div className="truncate min-w-0">
-                    <p className="text-xs font-bold text-[var(--text-main)] truncate leading-tight group-hover:text-[var(--accent-color)] transition-colors">
+                    <p className="text-[13px] font-semibold text-[var(--text-main)] truncate leading-tight font-sans tracking-tight">
                       {user.displayName || 'Dev User'}
                     </p>
-                    <p className="text-[10px] text-[var(--text-muted)] truncate">
+                    <p className="text-[11px] text-[var(--text-muted)] truncate font-sans">
                       {user.email}
                     </p>
                   </div>
@@ -185,7 +190,7 @@ export const Navbar: React.FC = () => {
                   onClick={handleLogout}
                   id="btn-logout"
                   title="Sign out"
-                  className="p-1 text-[var(--text-muted)] hover:text-[var(--diff-del)] rounded-lg hover:bg-[var(--diff-del-bg)] transition-colors shrink-0"
+                  className="p-1.5 text-[var(--text-muted)] hover:text-[var(--diff-del)] rounded-lg hover:bg-[var(--diff-del-bg)] transition-colors shrink-0"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -194,7 +199,7 @@ export const Navbar: React.FC = () => {
           ) : (
             <Link
               to="/login"
-              className="w-full py-2 px-3 rounded-xl btn-accent font-mono font-bold text-xs text-center block"
+              className="btn-secondary w-full py-2 px-3 text-[13px] justify-center"
             >
               {!collapsed ? '$ login' : '>'}
             </Link>
@@ -203,7 +208,7 @@ export const Navbar: React.FC = () => {
       </aside>
 
       {/* ── MOBILE HEADER ───────────────────────────────────────── */}
-      <div className="md:hidden sticky top-0 z-40 glass-card border-b border-[var(--border-hairline)] px-4 py-3 flex items-center justify-between font-mono">
+      <div className="md:hidden sticky top-0 z-40 glass-card border-b border-[var(--border-hairline)] px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src="/logo.png" alt="SkillSync Logo" className="w-7 h-7 object-contain" />
           <span className="font-extrabold text-sm text-[var(--text-main)]">
@@ -236,7 +241,7 @@ export const Navbar: React.FC = () => {
 
       {/* ── MOBILE MENU OVERLAY ─────────────────────────────────── */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[53px] glass-card border-b border-[var(--border-hairline)] p-4 z-40 space-y-1 font-mono text-xs shadow-xl animate-fade-up">
+        <div className="md:hidden fixed inset-x-0 top-[53px] glass-card border-b border-[var(--border-hairline)] p-4 z-40 space-y-1 text-[13px] shadow-xl animate-fade-up">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.path;
@@ -245,14 +250,14 @@ export const Navbar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-semibold transition-all ${
-                  active ? 'btn-accent' : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-paper)]'
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium border border-transparent transition-all ${
+                  active ? 'bg-[var(--badge-bg)] text-[var(--text-main)] border border-[var(--accent-color)]/25' : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-elevated)]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-[var(--accent-color)]'}`} />
+                <Icon className={`w-4 h-4 ${active ? 'text-[var(--accent-color)]' : 'text-[var(--text-muted)]'}`} />
                 {item.label}
                 {item.badge && (
-                  <span className="ml-auto px-1.5 py-0.5 text-[9px] font-mono font-bold bg-[var(--badge-bg)] text-[var(--badge-text)] rounded-md">
+                  <span className="ml-auto px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--badge-bg)] text-[var(--badge-text)] rounded-md">
                     {item.badge}
                   </span>
                 )}
@@ -269,7 +274,7 @@ export const Navbar: React.FC = () => {
               {theme === 'dark'
                 ? <Moon className="w-4 h-4 text-amber-400" />
                 : <Sun className="w-4 h-4 text-orange-500" />}
-              <span className="font-semibold">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+              <span className="font-semibold">{theme === 'dark' ? 'Dark' : 'Light'}</span>
             </button>
           </div>
         </div>

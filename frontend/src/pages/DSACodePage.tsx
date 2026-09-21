@@ -7,15 +7,12 @@ import { useDebounce } from '../lib/useDebounce';
 import { 
   RefreshCw,
   Cpu,
-  ArrowRight,
   Code2,
   Trophy,
   Award,
   Globe,
   ExternalLink,
-  Flame,
-  Zap,
-  BookOpen
+  Zap
 } from 'lucide-react';
 import { GithubIcon } from '../components/ui/icons';
 
@@ -101,25 +98,16 @@ export const DSACodePage: React.FC = () => {
   const hasPortfolio = Boolean(debouncedPortfolioUrl.trim());
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
-      {/* Page Header */}
-      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
-        <div>
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5 mb-1">
-            <Code2 className="w-3.5 h-3.5 text-[var(--accent-color)]" /> $ skillsync engineer --profile-evaluation
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-sans">
-            DSA & Competitive Signal Extractor
-          </h1>
-        </div>
-
-        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3.5 py-1.5 border border-[var(--border-hairline)] rounded-xl">
-          mode: async live multi-platform scrapers
-        </span>
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 text-[var(--text-main)] animate-fade-in">
+      <div>
+        <h1 className="h-section text-2xl md:text-3xl">
+          Coding profiles
+        </h1>
+        <p className="caption mt-1">Link your handles — scores update live from each platform.</p>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] font-mono text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] text-[var(--diff-del)] text-sm flex items-center gap-2">
           <span>{error}</span>
         </div>
       )}
@@ -128,131 +116,132 @@ export const DSACodePage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Form: Handle Inputs */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-6">
-            <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-4 font-sans">
-              <div>
-                <span className="text-xs font-mono font-bold text-[var(--accent-color)] uppercase tracking-wider block">
-                  [CONNECTED CODING PLATFORMS & PORTFOLIO]
-                </span>
-                <h2 className="text-lg font-extrabold text-[var(--text-main)]">
-                  Enter developer handles to extract verification signals
-                </h2>
-              </div>
+          <div className="card p-6 md:p-8 space-y-6">
+            <div>
+              <h2 className="font-semibold text-[16px] tracking-tight">
+                Your handles
+              </h2>
+              <p className="caption mt-0.5">Four platforms, one combined score.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center gap-1.5">
-                  <GithubIcon className="w-3.5 h-3.5" /> GitHub Handle
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="field">
+                <label className="field-label">
+                  <GithubIcon className="w-3.5 h-3.5" /> GitHub
                 </label>
                 <input
                   type="text"
                   value={rawGithubHandle}
                   onChange={(e) => setRawGithubHandle(e.target.value)}
                   placeholder="e.g. tourist"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="input-glow px-3.5 py-2.5"
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center gap-1.5">
-                  <Code2 className="w-3.5 h-3.5 text-amber-500" /> LeetCode Handle
+              <div className="field">
+                <label className="field-label">
+                  <Code2 className="w-3.5 h-3.5" /> LeetCode
                 </label>
                 <input
                   type="text"
                   value={rawLeetcodeHandle}
                   onChange={(e) => setRawLeetcodeHandle(e.target.value)}
                   placeholder="e.g. tourist"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="input-glow px-3.5 py-2.5"
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center gap-1.5">
-                  <Trophy className="w-3.5 h-3.5 text-emerald-500" /> CodeChef Handle
+              <div className="field">
+                <label className="field-label">
+                  <Trophy className="w-3.5 h-3.5" /> CodeChef
                 </label>
                 <input
                   type="text"
                   value={rawCodechefHandle}
                   onChange={(e) => setRawCodechefHandle(e.target.value)}
                   placeholder="e.g. tourist"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="input-glow px-3.5 py-2.5"
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center gap-1.5">
-                  <Award className="w-3.5 h-3.5 text-sky-500" /> HackerRank Handle
+              <div className="field">
+                <label className="field-label">
+                  <Award className="w-3.5 h-3.5" /> HackerRank
                 </label>
                 <input
                   type="text"
                   value={rawHackerrankHandle}
                   onChange={(e) => setRawHackerrankHandle(e.target.value)}
                   placeholder="e.g. tourist"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
-                />
-              </div>
-
-              {/* Portfolio Link Field */}
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-indigo-500" /> Personal Portfolio Website Link
-                  </span>
-                  <span className="text-[10px] text-[var(--diff-add)] font-extrabold bg-[var(--diff-add-bg)] px-2 py-0.5 rounded-md border border-[var(--diff-add)]/30">
-                    +3% Evaluation Boost
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  value={rawPortfolioUrl}
-                  onChange={(e) => setRawPortfolioUrl(e.target.value)}
-                  placeholder="e.g. https://alexmercer.dev or myportfolio.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center justify-between">
-                  <span>Hackathon Wins (+5% bonus)</span>
-                  <Flame className="w-3.5 h-3.5 text-rose-500" />
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={hackathonWins}
-                  onChange={(e) => setHackathonWins(parseInt(e.target.value) || 0)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1 flex items-center justify-between">
-                  <span>Research Papers (+8% bonus)</span>
-                  <BookOpen className="w-3.5 h-3.5 text-sky-500" />
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={papersPublished}
-                  onChange={(e) => setPapersPublished(parseInt(e.target.value) || 0)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                  className="input-glow px-3.5 py-2.5"
                 />
               </div>
             </div>
 
+            {/* Progressive disclosure: extras hidden until needed */}
+            <details className="disclosure">
+              <summary>
+                <Globe className="w-4 h-4 text-[var(--accent-color)]" />
+                Extras that boost your score
+                <span className="chip chip-success ml-auto">up to +16%</span>
+              </summary>
+              <div className="disclosure-body grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="field sm:col-span-2">
+                  <label className="field-label">
+                    Portfolio link
+                  </label>
+                  <p className="field-hint">Adds 3% when provided.</p>
+                  <input
+                    type="text"
+                    value={rawPortfolioUrl}
+                    onChange={(e) => setRawPortfolioUrl(e.target.value)}
+                    placeholder="https://you.dev"
+                    className="input-glow px-3.5 py-2.5"
+                  />
+                </div>
+
+                <div className="field">
+                  <label className="field-label">
+                    Hackathon wins
+                  </label>
+                  <p className="field-hint">+5% bonus.</p>
+                  <input
+                    type="number"
+                    min="0"
+                    value={hackathonWins}
+                    onChange={(e) => setHackathonWins(parseInt(e.target.value) || 0)}
+                    className="input-glow px-3.5 py-2.5"
+                  />
+                </div>
+
+                <div className="field">
+                  <label className="field-label">
+                    Research papers
+                  </label>
+                  <p className="field-hint">+8% bonus.</p>
+                  <input
+                    type="number"
+                    min="0"
+                    value={papersPublished}
+                    onChange={(e) => setPapersPublished(parseInt(e.target.value) || 0)}
+                    className="input-glow px-3.5 py-2.5"
+                  />
+                </div>
+              </div>
+            </details>
+
             <button
               onClick={handleAnalyzeProfile}
               disabled={analyzing}
-              className="w-full py-3.5 px-6 rounded-xl btn-accent font-mono font-extrabold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+              className="btn-primary w-full py-3.5 px-6 text-sm"
             >
               {analyzing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> $ computing live developer signals...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Analyzing…
                 </>
               ) : (
                 <>
-                  <Cpu className="w-4 h-4" /> $ calculate --developer-evaluation <ArrowRight className="w-4 h-4" />
+                  <Cpu className="w-4 h-4" /> Analyze profiles
                 </>
               )}
             </button>
@@ -260,14 +249,11 @@ export const DSACodePage: React.FC = () => {
         </div>
 
         {/* Right Column: Score Gauge & Platform Verifications */}
-        <div className="space-y-6 font-mono">
-          <DiffStatDisplay score={readinessScore} label="Holistic Developer Evaluation Score" />
+        <div className="space-y-6">
+          <DiffStatDisplay score={readinessScore} label="Developer score" />
 
           <div className="space-y-3">
-            <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider border-b border-[var(--border-hairline)] pb-2 flex items-center justify-between">
-              <span>Platform Verification Badges</span>
-              <span className="text-[10px] text-[var(--accent-color)]">5 Signals Tracked</span>
-            </div>
+            <p className="font-semibold text-[14px] tracking-tight">Platforms</p>
 
             <PlatformBadge
               platform="GitHub"
@@ -325,7 +311,7 @@ export const DSACodePage: React.FC = () => {
       </div>
 
       {/* Detailed Platform Statistics Grid */}
-      <div className="space-y-6 pt-4 font-mono text-xs">
+      <div className="space-y-6 pt-4">
         <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-2">
           <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider block flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-500" /> [DETAILED PLATFORM SIGNALS & COMPETITIVE PROGRAMMING METRICS]
@@ -561,7 +547,7 @@ export const DSACodePage: React.FC = () => {
 
       {/* Portfolio Link Display Banner */}
       {hasPortfolio && (
-        <div className="p-5 rounded-2xl glass-card border border-[var(--diff-add)]/30 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono">
+        <div className="p-5 rounded-2xl glass-card border border-[var(--diff-add)]/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-[var(--diff-add-bg)] text-[var(--diff-add)] flex items-center justify-center shrink-0 border border-[var(--diff-add)]/30">
               <Globe className="w-5 h-5" />
@@ -583,18 +569,18 @@ export const DSACodePage: React.FC = () => {
             href={debouncedPortfolioUrl.startsWith('http') ? debouncedPortfolioUrl : `https://${debouncedPortfolioUrl}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-xl btn-accent font-bold text-xs flex items-center gap-1.5 cursor-pointer shrink-0 self-start md:self-auto shadow-md"
+            className="px-5 py-2.5 btn-secondary px-5 py-2.5 text-[13px] shrink-0 self-start md:self-auto"
           >
             Visit Portfolio <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       )}
 
-      {/* Live GitHub Commit Signal Graph */}
-      <div className="border-t border-[var(--border-hairline)] pt-8 space-y-4">
-        <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider block font-mono">
-          [LIVE COMMIT SIGNAL GRAPH & CONTRIBUTION HISTORY]
-        </span>
+      <div className="pt-8 space-y-4">
+        <div>
+          <h2 className="font-semibold text-[16px] tracking-tight">Contribution history</h2>
+          <p className="caption mt-0.5">Live from the GitHub handle above.</p>
+        </div>
         <CommitGraph username={debouncedGithubHandle} />
       </div>
     </div>

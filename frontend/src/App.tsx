@@ -19,9 +19,17 @@ const InterroXPage = lazy(() => import('./pages/InterroXPage').then(m => ({ defa
 const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 
 const PageFallback: React.FC = () => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] font-mono text-xs text-[var(--text-muted)] space-y-3">
-    <div className="w-5 h-5 border-2 border-[var(--text-main)] border-t-[var(--accent-color)] rounded-full animate-spin" />
-    <span>$ loading module chunk...</span>
+  <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 animate-fade-in">
+    <div className="relative">
+      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-[var(--shadow-sm)] animate-pulse" style={{ background: 'var(--grad-accent)' }}>
+        <span className="text-white font-extrabold text-sm font-sans">S</span>
+      </div>
+      <div className="absolute -inset-1.5 rounded-[18px] border border-[var(--accent-color)]/30 animate-ping opacity-30" />
+    </div>
+    <div className="text-center space-y-1">
+      <p className="font-sans text-sm font-semibold text-[var(--text-main)]">Loading workspace…</p>
+      <p className="font-mono text-[11px] text-[var(--text-muted)]">$ importing module chunk</p>
+    </div>
   </div>
 );
 
@@ -33,12 +41,16 @@ const AppLayout: React.FC = () => {
   }, [getToken]);
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300 antialiased">
       <Navbar />
-      <main className="flex-1 overflow-x-hidden min-h-screen animate-fade-in">
-        <Suspense fallback={<PageFallback />}>
-          <Outlet />
-        </Suspense>
+      <main className="flex-1 overflow-x-hidden min-h-screen min-w-0 animate-fade-in relative">
+        {/* Subtle top fade for depth, theme-aware */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40" style={{ background: 'var(--grad-hero)' }} />
+        <div className="relative">
+          <Suspense fallback={<PageFallback />}>
+            <Outlet />
+          </Suspense>
+        </div>
       </main>
     </div>
   );

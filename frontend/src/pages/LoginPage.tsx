@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Terminal, Mail, Lock, LogIn, UserPlus, AlertCircle, ArrowLeft, Zap, Shield, TrendingUp } from 'lucide-react';
+import { AmbientForest } from '../components/ui/AmbientForest';
+import { Terminal, Mail, Lock, LogIn, UserPlus, AlertCircle, ArrowLeft, Zap, Shield, TrendingUp, GitCommitHorizontal, ScanText, Crosshair } from 'lucide-react';
+
+const TAGLINE = 'We translate it.';
 
 export const LoginPage: React.FC = () => {
   const { loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
@@ -57,140 +60,201 @@ export const LoginPage: React.FC = () => {
     { icon: Shield,     text: 'Secure OAuth & encrypted storage' },
   ];
 
+  const floatingSignals = [
+    { icon: GitCommitHorizontal, text: '2,431 commits synced', color: '#FBBF24', delay: '0s' },
+    { icon: ScanText,            text: '768-d resume vectors', color: '#6EE7B7', delay: '1.4s' },
+    { icon: Crosshair,           text: '95% role fit',          color: '#FDBA74', delay: '2.6s' },
+  ];
+
+  // Typewriter for the gold headline (runs once, skipped on reduced motion)
+  const [typedCount, setTypedCount] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTypedCount(TAGLINE.length);
+      return;
+    }
+    let i = 0;
+    let cancelled = false;
+    let id = window.setTimeout(function tick() {
+      if (cancelled) return;
+      i += 1;
+      setTypedCount(i);
+      if (i < TAGLINE.length) id = window.setTimeout(tick, 60 + Math.random() * 70);
+    }, 900);
+    return () => { cancelled = true; window.clearTimeout(id); };
+  }, []);
+
+  // Render only the forest instance that's actually visible —
+  // the CSS-hidden twin would otherwise burn a second rAF loop.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+
+  // Gentle 3D tilt + spotlight tracking for the floating auth card
+  const cardWrapRef = useRef<HTMLDivElement>(null);
+  const onCardMove = (e: React.MouseEvent) => {
+    const el = cardWrapRef.current;
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `perspective(1000px) rotateX(${(-py * 4).toFixed(2)}deg) rotateY(${(px * 5).toFixed(2)}deg)`;
+    el.style.setProperty('--mx', `${((px + 0.5) * 100).toFixed(1)}%`);
+    el.style.setProperty('--my', `${((py + 0.5) * 100).toFixed(1)}%`);
+  };
+  const onCardLeave = () => {
+    const el = cardWrapRef.current;
+    if (el) el.style.transform = '';
+  };
+
   return (
     <div className="min-h-screen flex bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300">
 
-      {/* ── LEFT BRAND PANEL (desktop only) ─────────────────────── */}
-      <div className="hidden lg:flex flex-col justify-between w-[46%] relative overflow-hidden p-12"
-           style={{ background: 'linear-gradient(135deg, #0D1625 0%, #1a0a2e 50%, #0D1625 100%)' }}>
-        {/* Animated gradient orbs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-20 animate-pulse-glow"
-               style={{ background: 'radial-gradient(circle, #F59E0B 0%, transparent 70%)' }} />
-          <div className="absolute -bottom-32 -right-32 w-[400px] h-[400px] rounded-full opacity-15"
-               style={{ background: 'radial-gradient(circle, #818CF8 0%, transparent 70%)' }} />
-          <div className="hero-grid absolute inset-0 opacity-20" />
-        </div>
+      {/* ── LEFT BRAND PANEL (desktop only) — dark forest cinema ── */}
+      <div className="hidden lg:flex flex-col justify-between w-[46%] relative overflow-hidden p-12 bg-[#040805]">
+        {/* Rainforest backdrop (login only) — mounted only when visible */}
+        {isDesktop && <AmbientForest />}
 
         {/* Logo */}
-        <div className="relative z-10">
+        <div className="relative z-10 pt-7 animate-fade-up">
           <Link to="/" className="flex items-center gap-2.5 group w-fit">
-            <img src="/logo.png" alt="SkillSync" className="w-9 h-9 object-contain group-hover:scale-105 transition-transform" />
-            <span className="font-extrabold text-lg text-white font-sans">
-              Skill<span className="text-[#F59E0B]">Sync</span>
+            <img src="/logo.png" alt="SkillSync" className="w-9 h-9 object-contain group-hover:scale-105 transition-transform drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]" />
+            <span className="font-extrabold text-lg text-white font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+              Skill<span className="text-[#FBBF24]">Sync</span>
             </span>
           </Link>
         </div>
 
         {/* Hero copy */}
-        <div className="relative z-10 space-y-8">
+        <div className="relative z-10 space-y-8 pb-2">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-white/8 text-white/70 text-xs font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
-              v2.0 · Developer Signal Platform
+            <div className="animate-fade-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-black/60 text-white/75 text-xs" style={{ animationDelay: '0.1s' }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FBBF24] animate-pulse" />
+              Developer signal platform
             </div>
-            <h1 className="text-3xl font-extrabold text-white leading-tight font-sans">
+            <h1 className="animate-fade-up text-[2.6rem] font-extrabold text-white leading-[1.05] tracking-tight font-sans drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]" style={{ animationDelay: '0.18s' }}>
               Your code speaks.<br />
-              <span style={{
-                background: 'linear-gradient(135deg, #F59E0B 0%, #818CF8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
-                We translate it.
+              <span
+                className="headline-pan"
+                style={{
+                  background: 'linear-gradient(135deg, #FDE68A 0%, #F59E0B 40%, #FBBF24 60%, #EA580C 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                {TAGLINE.slice(0, typedCount)}
               </span>
+              {typedCount < TAGLINE.length && <span className="type-caret" aria-hidden="true" />}
             </h1>
-            <p className="text-white/55 text-sm leading-relaxed font-sans max-w-xs">
+            <p className="animate-fade-up text-white/65 text-[15px] leading-relaxed font-sans max-w-xs drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]" style={{ animationDelay: '0.28s' }}>
               Sign in to unlock AI-powered resume scoring, career path roadmaps, and JD match analysis.
             </p>
           </div>
 
           {/* Feature bullets */}
           <ul className="space-y-3">
-            {bullets.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-3 text-sm text-white/70">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                     style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.25)' }}>
-                  <Icon className="w-3.5 h-3.5 text-[#F59E0B]" />
+            {bullets.map(({ icon: Icon, text }, i) => (
+              <li key={text} className="animate-fade-up flex items-center gap-3 text-sm text-white/80" style={{ animationDelay: `${0.36 + i * 0.08}s` }}>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                     style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(245,158,11,0.35)', boxShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
+                  <Icon className="w-3.5 h-3.5 text-[#FBBF24]" />
                 </div>
-                {text}
+                <span className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{text}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Footer quote */}
-        <div className="relative z-10 text-white/30 text-[11px] font-mono">
+        {/* Floating live-signal chips over the forest */}
+        <div className="pointer-events-none absolute right-8 top-[31%] z-10 hidden 2xl:flex flex-col gap-3">
+          {floatingSignals.map(({ icon: Icon, text, color, delay }) => (
+            <div
+              key={text}
+              className="float-y flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[#0A120D]/90 px-3.5 py-2.5 text-[13px] font-medium text-white/85"
+              style={{ animationDelay: delay, boxShadow: '0 8px 28px rgba(0,0,0,0.5)' }}
+            >
+              <span
+                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}55` }}
+              >
+                <Icon className="w-3.5 h-3.5" style={{ color }} />
+              </span>
+              {text}
+            </div>
+          ))}
+        </div>
+
+        <div className="relative z-10 pb-7 text-white/40 text-xs">
           © 2026 SkillSync · Learn • Upskill • Grow
         </div>
       </div>
 
       {/* ── RIGHT FORM PANEL ────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative overflow-hidden">
         {/* Subtle bg gradient for right panel */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'var(--grad-hero)' }} />
+        {/* Warm ambient wash echoing the forest */}
+        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(closest-side, rgba(234,88,12,0.13), transparent)' }} />
+        <div className="absolute -bottom-32 -left-24 h-96 w-96 rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(closest-side, rgba(251,191,36,0.11), transparent)' }} />
 
         <div className="relative w-full max-w-md space-y-6 animate-fade-up">
+          {/* Mobile forest strip (desktop gets the full panel) */}
+          {!isDesktop && (
+            <div className="lg:hidden relative h-36 overflow-hidden rounded-2xl border border-[var(--border-hairline)] shadow-[var(--shadow-sm)]">
+              <AmbientForest compact className="!absolute" />
+            </div>
+          )}
 
-          {/* Back link */}
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-[var(--diff-add)]" />
-            $ cd .. (back to landing)
+          <Link to="/" className="btn-tertiary w-fit">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back
           </Link>
 
-          {/* Card */}
-          <div className="glass-card rounded-2xl p-8 space-y-6">
+          {/* Floating card — rotating beam border + 3D tilt + spotlight */}
+          <div ref={cardWrapRef} onMouseMove={onCardMove} onMouseLeave={onCardLeave} className="beam-border tilt">
+          <div className="card spot-card p-7 md:p-8 space-y-6" style={{ border: 'none', borderRadius: 20 }}>
 
             {/* Header */}
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                      style={{ background: 'var(--grad-accent)' }}>
                   <Terminal className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-extrabold tracking-tight text-[var(--text-main)] font-sans leading-tight">
+                  <h1 className="h-section text-xl">
                     {mode === 'signin' ? 'Welcome back' : 'Create account'}
                   </h1>
-                  <p className="text-[11px] text-[var(--text-muted)] font-mono">
-                    {mode === 'signin' ? 'SkillSync Developer Auth' : 'Register your developer handle'}
+                  <p className="caption mt-0.5">
+                    {mode === 'signin' ? 'Sign in to your workspace' : 'Set up your workspace'}
                   </p>
                 </div>
               </div>
 
-              {/* Mode switcher pill */}
-              <div className="relative flex p-1 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)]">
-                {/* Sliding indicator */}
-                <div
-                  className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg transition-all duration-300 ease-in-out"
-                  style={{
-                    background: 'var(--grad-accent)',
-                    left: mode === 'signin' ? '4px' : 'calc(50%)',
-                    boxShadow: '0 2px 8px rgba(249,115,22,0.30)',
-                  }}
-                />
+              {/* Mode switcher — quiet segmented control */}
+              <div className="segment w-full">
                 <button
                   id="tab-signin"
                   type="button"
                   onClick={() => setMode('signin')}
-                  className={`relative flex-1 py-1.5 rounded-lg font-bold text-xs transition-colors z-10 ${
-                    mode === 'signin' ? 'text-white' : 'text-[var(--text-muted)]'
-                  }`}
+                  className={`segment-btn flex-1 justify-center ${mode === 'signin' ? 'segment-btn-active' : ''}`}
                 >
-                  Sign In
+                  Sign in
                 </button>
                 <button
                   id="tab-signup"
                   type="button"
                   onClick={() => setMode('signup')}
-                  className={`relative flex-1 py-1.5 rounded-lg font-bold text-xs transition-colors z-10 ${
-                    mode === 'signup' ? 'text-white' : 'text-[var(--text-muted)]'
-                  }`}
+                  className={`segment-btn flex-1 justify-center ${mode === 'signup' ? 'segment-btn-active' : ''}`}
                 >
-                  Sign Up
+                  Sign up
                 </button>
               </div>
             </div>
@@ -203,12 +267,12 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
 
-            {/* Google Button */}
+            {/* Google Button — secondary */}
             <button
               id="btn-google-auth"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] text-sm font-semibold text-[var(--text-main)] flex items-center justify-center gap-3 transition-all hover:border-[var(--accent-color)] hover:shadow-sm card-lift cursor-pointer"
+              className="btn-secondary w-full py-2.5 px-4 text-sm"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -224,17 +288,15 @@ export const LoginPage: React.FC = () => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-[var(--border-hairline)]" />
               </div>
-              <span className="relative px-3 bg-[var(--bg-surface)] text-[10px] uppercase font-bold text-[var(--text-muted)] font-mono rounded">
-                OR EMAIL AUTH
+              <span className="caption relative px-3 bg-[var(--bg-surface)]">
+                or continue with email
               </span>
             </div>
 
             {/* Form */}
             <form id="email-auth-form" onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1.5 font-mono">
-                  Email Address
-                </label>
+              <div className="field">
+                <label htmlFor="input-email" className="field-label">Email</label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -242,17 +304,15 @@ export const LoginPage: React.FC = () => {
                     id="input-email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="alex.developer@example.com"
+                    placeholder="you@example.com"
                     required
-                    className="input-glow w-full pl-9 pr-3 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-sm font-mono text-[var(--text-main)] transition-all"
+                    className="input-glow pl-9 pr-3 py-2.5"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1.5 font-mono">
-                  Password
-                </label>
+              <div className="field">
+                <label htmlFor="input-password" className="field-label">Password</label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -262,7 +322,7 @@ export const LoginPage: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="input-glow w-full pl-9 pr-3 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-sm font-mono text-[var(--text-main)] transition-all"
+                    className="input-glow pl-9 pr-3 py-2.5"
                   />
                 </div>
               </div>
@@ -271,22 +331,23 @@ export const LoginPage: React.FC = () => {
                 id="btn-email-submit"
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl btn-accent font-mono font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="btn-primary btn-shine w-full py-3 px-4 text-sm"
               >
                 {loading ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : mode === 'signin' ? (
-                  <><LogIn className="w-4 h-4" /> $ authenticate</>
+                  <><LogIn className="w-4 h-4" /> Sign in</>
                 ) : (
-                  <><UserPlus className="w-4 h-4" /> $ register --new</>
+                  <><UserPlus className="w-4 h-4" /> Create account</>
                 )}
               </button>
             </form>
 
           </div>
+          </div>
 
           {/* Bottom note */}
-          <p className="text-center text-[11px] text-[var(--text-muted)] font-mono">
+          <p className="caption text-center">
             By continuing you agree to SkillSync's{' '}
             <span className="text-[var(--accent-color)] cursor-pointer hover:underline">Terms of Service</span>
           </p>
