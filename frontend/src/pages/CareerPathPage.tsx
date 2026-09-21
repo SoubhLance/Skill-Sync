@@ -297,7 +297,7 @@ export const CareerPathPage: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)]">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Top Header */}
       <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
         <div>
@@ -310,11 +310,11 @@ export const CareerPathPage: React.FC = () => {
         </div>
 
         {/* Audience Track Toggle Control */}
-        <div className="flex p-0.5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
+        <div className="flex p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
           <button
             type="button"
             onClick={() => setAudience('student')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
               audience === 'student'
                 ? 'btn-accent shadow-sm'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -325,7 +325,7 @@ export const CareerPathPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setAudience('pro')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
               audience === 'pro'
                 ? 'btn-accent shadow-sm'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -341,7 +341,7 @@ export const CareerPathPage: React.FC = () => {
       {/* ========================================================================= */}
       {!hasGenerated ? (
         <form onSubmit={handleGenerate} className="space-y-8 font-mono text-xs">
-          <div className="p-6 md:p-8 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-6">
+          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-6">
             <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-4 font-sans">
               <div>
                 <span className="text-xs font-mono font-bold text-[var(--accent-color)] uppercase tracking-wider block">
@@ -351,7 +351,7 @@ export const CareerPathPage: React.FC = () => {
                   Add your skills or upload a resume to generate top 5 ranked career paths
                 </h2>
               </div>
-              <span className="hidden sm:inline-block px-2.5 py-1 rounded-sm bg-[var(--badge-bg)] text-[var(--badge-text)] font-mono text-xs font-bold border border-[var(--border-hairline)]">
+              <span className="hidden sm:inline-block px-3 py-1 rounded-lg bg-[var(--badge-bg)] text-[var(--badge-text)] font-mono text-xs font-bold border border-[var(--border-hairline)]">
                 Track: {audience === 'student' ? 'College Student' : 'Working Pro'}
               </span>
             </div>
@@ -366,7 +366,7 @@ export const CareerPathPage: React.FC = () => {
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
                 placeholder="e.g. Machine Learning Engineer, Backend Developer"
-                className="w-full px-3.5 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 required
               />
 
@@ -378,10 +378,10 @@ export const CareerPathPage: React.FC = () => {
                     key={role}
                     type="button"
                     onClick={() => setTargetRole(role)}
-                    className={`px-2 py-0.5 rounded-sm text-[10px] border transition-colors cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[10px] border transition-all cursor-pointer ${
                       targetRole === role
                         ? 'btn-accent font-bold border-transparent'
-                        : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--text-main)]'
+                        : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-color)] hover:text-[var(--text-main)]'
                     }`}
                   >
                     + {role}
@@ -396,7 +396,7 @@ export const CareerPathPage: React.FC = () => {
                 <UploadCloud className="w-4 h-4 text-sky-500" /> Option A: Resume PDF Upload (Auto Skill Extractor)
               </label>
 
-              <div className="border border-dashed border-[var(--border-hairline)] hover:border-[var(--accent-color)] rounded-sm p-5 text-center bg-[var(--bg-paper)] cursor-pointer transition-colors">
+              <div className="border-2 border-dashed border-[var(--border-hairline)] hover:border-[var(--accent-color)] rounded-xl p-6 text-center bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all">
                 <input
                   type="file"
                   accept=".pdf,.docx"
@@ -412,7 +412,7 @@ export const CareerPathPage: React.FC = () => {
                     </div>
                   ) : (
                     <>
-                      <UploadCloud className="w-6 h-6 text-[var(--accent-color)] mx-auto" />
+                      <UploadCloud className="w-7 h-7 text-[var(--accent-color)] mx-auto" />
                       <p className="font-bold text-[var(--text-main)] text-xs">
                         {resumeFile ? `Attached: ${resumeFile.name}` : "Drop resume PDF here or click to browse"}
                       </p>
@@ -425,7 +425,7 @@ export const CareerPathPage: React.FC = () => {
               </div>
 
               {extractStatusMessage && (
-                <p className="text-[11px] text-[#1A7F37] dark:text-[#2DA44E] font-mono font-semibold">
+                <p className="text-[11px] text-[var(--diff-add)] font-mono font-semibold">
                   {extractStatusMessage}
                 </p>
               )}
@@ -435,7 +435,7 @@ export const CareerPathPage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5">
-                  <Code2 className="w-4 h-4 text-[#2DA44E]" /> Option B: Interactive Skill Chips Input ({skills.length} added) *
+                  <Code2 className="w-4 h-4 text-[var(--diff-add)]" /> Option B: Interactive Skill Chips Input ({skills.length} added) *
                 </label>
                 <span className="text-[10px] text-[var(--text-muted)]">Type skill & press Enter or comma</span>
               </div>
@@ -448,33 +448,33 @@ export const CareerPathPage: React.FC = () => {
                   onChange={(e) => setSkillInputBuffer(e.target.value)}
                   onKeyDown={handleKeyDownSkill}
                   placeholder="e.g. PyTorch, Docker, FastAPI, Kubernetes"
-                  className="flex-1 px-3.5 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddSkill()}
-                  className="px-4 py-2.5 rounded-sm btn-accent font-bold text-xs flex items-center gap-1 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl btn-accent font-bold text-xs flex items-center gap-1 cursor-pointer shadow-md"
                 >
-                  <Plus className="w-4 h-4" /> Add Skill
+                  <Plus className="w-4 h-4" /> Add
                 </button>
               </div>
 
-              {/* Active Skill Chips Container */}
-              <div className="p-3.5 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] space-y-2 min-h-[60px]">
+              {/* Added Skills Chip Container */}
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] min-h-[50px] space-y-2">
                 <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Active Skills List:</div>
-                
+
                 {skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {skills.map((skill) => (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border-hairline)] font-mono text-xs font-bold shadow-2xs group"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border-hairline)] text-xs font-bold shadow-2xs group"
                       >
-                        <span className="text-[#1A7F37] dark:text-[#2DA44E]">+</span> {skill}
+                        {skill}
                         <button
                           type="button"
                           onClick={() => handleRemoveSkill(skill)}
-                          className="hover:text-[#CF222E] p-0.5 rounded-sm transition-colors cursor-pointer"
+                          className="hover:text-[var(--diff-del)] p-0.5 rounded-sm transition-colors cursor-pointer"
                           title={`Remove ${skill}`}
                         >
                           <X className="w-3 h-3" />
@@ -500,7 +500,7 @@ export const CareerPathPage: React.FC = () => {
                       type="button"
                       disabled={isAdded}
                       onClick={() => handleAddSkill(preset)}
-                      className={`px-2 py-0.5 rounded-sm text-[10px] border transition-colors cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-[10px] border transition-colors cursor-pointer ${
                         isAdded
                           ? 'opacity-40 bg-[var(--bg-paper)] text-[var(--text-muted)] border-transparent cursor-not-allowed'
                           : 'bg-[var(--bg-surface)] text-[var(--text-main)] border-[var(--border-hairline)] hover:border-[var(--accent-color)]'
@@ -517,7 +517,7 @@ export const CareerPathPage: React.FC = () => {
             <button
               type="submit"
               disabled={isGenerating || !targetRole.trim() || skills.length === 0}
-              className="w-full py-4 px-6 rounded-sm btn-accent font-mono font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer border border-transparent disabled:opacity-50"
+              className="w-full py-4 px-6 rounded-xl btn-accent font-mono font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
             >
               {isGenerating ? (
                 <>
@@ -537,13 +537,13 @@ export const CareerPathPage: React.FC = () => {
         /* ========================================================================= */
         <div className="space-y-8 font-mono text-xs">
           {/* Header Action Bar: Reconfigure Inputs Button */}
-          <div className="p-4 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans">
+          <div className="p-4 rounded-xl glass-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono text-[var(--accent-color)] font-bold uppercase">
                   [RECOMMENDATION GENERATED FROM YOUR INPUTS]
                 </span>
-                <span className="text-[9px] font-mono font-bold text-[var(--text-muted)] bg-[var(--bg-paper)] border border-[var(--border-hairline)] px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
+                <span className="text-[9px] font-mono font-bold text-[var(--text-muted)] bg-[var(--bg-paper)] border border-[var(--border-hairline)] px-2 py-0.5 rounded-md uppercase tracking-wider">
                   demo - ranked options
                 </span>
               </div>
@@ -554,7 +554,7 @@ export const CareerPathPage: React.FC = () => {
 
             <button
               onClick={() => setHasGenerated(false)}
-              className="px-3.5 py-2 rounded-sm bg-[var(--bg-paper)] text-[var(--text-main)] border border-[var(--border-hairline)] hover:border-[var(--text-main)] font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="px-4 py-2 rounded-xl bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] text-[var(--text-main)] border border-[var(--border-hairline)] font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shrink-0 transition-colors"
             >
               <Edit3 className="w-3.5 h-3.5 text-[var(--accent-color)]" /> Edit / Re-configure Inputs
             </button>
@@ -580,13 +580,13 @@ export const CareerPathPage: React.FC = () => {
                 </p>
               </div>
 
-              <span className="px-2.5 py-1 rounded-sm bg-[var(--bg-surface)] text-[var(--text-muted)] font-mono text-[10px] border border-[var(--border-hairline)] self-start sm:self-auto">
+              <span className="px-3 py-1 rounded-lg bg-[var(--bg-surface)] text-[var(--text-muted)] font-mono text-[10px] border border-[var(--border-hairline)] self-start sm:self-auto">
                 5 Candidates Evaluated
               </span>
             </div>
 
             {/* Ranked List / Cards Set */}
-            <div className="grid grid-cols-1 gap-3.5 font-mono">
+            <div className="grid grid-cols-1 gap-3.5 font-mono stagger-children">
               {rankedRoles.map((role, idx) => {
                 const isSelected = selectedRoleIndex === idx;
                 const isTop1 = idx === 0;
@@ -595,10 +595,10 @@ export const CareerPathPage: React.FC = () => {
                   <div
                     key={role.title}
                     onClick={() => setSelectedRoleIndex(idx)}
-                    className={`p-4 md:p-5 rounded-sm transition-all cursor-pointer border relative ${
+                    className={`card-lift p-5 rounded-2xl transition-all cursor-pointer border relative ${
                       isSelected
-                        ? 'bg-[var(--bg-surface)] border-[var(--accent-color)] shadow-sm ring-1 ring-[var(--accent-color)]'
-                        : 'bg-[var(--bg-paper)] border-[var(--border-hairline)] hover:border-[var(--text-main)] hover:bg-[var(--bg-surface)]'
+                        ? 'glass-card border-[var(--accent-color)] shadow-md ring-1 ring-[var(--accent-color)]/40'
+                        : 'glass-card hover:border-[var(--accent-color)]/40'
                     }`}
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -607,7 +607,7 @@ export const CareerPathPage: React.FC = () => {
                         <div className="flex items-center gap-2.5 flex-wrap">
                           {/* Rank Badge */}
                           <span
-                            className={`px-2.5 py-0.5 rounded-sm font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1 ${
+                            className={`px-2.5 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1 ${
                               isTop1
                                 ? 'btn-accent shadow-2xs font-bold border border-transparent'
                                 : 'bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border-hairline)]'
@@ -622,7 +622,7 @@ export const CareerPathPage: React.FC = () => {
                           </h3>
 
                           {isSelected && (
-                            <span className="px-2 py-0.5 rounded-sm bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] font-bold text-[10px] border border-[#2DA44E]/30 flex items-center gap-1">
+                            <span className="px-2.5 py-0.5 rounded-md bg-[var(--diff-add-bg)] text-[var(--diff-add)] font-bold text-[10px] border border-[var(--diff-add)]/30 flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> ACTIVE ROADMAP VIEW
                             </span>
                           )}
@@ -630,7 +630,7 @@ export const CareerPathPage: React.FC = () => {
 
                         {/* Why this fits line */}
                         <div className="text-[11px] font-sans text-[var(--text-muted)] flex items-center gap-1.5 pt-0.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#1A7F37] dark:text-[#2DA44E] shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[var(--diff-add)] shrink-0" />
                           <span className="font-mono text-[var(--text-main)] font-semibold">
                             {role.whyItFits}
                           </span>
@@ -645,13 +645,13 @@ export const CareerPathPage: React.FC = () => {
                             role.skillGaps.slice(0, 4).map((gap, gIdx) => (
                               <span
                                 key={gIdx}
-                                className="px-2 py-0.5 rounded-sm bg-[#FFEBE9] text-[#CF222E] dark:bg-[#CF222E]/20 dark:text-[#CF222E] border border-[#CF222E]/30 font-semibold text-[10px]"
+                                className="px-2 py-0.5 rounded-md bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold text-[10px]"
                               >
                                 - {gap}
                               </span>
                             ))
                           ) : (
-                            <span className="text-[10px] text-[#1A7F37] dark:text-[#2DA44E] font-bold">
+                            <span className="text-[10px] text-[var(--diff-add)] font-bold">
                               ✓ All baseline skills present
                             </span>
                           )}
@@ -667,12 +667,12 @@ export const CareerPathPage: React.FC = () => {
                       <div className="flex md:flex-col items-center md:items-end justify-between gap-2 shrink-0 border-t md:border-t-0 pt-2 md:pt-0 border-[var(--border-hairline)]">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`px-3 py-1.5 rounded-sm font-mono font-bold text-xs md:text-sm border ${
+                            className={`px-3 py-1.5 rounded-lg font-mono font-bold text-xs md:text-sm border ${
                               role.alignmentPercent >= 70
-                                ? 'bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] border-[#2DA44E]/30'
+                                ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border-[var(--diff-add)]/30'
                                 : role.alignmentPercent >= 50
-                                ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30'
-                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                                ? 'bg-sky-500/10 text-sky-500 border-sky-500/30'
+                                : 'bg-amber-500/10 text-amber-500 border-amber-500/30'
                             }`}
                           >
                             {role.alignmentPercent}% Alignment
@@ -694,7 +694,7 @@ export const CareerPathPage: React.FC = () => {
           {/* DRILL-DOWN VIEW: SELECTED TARGET ROLE ALIGNMENT & MILESTONE ROADMAP */}
           {/* ========================================================================= */}
           {/* Target Alignment Summary Box */}
-          <div className="p-6 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-6">
+          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-4">
               <div className="space-y-1">
                 <span className="text-[11px] font-mono font-bold text-[var(--text-muted)] uppercase tracking-wider">
@@ -707,7 +707,7 @@ export const CareerPathPage: React.FC = () => {
 
               <div className="flex items-center gap-3 font-mono">
                 <span className="text-xs text-[var(--text-muted)]">Track: {audience === 'student' ? 'Skill Building' : 'Career Transition'}</span>
-                <span className="px-3 py-1 bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] border border-[#2DA44E]/30 rounded-sm font-bold text-xs">
+                <span className="px-3 py-1 bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 rounded-lg font-bold text-xs">
                   {activeRole.alignmentPercent}% Alignment
                 </span>
               </div>
@@ -724,14 +724,14 @@ export const CareerPathPage: React.FC = () => {
                   {activeRole.skillGaps.map((gap, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-sm bg-[#FFEBE9] text-[#CF222E] dark:bg-[#CF222E]/20 dark:text-[#CF222E] border border-[#CF222E]/30 font-semibold"
+                      className="px-2.5 py-1 rounded-md bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold"
                     >
                       - {gap}
                     </span>
                   ))}
                 </div>
               ) : (
-                <span className="px-3 py-1 rounded-sm bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] font-bold text-xs">
+                <span className="px-3 py-1 rounded-lg bg-[var(--diff-add-bg)] text-[var(--diff-add)] font-bold text-xs">
                   ✓ All core baseline skills present in your input profile!
                 </span>
               )}
@@ -747,18 +747,18 @@ export const CareerPathPage: React.FC = () => {
               <span className="text-xs text-[var(--text-muted)]">3 Phases • {audience === 'student' ? '12 Weeks' : '3 Months'}</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs stagger-children">
               {roadmapSteps.map((step) => (
                 <div
                   key={step.stepNumber}
-                  className="p-5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-4 flex flex-col justify-between hover:border-[var(--accent-color)] transition-colors"
+                  className="card-lift p-6 rounded-2xl glass-card space-y-4 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-2">
                       <span className="font-bold text-[var(--accent-color)] text-xs">
                         STEP 0{step.stepNumber}
                       </span>
-                      <span className="text-[11px] text-[var(--text-muted)] bg-[var(--bg-paper)] px-2 py-0.5 border border-[var(--border-hairline)] rounded-sm">
+                      <span className="text-[11px] text-[var(--text-muted)] bg-[var(--bg-paper)] px-2.5 py-0.5 border border-[var(--border-hairline)] rounded-md">
                         {step.duration}
                       </span>
                     </div>
@@ -776,7 +776,7 @@ export const CareerPathPage: React.FC = () => {
                       <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase">Focus Skills:</div>
                       <div className="space-y-1">
                         {step.skillsToLearn.map((skill, sIdx) => (
-                          <div key={sIdx} className="text-[#1A7F37] dark:text-[#2DA44E] bg-[#DAFBE1] dark:bg-[#2DA44E]/10 px-2 py-0.5 border border-[#2DA44E]/30 rounded-sm text-[11px]">
+                          <div key={sIdx} className="text-[var(--diff-add)] bg-[var(--diff-add-bg)] px-2.5 py-1 border border-[var(--diff-add)]/30 rounded-md text-[11px] font-semibold">
                             + {skill}
                           </div>
                         ))}
@@ -802,4 +802,3 @@ export const CareerPathPage: React.FC = () => {
     </div>
   );
 };
-

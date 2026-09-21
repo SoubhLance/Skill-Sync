@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { 
   FileText, 
-  Layout, 
   Download, 
   Code, 
   Check, 
-  Sparkles,
   Eye,
   User,
-  Briefcase,
-  GraduationCap,
-  Wrench
+  Sparkles
 } from 'lucide-react';
 
 interface ResumeTemplate {
@@ -47,7 +43,7 @@ export const ResumeBuilderPage: React.FC = () => {
   );
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)]">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Header */}
       <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
         <div>
@@ -60,19 +56,19 @@ export const ResumeBuilderPage: React.FC = () => {
         </div>
 
         {/* Form vs Live Preview Tab Switcher */}
-        <div className="flex p-0.5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)]">
+        <div className="flex p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
           <button
             onClick={() => setActiveTab('form')}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-sm transition-all ${
-              activeTab === 'form' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)]'
+            className={`px-4 py-2 font-bold rounded-lg transition-all cursor-pointer ${
+              activeTab === 'form' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
             Form & Details
           </button>
           <button
             onClick={() => setActiveTab('preview')}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-sm transition-all ${
-              activeTab === 'preview' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)]'
+            className={`px-4 py-2 font-bold rounded-lg transition-all cursor-pointer ${
+              activeTab === 'preview' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
             Live Rendered Preview
@@ -86,17 +82,17 @@ export const ResumeBuilderPage: React.FC = () => {
           [SELECT FROM 5 PRE-DESIGNED TEMPLATES]
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 stagger-children">
           {RESUME_TEMPLATES.map((tmpl) => {
             const isSelected = selectedTemplate === tmpl.id;
             return (
               <div
                 key={tmpl.id}
                 onClick={() => setSelectedTemplate(tmpl.id)}
-                className={`p-3 rounded-sm bg-[var(--bg-surface)] border cursor-pointer transition-all flex flex-col justify-between space-y-2 ${
+                className={`p-4 rounded-xl glass-card cursor-pointer transition-all flex flex-col justify-between space-y-2 card-lift ${
                   isSelected
-                    ? 'border-[var(--accent-color)] ring-1 ring-[var(--accent-color)]'
-                    : 'border-[var(--border-hairline)] hover:border-[var(--text-muted)]'
+                    ? 'border-[var(--accent-color)] ring-2 ring-[var(--accent-color)]/30'
+                    : 'hover:border-[var(--accent-color)]/40'
                 }`}
               >
                 <div className="space-y-1">
@@ -114,8 +110,8 @@ export const ResumeBuilderPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="h-1 w-full bg-[var(--border-hairline)] rounded-full overflow-hidden mt-2">
-                  <div className={`h-full ${tmpl.color} w-3/4`} />
+                <div className="h-1.5 w-full bg-[var(--bg-paper)] rounded-full overflow-hidden mt-2 border border-[var(--border-hairline)]">
+                  <div className={`h-full ${tmpl.color} w-3/4 rounded-full`} />
                 </div>
               </div>
             );
@@ -127,7 +123,7 @@ export const ResumeBuilderPage: React.FC = () => {
       {activeTab === 'form' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-mono text-xs">
           {/* Form Fields Section */}
-          <div className="p-6 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-4">
+          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-4">
             <div className="border-b border-[var(--border-hairline)] pb-3 font-bold text-[var(--text-main)] uppercase flex items-center gap-2">
               <User className="w-4 h-4 text-[var(--accent-color)]" /> Personal & Contact Info
             </div>
@@ -139,7 +135,7 @@ export const ResumeBuilderPage: React.FC = () => {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 />
               </div>
 
@@ -149,7 +145,7 @@ export const ResumeBuilderPage: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 />
               </div>
 
@@ -159,7 +155,7 @@ export const ResumeBuilderPage: React.FC = () => {
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 />
               </div>
 
@@ -169,7 +165,7 @@ export const ResumeBuilderPage: React.FC = () => {
                   type="text"
                   value={githubUrl}
                   onChange={(e) => setGithubUrl(e.target.value)}
-                  className="w-full px-3 py-2 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 />
               </div>
             </div>
@@ -180,7 +176,7 @@ export const ResumeBuilderPage: React.FC = () => {
                 rows={3}
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
-                className="w-full p-3 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
               />
             </div>
 
@@ -190,7 +186,7 @@ export const ResumeBuilderPage: React.FC = () => {
                 rows={2}
                 value={skills}
                 onChange={(e) => setSkills(e.target.value)}
-                className="w-full p-3 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
               />
             </div>
 
@@ -200,40 +196,40 @@ export const ResumeBuilderPage: React.FC = () => {
                 rows={4}
                 value={experience}
                 onChange={(e) => setExperience(e.target.value)}
-                className="w-full p-3 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
               />
             </div>
           </div>
 
           {/* Quick Rendered Draft Box */}
-          <div className="p-6 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-4 flex flex-col justify-between">
+          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-4 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="border-b border-[var(--border-hairline)] pb-3 font-bold text-[var(--text-main)] uppercase flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-[var(--accent-color)]" /> Template Preview: {selectedTemplate}
                 </span>
-                <span className="text-[10px] text-[var(--accent-color)]">LaTeX Draft</span>
+                <span className="text-[10px] text-[var(--accent-color)] font-mono">LaTeX Draft</span>
               </div>
 
-              {/* Rendered Document Mock Box — uses CSS vars so it respects dark mode */}
-              <div className="p-6 bg-[var(--bg-paper)] text-[var(--text-main)] rounded-sm border border-[var(--border-hairline)] space-y-3 font-sans text-xs">
+              {/* Rendered Document Mock Box */}
+              <div className="p-6 bg-[var(--bg-paper)] text-[var(--text-main)] rounded-xl border border-[var(--border-hairline)] space-y-3 font-sans text-xs">
                 <div className="border-b border-[var(--border-hairline)] pb-2 text-center space-y-0.5">
                   <h3 className="font-extrabold text-base tracking-tight">{fullName}</h3>
                   <p className="text-[10px] text-[var(--text-muted)]">{email} • {phone} • {githubUrl}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5">Summary</h4>
+                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">Summary</h4>
                   <p className="text-[11px] text-[var(--text-muted)] leading-tight">{summary}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5">Skills</h4>
-                  <p className="text-[11px] font-mono text-[#1A7F37] dark:text-[#2DA44E]">{skills}</p>
+                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">Skills</h4>
+                  <p className="text-[11px] font-mono text-[var(--diff-add)]">{skills}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5">Experience</h4>
+                  <h4 className="font-bold text-[11px] uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">Experience</h4>
                   <pre className="text-[10px] font-mono text-[var(--text-muted)] whitespace-pre-wrap">{experience}</pre>
                 </div>
               </div>
@@ -241,7 +237,7 @@ export const ResumeBuilderPage: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('preview')}
-              className="w-full py-3 px-4 rounded-sm btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md"
             >
               $ render --template={selectedTemplate}
             </button>
@@ -249,8 +245,8 @@ export const ResumeBuilderPage: React.FC = () => {
         </div>
       ) : (
         /* Rendered Document & Mock Code Screen */
-        <div className="p-8 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-6 font-mono text-xs">
-          <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-4">
+        <div className="p-8 rounded-2xl glass-card space-y-6 font-mono text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-hairline)] pb-4 gap-3">
             <div>
               <span className="font-bold text-sm text-[var(--text-main)] block font-sans">
                 Rendered LaTeX PDF Preview ({selectedTemplate})
@@ -259,21 +255,21 @@ export const ResumeBuilderPage: React.FC = () => {
             </div>
 
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 rounded-sm bg-[var(--bg-paper)] text-[var(--text-main)] border border-[var(--border-hairline)] font-bold flex items-center gap-1.5">
+              <button className="px-4 py-2 rounded-xl bg-[var(--bg-paper)] text-[var(--text-main)] border border-[var(--border-hairline)] hover:bg-[var(--bg-elevated)] font-bold flex items-center gap-1.5 transition-colors cursor-pointer">
                 <Code className="w-3.5 h-3.5" /> View Raw LaTeX
               </button>
               <button
                 disabled
                 title="PDF export coming soon"
-                className="px-3 py-1.5 rounded-sm btn-accent font-bold flex items-center gap-1.5 opacity-50 cursor-not-allowed"
+                className="px-4 py-2 rounded-xl btn-accent font-bold flex items-center gap-1.5 opacity-50 cursor-not-allowed"
               >
                 <Download className="w-3.5 h-3.5" /> Download PDF
               </button>
             </div>
           </div>
 
-          {/* Rendered document mock — uses CSS vars so it respects dark mode */}
-          <div className="p-8 bg-[var(--bg-paper)] text-[var(--text-main)] rounded-sm border border-[var(--border-hairline)] space-y-4 font-sans max-w-3xl mx-auto shadow-sm">
+          {/* Rendered document mock */}
+          <div className="p-8 bg-[var(--bg-paper)] text-[var(--text-main)] rounded-2xl border border-[var(--border-hairline)] space-y-4 font-sans max-w-3xl mx-auto shadow-lg">
             <div className="border-b-2 border-[var(--border-hairline)] pb-3 text-center space-y-1">
               <h2 className="font-extrabold text-xl tracking-tight uppercase">{fullName}</h2>
               <p className="text-xs text-[var(--text-muted)]">{email} | {phone} | {githubUrl}</p>
@@ -290,7 +286,7 @@ export const ResumeBuilderPage: React.FC = () => {
               <h3 className="font-extrabold text-xs uppercase border-b border-[var(--border-hairline)] pb-0.5 text-[var(--text-muted)]">
                 Technical Proficiencies
               </h3>
-              <p className="text-xs font-mono text-[var(--text-main)] bg-[var(--bg-surface)] p-2 rounded-sm">{skills}</p>
+              <p className="text-xs font-mono text-[var(--text-main)] bg-[var(--bg-surface)] p-3 rounded-xl border border-[var(--border-hairline)]">{skills}</p>
             </div>
 
             <div className="space-y-1">

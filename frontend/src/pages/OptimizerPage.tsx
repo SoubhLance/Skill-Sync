@@ -5,16 +5,10 @@ import { GithubIcon, LinkedinIcon } from '../components/ui/icons';
 import { 
   Sparkles, 
   UploadCloud, 
-  CheckCircle2, 
   RefreshCw, 
   AlertCircle, 
   AlertTriangle,
-  FileText,
-  Star,
-  GitBranch,
-  CheckSquare,
-  Layers,
-  HelpCircle
+  CheckSquare
 } from 'lucide-react';
 
 export const OptimizerPage: React.FC = () => {
@@ -47,7 +41,7 @@ export const OptimizerPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)]">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Header */}
       <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
         <div>
@@ -59,7 +53,7 @@ export const OptimizerPage: React.FC = () => {
           </h1>
         </div>
 
-        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 border border-[var(--border-hairline)] rounded-sm">
+        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 border border-[var(--border-hairline)] rounded-lg">
           target: developer signals
         </span>
       </div>
@@ -71,18 +65,18 @@ export const OptimizerPage: React.FC = () => {
             [01. LINKEDIN PROFILE PDF EXPORT OPTIMIZER]
           </span>
 
-          <div className="p-6 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-5">
+          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
             <div className="space-y-1 font-sans">
               <h3 className="font-extrabold text-base text-[var(--text-main)] flex items-center gap-2">
                 <LinkedinIcon className="w-5 h-5 text-sky-500" /> Upload LinkedIn Profile PDF Export
               </h3>
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                 Since live LinkedIn scraping is blocked, export your profile as PDF (Profile → More → Save to PDF) and drop it here.
               </p>
             </div>
 
             {/* Dropzone */}
-            <div className="border border-dashed border-[var(--border-hairline)] hover:border-[var(--accent-color)] rounded-sm p-6 text-center bg-[var(--bg-paper)] cursor-pointer transition-colors">
+            <div className="border-2 border-dashed border-[var(--border-hairline)] hover:border-[var(--accent-color)] rounded-xl p-8 text-center bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all">
               <input
                 type="file"
                 accept=".pdf"
@@ -91,8 +85,8 @@ export const OptimizerPage: React.FC = () => {
                 id="linkedin-pdf-input"
               />
               <label htmlFor="linkedin-pdf-input" className="cursor-pointer block space-y-2">
-                <UploadCloud className="w-8 h-8 text-[var(--accent-color)] mx-auto" />
-                <p className="font-bold text-[var(--text-main)]">
+                <UploadCloud className="w-10 h-10 text-[var(--accent-color)] mx-auto" />
+                <p className="font-bold text-sm text-[var(--text-main)] font-sans">
                   {linkedinFile ? linkedinFile.name : "Drag & drop LinkedIn Profile PDF or click to browse"}
                 </p>
                 <p className="text-[11px] text-[var(--text-muted)] font-sans">
@@ -103,7 +97,7 @@ export const OptimizerPage: React.FC = () => {
 
             {/* In-flight Loading State */}
             {loading && (
-              <div className="p-4 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-center justify-center gap-3 text-[var(--accent-color)] font-mono">
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-center justify-center gap-3 text-[var(--accent-color)] font-mono">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 <span>$ parsing PyMuPDF spans & scoring profile signals...</span>
               </div>
@@ -111,15 +105,15 @@ export const OptimizerPage: React.FC = () => {
 
             {/* 422 Scanned PDF / Image Error State */}
             {isScannedPdfError && (
-              <div className="p-4 rounded-sm bg-[#FFEBE9] border border-[#CF222E]/40 text-[#CF222E] space-y-2 font-mono text-xs">
+              <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] space-y-2 font-mono text-xs">
                 <div className="font-extrabold flex items-center gap-2 text-sm">
-                  <AlertTriangle className="w-4 h-4 text-[#CF222E] shrink-0" />
+                  <AlertTriangle className="w-4 h-4 text-[var(--diff-del)] shrink-0" />
                   <span>PDF Has No Extractable Text</span>
                 </div>
-                <p className="text-[11px] font-sans text-slate-700 dark:text-slate-300 leading-relaxed">
+                <p className="text-[11px] font-sans leading-relaxed text-[var(--text-main)]">
                   This PDF appears to be a scanned image or screenshot. Please re-export your profile directly using LinkedIn's native feature:
                 </p>
-                <div className="bg-[#FFFFFF] dark:bg-[#0B0F17] p-2.5 rounded-sm border border-[#CF222E]/30 text-[11px] text-[var(--text-main)] font-mono">
+                <div className="bg-[var(--bg-paper)] p-3 rounded-lg border border-[var(--diff-del)]/30 text-[11px] text-[var(--text-main)] font-mono">
                   Go to LinkedIn Profile → Click <strong>More</strong> button → Select <strong>"Save to PDF"</strong>
                 </div>
               </div>
@@ -127,7 +121,7 @@ export const OptimizerPage: React.FC = () => {
 
             {/* Generic non-422 Error State */}
             {error && !isScannedPdfError && (
-              <div className="p-4 rounded-sm bg-[#FFEBE9] border border-[#CF222E]/40 text-[#CF222E] flex items-center gap-2 font-mono text-xs">
+              <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] flex items-center gap-2 font-mono text-xs">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -146,7 +140,7 @@ export const OptimizerPage: React.FC = () => {
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {scoreResult.sections_detected.map((sec, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-sm bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] border border-[#2DA44E]/30 text-[10px] font-bold">
+                        <span key={idx} className="px-2.5 py-1 rounded-md bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 text-[10px] font-bold">
                           ✓ {sec}
                         </span>
                       ))}
@@ -162,7 +156,7 @@ export const OptimizerPage: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(scoreResult.breakdown).map(([key, val]) => (
-                        <div key={key} className="p-2.5 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex justify-between items-center">
+                        <div key={key} className="p-3 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex justify-between items-center">
                           <span className="text-[11px] font-sans text-[var(--text-muted)] capitalize">{key.replace(/_/g, ' ')}</span>
                           <span className="font-bold text-[var(--accent-color)]">{typeof val === 'number' ? (val <= 1 ? `${(val * 100).toFixed(0)}%` : val) : val}</span>
                         </div>
@@ -174,12 +168,12 @@ export const OptimizerPage: React.FC = () => {
                 {/* Critical Gaps & Recommendations */}
                 {scoreResult.gaps.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-[10px] font-bold text-[#CF222E] uppercase tracking-wider">
+                    <div className="text-[10px] font-bold text-[var(--diff-del)] uppercase tracking-wider">
                       Optimization Gaps to Fix ({scoreResult.gaps.length}):
                     </div>
                     <div className="space-y-1.5 font-mono text-[11px]">
                       {scoreResult.gaps.map((gap, idx) => (
-                        <div key={idx} className="p-2 rounded-sm bg-[#FFEBE9] text-[#CF222E] dark:bg-[#CF222E]/20 border border-[#CF222E]/30 font-semibold flex items-start gap-2">
+                        <div key={idx} className="p-2.5 rounded-lg bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold flex items-start gap-2">
                           <span className="shrink-0">-</span>
                           <span>{gap}</span>
                         </div>
@@ -198,51 +192,51 @@ export const OptimizerPage: React.FC = () => {
             [02. GITHUB REPOSITORY OPTIMIZATION CHECKLIST]
           </span>
 
-          <div className="p-6 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-5">
+          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
             <div className="space-y-1 font-sans border-b border-[var(--border-hairline)] pb-3">
               <h3 className="font-extrabold text-base text-[var(--text-main)] flex items-center gap-2">
                 <GithubIcon className="w-5 h-5 text-[var(--text-main)]" /> GitHub Recruiter Signal Guide
               </h3>
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                 Technical recruiters inspect your pinned repositories and contribution graph. Complete this checklist to maximize profile readiness.
               </p>
             </div>
 
             <div className="space-y-3 font-mono">
-              <div className="p-3 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3">
-                <CheckSquare className="w-4 h-4 text-[#2DA44E] shrink-0 mt-0.5" />
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3 card-lift">
+                <CheckSquare className="w-4 h-4 text-[var(--diff-add)] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="font-bold text-[var(--text-main)]">Pin Top 6 Repositories with Visual READMEs</p>
+                  <p className="font-bold text-[var(--text-main)] font-sans">Pin Top 6 Repositories with Visual READMEs</p>
                   <p className="text-[11px] font-sans text-[var(--text-muted)]">
                     Ensure each pinned project has an architecture diagram, installation steps, and live demo link.
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3">
-                <CheckSquare className="w-4 h-4 text-[#2DA44E] shrink-0 mt-0.5" />
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3 card-lift">
+                <CheckSquare className="w-4 h-4 text-[var(--diff-add)] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="font-bold text-[var(--text-main)]">Configure Profile README.md with Live Stats</p>
+                  <p className="font-bold text-[var(--text-main)] font-sans">Configure Profile README.md with Live Stats</p>
                   <p className="text-[11px] font-sans text-[var(--text-muted)]">
                     Add top languages card, commit activity streak, and active technology badges to your github.com/username repo.
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3">
-                <CheckSquare className="w-4 h-4 text-[#2DA44E] shrink-0 mt-0.5" />
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3 card-lift">
+                <CheckSquare className="w-4 h-4 text-[var(--diff-add)] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="font-bold text-[var(--text-main)]">Add Topics, License, and Description Tags</p>
+                  <p className="font-bold text-[var(--text-main)] font-sans">Add Topics, License, and Description Tags</p>
                   <p className="text-[11px] font-sans text-[var(--text-muted)]">
                     Add tags like "fastapi", "pytorch", "microservices" to ensure your projects get indexed in candidate searches.
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3">
-                <CheckSquare className="w-4 h-4 text-[#2DA44E] shrink-0 mt-0.5" />
+              <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3 card-lift">
+                <CheckSquare className="w-4 h-4 text-[var(--diff-add)] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="font-bold text-[var(--text-main)]">Maintain Consistent Contribution Frequency</p>
+                  <p className="font-bold text-[var(--text-main)] font-sans">Maintain Consistent Contribution Frequency</p>
                   <p className="text-[11px] font-sans text-[var(--text-muted)]">
                     Commit regularly across week days to build a rich green contribution graph signal.
                   </p>

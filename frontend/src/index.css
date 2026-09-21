@@ -1,53 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   DESIGN TOKENS — LIGHT MODE (default)
+   ============================================================ */
 @layer base {
   :root {
-    /* Light Mode Palette: Warm Cream Background, Deep Navy Text, Vibrant Orange Accent */
-    --bg-paper: #FAF7F2;
+    /* Backgrounds */
+    --bg-paper:   #F2EFE9;
     --bg-surface: #FFFFFF;
-    --text-main: #0A192F;
-    --text-muted: #475569;
-    --accent-color: #FF6B00;
-    --accent-hover: #EA580C;
-    --border-hairline: #E2E8F0;
+    --bg-elevated:#FAFAF8;
+
+    /* Text */
+    --text-main:  #0D1117;
+    --text-muted: #57606A;
+    --text-subtle:#8B949E;
+
+    /* Accent — orange brand + violet secondary */
+    --accent-color:  #F97316;
+    --accent-hover:  #EA580C;
+    --accent-2:      #7C3AED;
+
+    /* Borders */
+    --border-hairline: #D0D7DE;
+    --border-glow:     rgba(249,115,22,0.35);
+
+    /* Glassmorphism */
+    --glass-bg:       rgba(255,255,255,0.70);
+    --glass-border:   rgba(255,255,255,0.90);
+    --glass-shadow:   0 8px 32px rgba(0,0,0,0.08), 0 1.5px 4px rgba(0,0,0,0.04);
+
+    /* Gradients */
+    --grad-accent:  linear-gradient(135deg, #F97316 0%, #7C3AED 100%);
+    --grad-hero:    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(249,115,22,0.12) 0%, transparent 70%),
+                    radial-gradient(ellipse 60% 40% at 85% 60%,  rgba(124,58,237,0.08) 0%, transparent 60%);
+    --grad-card-top:linear-gradient(180deg, rgba(249,115,22,0.06) 0%, transparent 100%);
+
+    /* Diff / Platform */
+    --diff-add:    #1A7F37;
+    --diff-add-bg: #DAFBE1;
+    --diff-del:    #CF222E;
+    --diff-del-bg: #FFEBE9;
+    --accent-blue: #2563EB;
+
+    /* Backward compat */
+    --bg-main:           #F2EFE9;
+    --accent-primary:    #F97316;
+    --accent-secondary:  #0D1117;
+    --border-color:      #D0D7DE;
+    --badge-bg:          rgba(249,115,22,0.10);
+    --badge-text:        #EA580C;
+
+    /* Fonts */
     --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-
-    /* Git diff indicator utility tokens */
-    --diff-add: #2DA44E;
-    --diff-add-bg: #DAFBE1;
-    --diff-del: #CF222E;
-    --diff-del-bg: #FFEBE9;
-    --accent-blue: #3B5BDB;
-
-    /* Backward compatibility mappings */
-    --bg-main: #FAF7F2;
-    --accent-primary: #FF6B00;
-    --accent-secondary: #0A192F;
-    --border-color: #E2E8F0;
-    --badge-bg: rgba(255, 107, 0, 0.12);
-    --badge-text: #EA580C;
   }
 
+  /* ============================================================
+     DESIGN TOKENS — DARK MODE (Comfortable Charcoal Slate)
+     ============================================================ */
   .dark {
-    /* Dark Mode Palette: Near-Black Background, Off-White Text, Muted Ochre/Amber Accent */
-    --bg-paper: #0B0F17;
-    --bg-surface: #131B2E;
-    --text-main: #F1F5F9;
-    --text-muted: #94A3B8;
-    --accent-color: #F59E0B;
-    --accent-hover: #D97706;
-    --border-hairline: #1E293B;
+    /* Backgrounds — Eye-comfort charcoal slate (no harsh blue swamp) */
+    --bg-paper:   #0E1117;
+    --bg-surface: #161B22;
+    --bg-elevated:#1F242C;
 
-    --bg-main: #0B0F17;
-    --accent-primary: #F59E0B;
-    --accent-secondary: #FBBF24;
-    --border-color: #1E293B;
-    --badge-bg: rgba(245, 158, 11, 0.15);
-    --badge-text: #FBBF24;
+    /* Text — Smooth, glare-free neutral whites and grays */
+    --text-main:  #E6EDF3;
+    --text-muted: #8B949E;
+    --text-subtle:#6E7681;
+
+    /* Accent — Warm sunset orange + soft indigo */
+    --accent-color:  #F97316;
+    --accent-hover:  #EA580C;
+    --accent-2:      #818CF8;
+
+    /* Borders — Soft, subtle hairline */
+    --border-hairline: #2D333B;
+    --border-glow:     rgba(249,115,22,0.22);
+
+    /* Glassmorphism — Refined frosted glass */
+    --glass-bg:     rgba(22,27,34,0.80);
+    --glass-border: rgba(255,255,255,0.08);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.38), 0 1.5px 4px rgba(0,0,0,0.18);
+
+    /* Gradients */
+    --grad-accent:  linear-gradient(135deg, #F97316 0%, #818CF8 100%);
+    --grad-hero:    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(249,115,22,0.12) 0%, transparent 70%),
+                    radial-gradient(ellipse 60% 40% at 85% 60%,  rgba(129,140,248,0.08) 0%, transparent 60%);
+    --grad-card-top:linear-gradient(180deg, rgba(249,115,22,0.06) 0%, transparent 100%);
+
+    /* Diff / Platform */
+    --diff-add:    #3FB950;
+    --diff-add-bg: rgba(63,185,80,0.14);
+    --diff-del:    #F85149;
+    --diff-del-bg: rgba(248,81,73,0.14);
+    --accent-blue: #58A6FF;
+
+    /* Backward compat */
+    --bg-main:           #0E1117;
+    --accent-primary:    #F97316;
+    --accent-secondary:  #818CF8;
+    --border-color:      #2D333B;
+    --badge-bg:          rgba(249,115,22,0.12);
+    --badge-text:        #FB923C;
   }
 }
 
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0   0   var(--border-glow); }
+  50%       { box-shadow: 0 0 20px 4px var(--border-glow); }
+}
+@keyframes gradient-shift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   BASE BODY
+   ============================================================ */
 body {
   background-color: var(--bg-paper);
   color: var(--text-main);
@@ -55,50 +149,143 @@ body {
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.font-mono {
-  font-family: var(--font-mono);
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+.font-mono { font-family: var(--font-mono); }
+.font-sans  { font-family: var(--font-sans);  }
+
+.text-gradient {
+  background: var(--grad-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.font-sans {
-  font-family: var(--font-sans);
+/* ============================================================
+   GLASSMORPHISM UTILITIES
+   ============================================================ */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
 }
 
-/* Custom hairline dev-tool UI classes */
-.bg-paper { background-color: var(--bg-paper); }
-.bg-surface { background-color: var(--bg-surface); }
-.text-main { color: var(--text-main); }
-.text-muted { color: var(--text-muted); }
-.border-hairline { border: 1px solid var(--border-hairline); }
+.glass-sidebar {
+  background: var(--glass-bg);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
 
-/* Accent styling */
+/* ============================================================
+   GRADIENT BUTTON (replaces old flat btn-accent)
+   ============================================================ */
 .btn-accent {
-  background-color: var(--accent-color);
-  color: #0A192F;
+  background: var(--grad-accent);
+  background-size: 200% 200%;
+  color: #FFFFFF !important;
   font-weight: 700;
-  transition: background-color 0.15s ease;
-}
-.dark .btn-accent {
-  background-color: #F59E0B;
-  color: #0B0F17;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.15s ease, background-position 0.4s ease;
+  box-shadow: 0 2px 12px rgba(249,115,22,0.30);
 }
 .btn-accent:hover {
-  background-color: var(--accent-hover);
+  background-position: right center;
+  box-shadow: 0 4px 20px rgba(249,115,22,0.50);
+  transform: translateY(-1px);
+}
+.btn-accent:active {
+  transform: translateY(0);
+}
+.dark .btn-accent {
+  box-shadow: 0 2px 12px rgba(249,115,22,0.25);
+}
+.dark .btn-accent:hover {
+  box-shadow: 0 4px 20px rgba(249,115,22,0.40);
 }
 
-/* Custom hairline scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-paper);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-hairline);
-  border-radius: 2px;
+/* ============================================================
+   SURFACE / CARD HELPERS
+   ============================================================ */
+.bg-paper     { background-color: var(--bg-paper);   }
+.bg-surface   { background-color: var(--bg-surface); }
+.bg-elevated  { background-color: var(--bg-elevated);}
+.text-main    { color: var(--text-main);  }
+.text-muted   { color: var(--text-muted); }
+.border-hairline { border: 1px solid var(--border-hairline); }
+
+/* ============================================================
+   GRADIENT ACCENT STRIP (sidebar left edge)
+   ============================================================ */
+.accent-strip {
+  background: var(--grad-accent);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
 }
 
+/* ============================================================
+   ANIMATION UTILITY CLASSES
+   ============================================================ */
+.animate-fade-up   { animation: fade-up  0.5s ease both; }
+.animate-fade-in   { animation: fade-in  0.4s ease both; }
+.animate-float     { animation: float    3s ease-in-out infinite; }
+.animate-pulse-glow{ animation: pulse-glow 2.5s ease-in-out infinite; }
+.animate-gradient  { background-size: 200% 200%; animation: gradient-shift 4s ease infinite; }
+.animate-spin-slow { animation: spin-slow 3s linear infinite; }
 
+/* Stagger children fade-up */
+.stagger-children > * { animation: fade-up 0.5s ease both; }
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.19s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.26s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.33s; }
+
+/* ============================================================
+   HERO GRID OVERLAY
+   ============================================================ */
+.hero-grid {
+  background-image:
+    linear-gradient(var(--border-hairline) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-hairline) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.4;
+}
+
+/* ============================================================
+   INPUT FOCUS GLOW
+   ============================================================ */
+.input-glow:focus {
+  outline: none;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 3px var(--border-glow);
+}
+
+/* ============================================================
+   CARD HOVER LIFT
+   ============================================================ */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--glass-shadow), 0 0 0 1px var(--border-glow);
+}
+
+/* ============================================================
+   SCROLLBAR — Hairline, theme-aware
+   ============================================================ */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: var(--bg-paper); }
+::-webkit-scrollbar-thumb  { background: var(--border-hairline); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-subtle, #8B949E); }

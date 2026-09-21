@@ -568,7 +568,7 @@ export const JDMatcherPage: React.FC = () => {
     : [...TECH_PRESET_SKILLS, ...NON_TECH_PRESET_SKILLS.slice(0, 4)];
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 font-sans text-[var(--text-main)]">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Header */}
       <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
         <div>
@@ -581,10 +581,10 @@ export const JDMatcherPage: React.FC = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex p-0.5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
+        <div className="flex p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs">
           <button
             onClick={() => setActiveTab('pairwise')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'pairwise' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
@@ -592,7 +592,7 @@ export const JDMatcherPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('browse')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'browse' ? 'btn-accent shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
@@ -602,7 +602,7 @@ export const JDMatcherPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 rounded-sm bg-[#FFEBE9] border border-[#CF222E]/40 text-[#CF222E] font-mono text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] font-mono text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -614,17 +614,17 @@ export const JDMatcherPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Panel: Input Specs */}
             <div className="space-y-6 font-mono text-xs">
-              <div className="p-6 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-5">
+              <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
                 <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-3">
                   <h2 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-[var(--accent-color)]" /> Input Resume & JD Text
                   </h2>
 
-                  <div className="flex p-0.5 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)]">
+                  <div className="flex p-0.5 rounded-lg bg-[var(--bg-paper)] border border-[var(--border-hairline)]">
                     <button
                       type="button"
                       onClick={() => setInputMode('paste')}
-                      className={`px-2 py-1 text-[10px] font-bold rounded-sm cursor-pointer ${
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
                         inputMode === 'paste' ? 'btn-accent' : 'text-[var(--text-muted)]'
                       }`}
                     >
@@ -633,7 +633,7 @@ export const JDMatcherPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setInputMode('upload')}
-                      className={`px-2 py-1 text-[10px] font-bold rounded-sm cursor-pointer ${
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md cursor-pointer transition-all ${
                         inputMode === 'upload' ? 'btn-accent' : 'text-[var(--text-muted)]'
                       }`}
                     >
@@ -653,7 +653,7 @@ export const JDMatcherPage: React.FC = () => {
                         value={resumeText}
                         onChange={(e) => setResumeText(e.target.value)}
                         placeholder="Paste full candidate resume text..."
-                        className="w-full p-3 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                        className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                       />
                     </div>
 
@@ -666,7 +666,7 @@ export const JDMatcherPage: React.FC = () => {
                         value={jdText}
                         onChange={(e) => setJdText(e.target.value)}
                         placeholder="Paste target job description requirements..."
-                        className="w-full p-3 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                        className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                       />
                     </div>
                   </>
@@ -699,7 +699,7 @@ export const JDMatcherPage: React.FC = () => {
                 <button
                   onClick={handleCalculateMatch}
                   disabled={loading}
-                  className="w-full py-3 px-4 rounded-sm btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-3.5 px-4 rounded-xl btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-md"
                 >
                   {loading ? (
                     <>
@@ -721,26 +721,26 @@ export const JDMatcherPage: React.FC = () => {
                   <DiffStatDisplay score={result.match_percent} label="Pairwise BERT Alignment Score" />
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-sm bg-[var(--bg-surface)] border border-[#2DA44E]/40 space-y-2">
-                      <p className="font-bold text-[#1A7F37] dark:text-[#2DA44E] flex items-center gap-1.5 border-b border-[#2DA44E]/20 pb-2">
+                    <div className="p-4 rounded-xl bg-[var(--diff-add-bg)] border border-[var(--diff-add)]/30 space-y-2">
+                      <p className="font-bold text-[var(--diff-add)] flex items-center gap-1.5 border-b border-[var(--diff-add)]/20 pb-2">
                         <CheckCircle2 className="w-4 h-4" /> Matching Overlap ({result.skill_overlap.length})
                       </p>
                       <div className="space-y-1 font-mono">
                         {result.skill_overlap.map((skill, idx) => (
-                          <div key={idx} className="text-[#1A7F37] dark:text-[#2DA44E] bg-[#DAFBE1] dark:bg-[#2DA44E]/20 px-2 py-0.5 border border-[#2DA44E]/30 rounded-sm">
+                          <div key={idx} className="text-[var(--diff-add)] bg-[var(--bg-surface)] px-2.5 py-1 border border-[var(--diff-add)]/30 rounded-md">
                             + {skill}
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-sm bg-[var(--bg-surface)] border border-[#CF222E]/40 space-y-2">
-                      <p className="font-bold text-[#CF222E] flex items-center gap-1.5 border-b border-[#CF222E]/20 pb-2">
+                    <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/30 space-y-2">
+                      <p className="font-bold text-[var(--diff-del)] flex items-center gap-1.5 border-b border-[var(--diff-del)]/20 pb-2">
                         <AlertCircle className="w-4 h-4" /> Missing Skill Gap ({result.skill_gap.length})
                       </p>
                       <div className="space-y-1 font-mono">
                         {result.skill_gap.map((skill, idx) => (
-                          <div key={idx} className="text-[#CF222E] bg-[#FFEBE9] dark:bg-[#CF222E]/20 px-2 py-0.5 border border-[#CF222E]/30 rounded-sm">
+                          <div key={idx} className="text-[var(--diff-del)] bg-[var(--bg-surface)] px-2.5 py-1 border border-[var(--diff-del)]/30 rounded-md">
                             - {skill}
                           </div>
                         ))}
@@ -749,7 +749,7 @@ export const JDMatcherPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="p-8 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center space-y-3 text-xs text-[var(--text-muted)] min-h-[350px] flex flex-col items-center justify-center font-mono">
+                <div className="p-8 rounded-2xl glass-card text-center space-y-3 text-xs text-[var(--text-muted)] min-h-[350px] flex flex-col items-center justify-center font-mono">
                   <GitCompare className="w-8 h-8 text-[var(--text-muted)]/40 mx-auto" />
                   <p className="font-bold text-[var(--text-main)]">
                     No active pairwise calculation.
@@ -777,15 +777,15 @@ export const JDMatcherPage: React.FC = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans stagger-children">
                 {jobs.slice(0, 3).map((job) => (
-                  <div key={job.job_id} className="p-5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-3 font-mono text-xs">
+                  <div key={job.job_id} className="card-lift p-5 rounded-2xl glass-card space-y-3 font-mono text-xs">
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-extrabold text-sm text-[var(--text-main)] font-sans">{job.job_role}</h4>
                         <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{job.domain} • {job.experience_label}</p>
                       </div>
-                      <span className="px-2 py-0.5 rounded-sm text-[10px] font-bold bg-[#DAFBE1] text-[#1A7F37] border border-[#2DA44E]/30 shrink-0">
+                      <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 shrink-0">
                         +{job.match_pct}% match
                       </span>
                     </div>
@@ -799,7 +799,7 @@ export const JDMatcherPage: React.FC = () => {
         /* Full Browse Job Recommendations Tab */
         <div className="space-y-6 font-mono text-xs">
           {/* Tech vs Non-Tech Track Switcher Header */}
-          <div className="p-4 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-sans">
+          <div className="p-4 rounded-2xl glass-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-sans">
             <div className="space-y-0.5">
               <span className="text-[10px] font-mono text-[var(--accent-color)] font-bold uppercase tracking-wider block">
                 [DATASET ACCESS: 415+ INDEXED ROLES VIA BERT + FAISS]
@@ -810,11 +810,11 @@ export const JDMatcherPage: React.FC = () => {
             </div>
 
             {/* Track Switcher Control */}
-            <div className="flex p-0.5 rounded-sm bg-[var(--bg-paper)] border border-[var(--border-hairline)] font-mono text-xs">
+            <div className="flex p-1 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] font-mono text-xs">
               <button
                 type="button"
                 onClick={() => handleTrackChange('all')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
                   trackFilter === 'all'
                     ? 'btn-accent shadow-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -825,7 +825,7 @@ export const JDMatcherPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleTrackChange('technical')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
                   trackFilter === 'technical'
                     ? 'btn-accent shadow-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -836,7 +836,7 @@ export const JDMatcherPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleTrackChange('general')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-sm transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
                   trackFilter === 'general'
                     ? 'btn-accent shadow-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
@@ -848,25 +848,25 @@ export const JDMatcherPage: React.FC = () => {
           </div>
 
           {/* Search Controls Form */}
-          <div className="p-5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-4">
+          <div className="p-5 rounded-2xl glass-card space-y-4">
             <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-center gap-3">
               <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   value={skillsQuery}
                   onChange={(e) => setSkillsQuery(e.target.value)}
                   placeholder="Enter candidate skill(s) e.g. Java, Python, Excel, PyTorch, React, Docker..."
-                  className="w-full pl-9 pr-3 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
                 />
               </div>
 
               <div className="relative w-full md:w-56">
-                <Filter className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-3" />
+                <Filter className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-3.5" />
                 <select
                   value={selectedDomain}
                   onChange={(e) => setSelectedDomain(e.target.value)}
-                  className="w-full pl-9 pr-8 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)] cursor-pointer"
+                  className="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none cursor-pointer"
                 >
                   {domains.map((dom) => (
                     <option key={dom} value={dom}>
@@ -879,14 +879,14 @@ export const JDMatcherPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={jobsLoading}
-                className="w-full md:w-auto px-6 py-2.5 rounded-sm btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer border border-transparent disabled:opacity-50"
+                className="w-full md:w-auto px-6 py-2.5 rounded-xl btn-accent font-mono font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
               >
                 {jobsLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <span>$ search</span>}
               </button>
             </form>
 
             {/* Quick Skill Search Chips with Multi-Select Toggling */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[var(--border-hairline)]">
+            <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[var(--border-hairline)]">
               <span className="text-[10px] text-[var(--text-muted)] uppercase mr-1">
                 {trackFilter === 'general' ? 'Non-Tech Presets:' : trackFilter === 'technical' ? 'Tech Presets:' : 'Popular Presets:'}
               </span>
@@ -901,10 +901,10 @@ export const JDMatcherPage: React.FC = () => {
                     key={preset}
                     type="button"
                     onClick={() => handlePresetClick(preset)}
-                    className={`px-2 py-0.5 rounded-sm text-[10px] border transition-colors cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[10px] border transition-all cursor-pointer ${
                       isSelected
                         ? 'btn-accent font-bold border-transparent shadow-2xs'
-                        : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--text-main)]'
+                        : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-color)] hover:text-[var(--text-main)]'
                     }`}
                   >
                     {isSelected ? '✓ ' : '+ '}{preset}
@@ -926,11 +926,11 @@ export const JDMatcherPage: React.FC = () => {
 
           {/* Job Recommendation Cards Grid */}
           {jobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans stagger-children">
               {jobs.map((job) => (
                 <div
                   key={job.job_id}
-                  className="p-5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-color)] space-y-4 font-mono text-xs transition-colors flex flex-col justify-between"
+                  className="card-lift p-5 rounded-2xl glass-card space-y-4 font-mono text-xs flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     {/* Role Title & Domain */}
@@ -945,12 +945,12 @@ export const JDMatcherPage: React.FC = () => {
                       </div>
 
                       <span
-                        className={`px-2.5 py-1 rounded-sm text-[11px] font-bold border shrink-0 font-mono ${
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-bold border shrink-0 font-mono ${
                           job.match_pct >= 70
-                            ? 'bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] border-[#2DA44E]/30'
+                            ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border-[var(--diff-add)]/30'
                             : job.match_pct >= 50
-                            ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30'
-                            : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                            ? 'bg-sky-500/10 text-sky-500 border-sky-500/30'
+                            : 'bg-amber-500/10 text-amber-500 border-amber-500/30'
                         }`}
                       >
                         +{job.match_pct}% match
@@ -960,14 +960,14 @@ export const JDMatcherPage: React.FC = () => {
                     {/* Overlapping Skills Section */}
                     <div className="space-y-1.5">
                       <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#1A7F37] dark:text-[#2DA44E]" /> Overlapping Skills ({job.skill_overlap.length}):
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[var(--diff-add)]" /> Overlapping Skills ({job.skill_overlap.length}):
                       </div>
                       {job.skill_overlap.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {job.skill_overlap.map((skill, sIdx) => (
                             <span
                               key={sIdx}
-                              className="px-2 py-0.5 rounded-sm text-[10px] bg-[#DAFBE1] text-[#1A7F37] dark:bg-[#2DA44E]/20 dark:text-[#2DA44E] border border-[#2DA44E]/30 font-semibold"
+                              className="px-2.5 py-0.5 rounded-md text-[10px] bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 font-semibold"
                             >
                               + {skill}
                             </span>
@@ -983,14 +983,14 @@ export const JDMatcherPage: React.FC = () => {
                     {/* Critical Skill Gaps Section (Same treatment as Career Path) */}
                     <div className="space-y-1.5 pt-1">
                       <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5 text-[#CF222E]" /> Critical Skill Gaps ({job.skill_gap.length}):
+                        <AlertCircle className="w-3.5 h-3.5 text-[var(--diff-del)]" /> Critical Skill Gaps ({job.skill_gap.length}):
                       </div>
                       {job.skill_gap.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {job.skill_gap.slice(0, 5).map((gap, gIdx) => (
                             <span
                               key={gIdx}
-                              className="px-2 py-0.5 rounded-sm text-[10px] bg-[#FFEBE9] text-[#CF222E] dark:bg-[#CF222E]/20 dark:text-[#CF222E] border border-[#CF222E]/30 font-semibold"
+                              className="px-2.5 py-0.5 rounded-md text-[10px] bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold"
                             >
                               - {gap}
                             </span>
@@ -1002,7 +1002,7 @@ export const JDMatcherPage: React.FC = () => {
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-[#1A7F37] dark:text-[#2DA44E] font-bold">
+                        <span className="text-[10px] text-[var(--diff-add)] font-bold">
                           ✓ All baseline skills present
                         </span>
                       )}
@@ -1021,7 +1021,7 @@ export const JDMatcherPage: React.FC = () => {
             </div>
           ) : (
             /* Empty Search Results State */
-            <div className="p-10 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center space-y-3 text-xs text-[var(--text-muted)] font-mono">
+            <div className="p-10 rounded-2xl glass-card text-center space-y-3 text-xs text-[var(--text-muted)] font-mono">
               <Search className="w-8 h-8 text-[var(--text-muted)]/40 mx-auto" />
               <p className="font-bold text-[var(--text-main)] text-sm">
                 No matching jobs found for "{skillsQuery}".

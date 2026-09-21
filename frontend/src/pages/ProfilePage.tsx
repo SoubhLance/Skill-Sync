@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, Mail, Shield, Moon, Sun, Save, LogOut, Terminal } from 'lucide-react';
+import { User, Mail, Shield, Moon, Sun, Save, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage: React.FC = () => {
@@ -25,7 +25,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto space-y-8 font-sans text-[var(--text-main)]">
+    <div className="p-6 md:p-10 max-w-4xl mx-auto space-y-8 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Header */}
       <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
         <div>
@@ -37,18 +37,18 @@ export const ProfilePage: React.FC = () => {
           </h1>
         </div>
 
-        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 border border-[var(--border-hairline)] rounded-sm">
+        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 border border-[var(--border-hairline)] rounded-lg">
           direct PFP destination: /profile
         </span>
       </div>
 
-      <div className="p-8 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-6 font-mono text-xs">
+      <div className="p-8 rounded-2xl glass-card space-y-6 font-mono text-xs">
         {/* User Avatar & Basic Metadata Header */}
         <div className="flex items-center gap-4 pb-6 border-b border-[var(--border-hairline)]">
           {user?.photoURL ? (
-            <img src={user.photoURL} alt="Avatar" className="w-16 h-16 rounded-sm object-cover border border-[var(--border-hairline)]" />
+            <img src={user.photoURL} alt="Avatar" className="w-16 h-16 rounded-xl object-cover border border-[var(--border-hairline)]" />
           ) : (
-            <div className="w-16 h-16 rounded-sm bg-[var(--accent-color)] text-[#0A192F] flex items-center justify-center font-bold text-xl">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--accent-color)] to-[var(--accent-2)] text-white flex items-center justify-center font-bold text-xl shadow-md">
               {displayName.charAt(0).toUpperCase()}
             </div>
           )}
@@ -57,15 +57,15 @@ export const ProfilePage: React.FC = () => {
             <h2 className="text-lg font-extrabold text-[var(--text-main)] font-sans leading-tight">
               {displayName}
             </h2>
-            <p className="text-xs text-[var(--text-muted)] font-mono">{email}</p>
-            <span className="inline-block px-2 py-0.5 mt-1 rounded-sm bg-[var(--badge-bg)] text-[var(--badge-text)] font-bold text-[10px]">
+            <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">{email}</p>
+            <span className="inline-block px-2.5 py-0.5 mt-1.5 rounded-md bg-[var(--badge-bg)] text-[var(--badge-text)] font-bold text-[10px] border border-[var(--border-hairline)]">
               VERIFIED DEVELOPER
             </span>
           </div>
         </div>
 
         {/* Profile Settings Form */}
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1">
@@ -75,7 +75,7 @@ export const ProfilePage: React.FC = () => {
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-color)]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
               />
             </div>
 
@@ -87,7 +87,7 @@ export const ProfilePage: React.FC = () => {
                 type="email"
                 value={email}
                 disabled
-                className="w-full px-3 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-muted)] opacity-70 cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-muted)] opacity-70 cursor-not-allowed"
               />
             </div>
           </div>
@@ -100,15 +100,15 @@ export const ProfilePage: React.FC = () => {
             <button
               type="button"
               onClick={toggleTheme}
-              className="px-4 py-2.5 rounded-sm border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-[var(--text-main)] font-bold text-xs flex items-center gap-2"
+              className="px-4 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] text-[var(--text-main)] font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
             >
               {theme === 'dark' ? (
                 <>
-                  <Moon className="w-4 h-4 text-amber-500" /> Active: Dark Mode (Batman Ochre)
+                  <Moon className="w-4 h-4 text-amber-400" /> Active: Dark Mode (Comfortable Slate)
                 </>
               ) : (
                 <>
-                  <Sun className="w-4 h-4 text-orange-500" /> Active: Light Mode (Warm Cream)
+                  <Sun className="w-4 h-4 text-orange-500" /> Active: Light Mode (Warm Canvas)
                 </>
               )}
             </button>
@@ -118,13 +118,13 @@ export const ProfilePage: React.FC = () => {
           <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               type="submit"
-              className="w-full sm:w-auto px-5 py-2.5 rounded-sm btn-accent font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl btn-accent font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md"
             >
               <Save className="w-4 h-4" /> Save Profile Preferences
             </button>
 
             {saved && (
-              <span className="text-[#1A7F37] dark:text-[#2DA44E] font-bold text-xs">
+              <span className="text-[var(--diff-add)] font-bold text-xs">
                 ✓ Preferences updated!
               </span>
             )}
@@ -132,7 +132,7 @@ export const ProfilePage: React.FC = () => {
             <button
               type="button"
               onClick={handleLogout}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-sm bg-[#FFEBE9] text-[#CF222E] dark:bg-[#CF222E]/20 border border-[#CF222E]/40 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[var(--diff-del-bg)] text-[var(--diff-del)] hover:bg-[var(--diff-del)]/20 border border-[var(--diff-del)]/30 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors"
             >
               <LogOut className="w-4 h-4" /> Sign Out
             </button>

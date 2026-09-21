@@ -70,18 +70,18 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
   );
 
   return (
-    <div className={`p-5 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs ${className}`}>
+    <div className={`p-5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs ${className}`}>
       {/* Commit Graph Header line */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[var(--border-hairline)] mb-3 gap-2">
         <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 bg-[#2DA44E] rounded-full animate-pulse shrink-0" />
+          <span className="w-2.5 h-2.5 bg-[var(--diff-add)] rounded-full animate-pulse shrink-0" />
           <span className="font-bold text-[var(--text-main)] tracking-tight">
             @{username}: {totalCommits} engineering signals in last 196 days
           </span>
         </div>
         <div className="flex items-center gap-2 text-[11px]">
           <span className="text-[var(--text-muted)]">src: github.com/{username}</span>
-          <span className="text-[#1A7F37] dark:text-[#2DA44E] bg-[#DAFBE1] dark:bg-[#2DA44E]/15 px-2 py-0.5 border border-[#2DA44E]/30 font-bold">
+          <span className="text-[var(--diff-add)] bg-[var(--diff-add-bg)] px-2 py-0.5 border border-[var(--diff-add)]/30 rounded-md font-bold">
             +{Math.round(additions / 10)}% activity
           </span>
         </div>
@@ -96,7 +96,7 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
                 <div
                   key={`cell-${username}-${wIdx}-${dIdx}`}
                   style={level > 0 ? { backgroundColor: GREEN_LEVELS_HEX[level]! } : undefined}
-                  className={`w-[11px] h-[11px] rounded-[1px] transition-all cursor-pointer hover:ring-1 hover:ring-[var(--text-main)] ${
+                  className={`w-[11px] h-[11px] rounded-[2px] transition-all cursor-pointer hover:ring-1 hover:ring-[var(--text-main)] ${
                     level === 0 ? 'bg-[var(--border-hairline)]' : ''
                   }`}
                   title={`Week ${wIdx + 1}, Day ${dIdx + 1}: ${level * 2} commits`}
@@ -112,16 +112,16 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
         <div className="flex items-center gap-2">
           <span>Less</span>
           <div className="flex gap-[3px]">
-            <div className="w-[10px] h-[10px] rounded-[1px] bg-[var(--border-hairline)]" />
+            <div className="w-[10px] h-[10px] rounded-[2px] bg-[var(--border-hairline)]" />
             {GREEN_LEVELS_HEX.slice(1).map((col, i) => (
-              <div key={`legend-${i}`} style={{ backgroundColor: col! }} className="w-[10px] h-[10px] rounded-[1px]" />
+              <div key={`legend-${i}`} style={{ backgroundColor: col! }} className="w-[10px] h-[10px] rounded-[2px]" />
             ))}
           </div>
           <span>More</span>
         </div>
         <div className="flex items-center gap-3 font-mono text-[11px]">
-          <span className="text-[#2DA44E] font-semibold">+{additions} additions</span>
-          <span className="text-[#CF222E] font-semibold">-{gaps} gaps</span>
+          <span className="text-[var(--diff-add)] font-semibold">+{additions} additions</span>
+          <span className="text-[var(--diff-del)] font-semibold">-{gaps} gaps</span>
         </div>
       </div>
     </div>

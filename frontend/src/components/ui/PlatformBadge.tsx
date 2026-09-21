@@ -18,14 +18,14 @@ export const PlatformBadge: React.FC<PlatformBadgeProps> = React.memo(({
   const isPassed = status === 'passed' || status === 'connected' || status === 'ready';
 
   return (
-    <div className={`p-3 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs flex items-center justify-between transition-colors hover:border-[var(--text-main)] ${className}`}>
+    <div className={`p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-mono text-xs flex items-center justify-between transition-all hover:border-[var(--accent-color)]/40 hover:bg-[var(--bg-elevated)] ${className}`}>
       <div className="flex items-center gap-2.5">
         {/* Status Badge Box */}
         <span
-          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-[2px] border ${
+          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border ${
             isPassed
-              ? 'bg-[#DAFBE1] text-[#1A7F37] border-[#2DA44E]/40 dark:bg-[#2DA44E]/15 dark:text-[#2DA44E]'
-              : 'bg-[#FFEBE9] text-[#CF222E] border-[#CF222E]/40 dark:bg-[#CF222E]/15'
+              ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border-[var(--diff-add)]/30'
+              : 'bg-[var(--diff-del-bg)] text-[var(--diff-del)] border-[var(--diff-del)]/30'
           }`}
         >
           {isPassed ? '✓ PASSED' : '⌛ PENDING'}
@@ -44,7 +44,7 @@ export const PlatformBadge: React.FC<PlatformBadgeProps> = React.memo(({
       </div>
 
       {metric && (
-        <span className="font-semibold text-[var(--text-main)] bg-[var(--bg-paper)] px-2 py-1 border border-[var(--border-hairline)] rounded-[2px]">
+        <span className="font-semibold text-[var(--text-main)] bg-[var(--bg-paper)] px-2 py-1 border border-[var(--border-hairline)] rounded-md">
           {metric}
         </span>
       )}

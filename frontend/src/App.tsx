@@ -33,9 +33,9 @@ const AppLayout: React.FC = () => {
   }, [getToken]);
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-200">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300">
       <Navbar />
-      <main className="flex-1 overflow-x-hidden min-h-screen">
+      <main className="flex-1 overflow-x-hidden min-h-screen animate-fade-in">
         <Suspense fallback={<PageFallback />}>
           <Outlet />
         </Suspense>
