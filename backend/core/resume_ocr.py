@@ -77,6 +77,7 @@ class ExtractionResult:
     warnings: list[str] = field(default_factory=list)
 
     # ── Extracted Structured Signals ──
+    name: str | None = None
     github_url: str | None = None
     linkedin_url: str | None = None
     leetcode_url: str | None = None
@@ -84,6 +85,8 @@ class ExtractionResult:
     phone_numbers: list[str] = field(default_factory=list)
     skills: list[str] = field(default_factory=list)
     achievements: list[str] = field(default_factory=list)
+    education: list[dict[str, Any]] = field(default_factory=list)
+    experience: list[dict[str, Any]] = field(default_factory=list)
     projects: list[dict[str, Any]] = field(default_factory=list)
     projects_summary: dict[str, Any] = field(default_factory=dict)
 
@@ -104,13 +107,293 @@ MIN_CHARS_FOR_TEXT_LAYER = 40  # below this, treat page as scanned image
 
 # ── Structured Signal Extraction Helpers ─────────────────────────────────────
 
+# Section header keywords (normalized lowercase) for resume parsing
+_SEC_KEYWORDS: list[str] = [
+    "summary", "objective", "profile",
+    "education", "academic background",
+    "experience", "work experience", "professional experience", "employment",
+    "internship", "internships",
+    "projects", "personal projects", "academic projects", "key projects",
+    "technical skills", "skills", "core competencies", "technologies",
+    "achievements", "honors & awards", "honors and awards", "awards",
+    "certifications", "certificates", "licenses",
+    "publications", "research",
+    "extracurricular", "activities", "volunteer",
+    "references",
+]
+
+def _is_section_header(line: str) -> str | None:
+    """
+    Return the matched section keyword if *line* looks like a resume section
+    header, else None.  Handles:
+      - Exact match ("Education")
+      - Trailing colon / pipe ("Technical Skills:" or "SKILLS |")
+      - ALL-CAPS single-word ("EXPERIENCE")
+      - Prefix match ("Work Experience  2021 – 2024")
+    """
+    stripped = line.strip()
+    if not stripped or len(stripped) > 80:
+        return None
+
+    # Normalize: lowercase, strip trailing colon / pipe / dashes / underscores
+    norm = re.sub(r"[\s|:\-_]+$", "", stripped).lower()
+    # Also strip leading special chars sometimes seen in OCR
+    norm = re.sub(r"^[\s|:\-_]+", "", norm)
+
+    for kw in _SEC_KEYWORDS:
+        if norm == kw:
+            return kw
+        # Allow "Technical Skills & Tools" → still matches "technical skills"
+        if norm.startswith(kw + " ") or norm.startswith(kw + ":"):
+            return kw
+        # Suffix: "My Work Experience" → matches "work experience"
+        if norm.endswith(" " + kw):
+            return kw
+
+    return None
+
+
+def _looks_like_name(line: str) -> bool:
+    """
+    Heuristic: a line is likely a name if it has 2-5 title-cased words,
+    no digits, no URLs, no @-signs, and is short (< 50 chars).
+    """
+    s = line.strip()
+    if not s or len(s) > 50:
+        return False
+    if re.search(r"[\d@:/]", s):
+        return False
+    words = s.split()
+    if len(words) < 2 or len(words) > 5:
+        return False
+    # All words should start with uppercase (title case) — allow small
+    # connecting words like "de", "van"
+    small_words = {"de", "van", "von", "di", "la", "le", "el", "al", "bin"}
+    for w in words:
+        if w.lower() in small_words:
+            continue
+        if not w[0].isupper():
+            return False
+    return True
+
+
+def _parse_phone_numbers(text: str) -> list[str]:
+    """
+    Extract phone numbers with tighter regex to avoid matching dates and IDs.
+    Requires either a leading +, or common phone patterns like (xxx) or area codes.
+    """
+    patterns = [
+        r"\+\d{1,3}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}",          # +91 (555) 019-2834
+        r"\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}",                                     # (555) 019-2834
+        r"\+\d[\d\s-]{7,14}\d",                                                    # +1 555 019 2834
+    ]
+    found: set[str] = set()
+    for pat in patterns:
+        for m in re.finditer(pat, text):
+            candidate = m.group().strip()
+            # Skip if it looks like a date (e.g. "2021 - 2024")
+            if re.fullmatch(r"\d{4}\s*[-–—]\s*\d{4}", candidate):
+                continue
+            # Require at least 7 digits
+            digits_only = re.sub(r"\D", "", candidate)
+            if len(digits_only) >= 7:
+                found.add(candidate)
+    return sorted(list(found))
+
+
+def _parse_education(lines: list[str]) -> list[dict[str, str]]:
+    """
+    Parse education section lines into structured dicts.
+    Tries to detect {school, degree, year, score} from each entry.
+    """
+    entries: list[dict[str, str]] = []
+    current: dict[str, str] | None = None
+
+    year_re = re.compile(r"((?:19|20)\d{2})\s*(?:[-–—]\s*(?:(?:19|20)\d{2}|[Pp]resent|[Cc]urrent))?")
+    score_re = re.compile(
+        r"(?:CGPA|GPA|CPI|SPI|Percentage|Score|Grade)[:\s]*(\d[\d.]+(?:\s*[/%])?)",
+        re.I,
+    )
+    degree_kws = [
+        "b.tech", "m.tech", "b.sc", "m.sc", "b.e", "m.e", "bca", "mca",
+        "b.a", "m.a", "bba", "mba", "ph.d", "phd", "diploma", "bachelor",
+        "master", "associate", "doctor", "b.com", "m.com", "bsc", "msc",
+        "engineering", "computer science",
+    ]
+
+    for line in lines:
+        s = line.strip()
+        if not s:
+            continue
+        s_lower = s.lower()
+        is_bullet = s.startswith(("•", "-", "*", "–", "—"))
+
+        if is_bullet and current:
+            # Bullet under current entry — check for score
+            clean = s.lstrip("•-*–— ").strip()
+            sm = score_re.search(clean)
+            if sm and not current.get("score"):
+                current["score"] = sm.group(0)
+            continue
+
+        # Check if this line starts a new education entry
+        has_degree = any(kw in s_lower for kw in degree_kws)
+        ym = year_re.search(s)
+        # A new entry is likely if it contains a degree keyword or looks like an institution name
+        if has_degree or (not is_bullet and len(s) > 8 and not s.startswith(("•", "-", "*"))):
+            if current and (current.get("school") or current.get("degree")):
+                entries.append(current)
+
+            school = ""
+            degree = ""
+            year = ""
+            score = ""
+
+            # Try to split on common separators
+            parts = re.split(r"\s*[|,—–]\s*", s)
+            for part in parts:
+                p_lower = part.strip().lower()
+                if any(kw in p_lower for kw in degree_kws):
+                    degree = part.strip()
+                elif year_re.search(part):
+                    ym2 = year_re.search(part)
+                    year = ym2.group(0) if ym2 else ""
+                    # If part has more than just the year, it might be school name + year
+                    rest = year_re.sub("", part).strip(" -–—,")
+                    if rest and not school:
+                        school = rest
+                elif not school and len(part.strip()) > 2:
+                    school = part.strip()
+
+            # Fallback: if we only got year from the whole line
+            if not school and not degree:
+                school = re.sub(r"[\(\)]", "", year_re.sub("", s)).strip(" -–—,|")
+
+            sm = score_re.search(s)
+            if sm:
+                score = sm.group(0)
+
+            current = {"school": school, "degree": degree, "year": year, "score": score}
+        elif current:
+            # Continuation line — try to fill missing fields
+            sm = score_re.search(s)
+            if sm and not current.get("score"):
+                current["score"] = sm.group(0)
+            elif not current.get("degree") and has_degree:
+                current["degree"] = s
+            elif not current.get("school") and not is_bullet:
+                current["school"] = s
+
+    if current and (current.get("school") or current.get("degree")):
+        entries.append(current)
+
+    return entries
+
+
+def _parse_experience(lines: list[str]) -> list[dict[str, Any]]:
+    """
+    Parse experience section lines into structured dicts.
+    Tries to detect {role, company, dates, bullets} from each entry.
+    """
+    entries: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+
+    date_re = re.compile(
+        r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
+        r"Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)"
+        r"[\s.]*\d{0,4}\s*[-–—]\s*(?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
+        r"Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)"
+        r"[\s.]*\d{0,4}|[Pp]resent|[Cc]urrent|\d{4})",
+        re.I,
+    )
+    year_range_re = re.compile(r"((?:19|20)\d{2})\s*[-–—]\s*((?:19|20)\d{2}|[Pp]resent|[Cc]urrent)")
+    role_company_re = re.compile(
+        r"^(.+?)\s*(?:@|at|,)\s*(.+?)(?:\s*[|—–-]\s*(.+))?$",
+        re.I,
+    )
+
+    for line in lines:
+        s = line.strip()
+        if not s:
+            continue
+        is_bullet = s.startswith(("•", "-", "*", "–", "—")) or bool(re.match(r"^\d+\.\s", s))
+
+        if is_bullet and current:
+            clean = s.lstrip("•-*–— ").strip()
+            if re.match(r"^\d+\.\s", clean):
+                clean = re.sub(r"^\d+\.\s*", "", clean)
+            if clean:
+                current["bullets"].append(clean)
+            continue
+
+        # Check if this looks like an experience header line
+        dm = date_re.search(s) or year_range_re.search(s)
+        rm = role_company_re.match(s)
+
+        is_new_entry = False
+        role = ""
+        company = ""
+        dates = ""
+
+        if dm:
+            dates = dm.group(0).strip()
+            is_new_entry = True
+
+        if rm and is_new_entry:
+            role = rm.group(1).strip()
+            company = rm.group(2).strip()
+            if rm.group(3):
+                dates = rm.group(3).strip()
+        elif is_new_entry:
+            # Try splitting on | or —
+            parts = re.split(r"\s*[|—–]\s*", s)
+            if len(parts) >= 2:
+                role = parts[0].strip()
+                company = parts[1].strip() if len(parts) > 2 else ""
+                # dates may be last part or already extracted
+                for p in parts:
+                    dm2 = date_re.search(p) or year_range_re.search(p)
+                    if dm2:
+                        dates = dm2.group(0).strip()
+                        # Remove dates from role/company if embedded
+                        if p.strip() == role:
+                            role = date_re.sub("", year_range_re.sub("", role)).strip(" -–—|,")
+                        elif p.strip() == company:
+                            company = date_re.sub("", year_range_re.sub("", company)).strip(" -–—|,")
+            else:
+                # Single line with date — treat whole pre-date part as role
+                pre_date = s[:dm.start()].strip(" -–—|,@") if dm else s
+                role = pre_date
+
+        if not is_new_entry and not is_bullet:
+            # Non-bullet, non-date line — might be a company name or role on its own
+            # If we have a current entry with no company, treat as company
+            if current and not current.get("company"):
+                current["company"] = s
+                continue
+            elif len(s) > 5 and not s[0].isdigit():
+                # Might be starting a new entry without clear date
+                is_new_entry = True
+                role = s
+
+        if is_new_entry:
+            if current and (current.get("role") or current.get("company")):
+                entries.append(current)
+            current = {"role": role, "company": company, "dates": dates, "bullets": []}
+
+    if current and (current.get("role") or current.get("company")):
+        entries.append(current)
+
+    return entries
+
+
 def _extract_structured_data(
     raw_text: str,
     hyperlinks: list[str],
 ) -> dict[str, Any]:
     """
-    Extract contact links, GitHub/LinkedIn URLs, skills, achievements,
-    and evaluate project link quality ("good" vs "bad").
+    Extract contact links, GitHub/LinkedIn URLs, name, skills, achievements,
+    education, experience, and evaluate project link quality ("good" vs "bad").
     """
     clean_links = list(set([l.strip() for l in hyperlinks if l]))
 
@@ -126,7 +409,6 @@ def _extract_structured_data(
             if m and m.group(1).lower() not in ("features", "explore", "topics", "pulls", "issues"):
                 github_url = f"https://github.com/{m.group(1)}"
             elif "github.com" in link_lower and not github_url:
-                # Catch repository URL if user profile link is not separate
                 m_repo = re.search(r"https?://(?:www\.)?github\.com/([a-zA-Z0-9_-]+)", link, re.I)
                 if m_repo and m_repo.group(1).lower() not in ("features", "explore", "topics"):
                     github_url = f"https://github.com/{m_repo.group(1)}"
@@ -158,49 +440,74 @@ def _extract_structured_data(
             leetcode_url = f"https://leetcode.com/u/{m.group(1)}"
 
     emails = sorted(list(set(re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", raw_text))))
-    phone_numbers = sorted(list(set(re.findall(r"\+?\d[\d\s-]{8,}\d", raw_text))))
+    phone_numbers = _parse_phone_numbers(raw_text)
 
-    # 2. Section Parsing (Projects, Achievements, Skills)
-    sec_headers = [
-        "summary", "education", "experience", "work experience",
-        "projects", "personal projects", "technical skills", "skills",
-        "achievements", "honors & awards", "awards", "certifications",
-    ]
+    # 2. Section Parsing — improved header detection
     lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
 
     sec_map: dict[str, list[str]] = {"header": []}
     current_sec = "header"
 
     for line in lines:
-        l_lower = line.lower()
-        matched = None
-        for sh in sec_headers:
-            if l_lower == sh or l_lower.startswith(sh + " ") or l_lower.endswith(" " + sh):
-                matched = sh
-                break
+        matched = _is_section_header(line)
         if matched:
+            # Normalize similar sections
+            if matched in ("work experience", "professional experience", "employment"):
+                matched = "experience"
+            elif matched in ("technical skills", "core competencies", "technologies"):
+                matched = "skills"
+            elif matched in ("honors & awards", "honors and awards", "awards"):
+                matched = "achievements"
+            elif matched in ("certificates", "licenses"):
+                matched = "certifications"
+            elif matched in ("personal projects", "academic projects", "key projects"):
+                matched = "projects"
+            elif matched in ("objective", "profile"):
+                matched = "summary"
             current_sec = matched
-            sec_map[current_sec] = []
+            if current_sec not in sec_map:
+                sec_map[current_sec] = []
         else:
+            if current_sec not in sec_map:
+                sec_map[current_sec] = []
             sec_map[current_sec].append(line)
 
-    # 3. Parse Skills
+    # 3. Extract candidate name — heuristic on "header" lines (before any section)
+    extracted_name: str | None = None
+    header_lines = sec_map.get("header", [])
+    for hl in header_lines[:5]:  # name is almost always in the first few lines
+        # Skip lines that are emails, phone numbers, URLs
+        if "@" in hl or re.search(r"https?://", hl) or re.search(r"\+?\d[\d\s-]{7,}", hl):
+            continue
+        if _looks_like_name(hl):
+            extracted_name = hl.strip()
+            break
+
+    # 4. Parse Skills
     extracted_skills: list[str] = []
     if extract_skills_from_resume is not None:
         skill_res = extract_skills_from_resume(raw_text)
         extracted_skills = skill_res.get("all_skills", [])
 
-    # 4. Parse Achievements
+    # 5. Parse Achievements
     achievements: list[str] = []
-    for key in ["achievements", "honors & awards", "awards", "certifications"]:
+    for key in ["achievements", "certifications"]:
         if key in sec_map:
             for l in sec_map[key]:
                 clean_bullet = l.lstrip("•-*–— ").strip()
                 if clean_bullet:
                     achievements.append(clean_bullet)
 
-    # 5. Parse Projects & Evaluate Link Quality
-    proj_lines = sec_map.get("projects", []) or sec_map.get("personal projects", [])
+    # 6. Parse Education
+    edu_lines = sec_map.get("education", []) or sec_map.get("academic background", [])
+    education = _parse_education(edu_lines)
+
+    # 7. Parse Experience
+    exp_lines = sec_map.get("experience", [])
+    experience = _parse_experience(exp_lines)
+
+    # 8. Parse Projects & Evaluate Link Quality
+    proj_lines = sec_map.get("projects", [])
     projects: list[dict[str, Any]] = []
     curr_p: dict[str, Any] | None = None
 
@@ -212,6 +519,9 @@ def _extract_structured_data(
             if "|" in line:
                 is_header = True
             elif re.search(r"^(?:[A-Z][a-zA-Z0-9_\s-]{2,30})\s*(?:\||-|–|—|\()\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|\d{4})", line, re.I):
+                is_header = True
+            elif not line.startswith(("•", "-", "*", "–", "—")) and len(line) < 60 and not projects and not curr_p:
+                # First non-bullet short line in projects — likely a project name
                 is_header = True
 
         if is_header:
@@ -233,15 +543,13 @@ def _extract_structured_data(
                 "verdict_reason": "No GitHub repository or live demo link provided for this project",
             }
 
-            # Link matching logic: match project name with hyperlink annotations or text URLs
+            # Link matching logic
             title_clean = re.sub(r"[^a-zA-Z0-9]", "", title.lower())
             for link in clean_links:
                 link_lower = link.lower()
-                # Skip profile links
-                if "/in/" in link_lower or link_lower.endswith(("soubhlance", "soubhiksadhu")):
+                if "/in/" in link_lower:
                     continue
                 link_clean = re.sub(r"[^a-zA-Z0-9]", "", link_lower)
-                # Check match against project title words
                 title_words = [w.lower() for w in title.split() if len(w) > 2]
                 if title_clean in link_clean or any(w in link_clean for w in title_words):
                     curr_p["repo_or_demo_link"] = link
@@ -289,6 +597,7 @@ def _extract_structured_data(
     }
 
     return {
+        "name": extracted_name,
         "github_url": github_url,
         "linkedin_url": linkedin_url,
         "leetcode_url": leetcode_url,
@@ -296,6 +605,8 @@ def _extract_structured_data(
         "phone_numbers": phone_numbers,
         "skills": extracted_skills,
         "achievements": achievements,
+        "education": education,
+        "experience": experience,
         "projects": projects,
         "projects_summary": projects_summary,
     }

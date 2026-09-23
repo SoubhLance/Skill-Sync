@@ -68,7 +68,7 @@ export const OptimizerPage: React.FC = () => {
           <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
             <div className="space-y-1 font-sans">
               <h3 className="font-extrabold text-base text-[var(--text-main)] flex items-center gap-2">
-                <LinkedinIcon className="w-5 h-5 text-sky-500" /> Upload LinkedIn Profile PDF Export
+                <LinkedinIcon className="w-5 h-5 text-[var(--accent-color)]" /> Upload LinkedIn Profile PDF Export
               </h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                 Since live LinkedIn scraping is blocked, export your profile as PDF (Profile → More → Save to PDF) and drop it here.

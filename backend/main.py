@@ -91,21 +91,34 @@ Model used: **bert-base-uncased** (MRR 0.8579, Hit@5 0.9358, Intra-sim 0.9321)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  CORS  —  allow Lovable dev server + your production domain
+#  CORS  —  allow all localhost dev server ports + custom production origins
 # ─────────────────────────────────────────────────────────────────────────────
 
-_origins = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:3000,http://localhost:5173,http://localhost:8080",
-).split(",")
+_cors_origins_env = os.getenv("CORS_ORIGINS", "")
+_extra_origins = [o.strip() for o in _cors_origins_env.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins     = _origins,
-    allow_credentials = True,
-    allow_methods     = ["*"],
-    allow_headers     = ["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:8080",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://127.0.0.1:8080",
+        *_extra_origins,
+    ],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -126,6 +139,9 @@ async def _global_exc(request: Request, exc: Exception):
 
 from backend.routes.recommend import router as rec_router
 app.include_router(rec_router)
+
+from backend.routes.resume import router as resume_router
+app.include_router(resume_router)
 
 from backend.core.api import router as linkedin_router
 app.include_router(linkedin_router, prefix="/api/optimizer")

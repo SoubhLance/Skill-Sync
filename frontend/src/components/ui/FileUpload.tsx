@@ -116,8 +116,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 : 'border-[var(--border-hairline)] hover:border-[var(--accent-color)]/60 bg-[var(--bg-paper)] hover:bg-[var(--bg-surface)] hover:shadow-[var(--shadow-sm)]'
             }`}
           >
-            {/* Aceternity Grid Accent Background Pattern */}
-            <div className="absolute inset-0 bg-[radial-gradient(#8881_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none" />
+            {/* Forest dot grid accent */}
+            <div className="absolute inset-0 bg-[radial-gradient(color-mix(in_srgb,var(--accent-color)_35%,transparent)_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none" />
 
             <div className="relative z-10 flex flex-col items-center justify-center space-y-3">
               <motion.div
@@ -167,7 +167,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 onFileSelect(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
               }}
-              className="p-1.5 rounded-sm hover:bg-[#CF222E]/10 text-[var(--text-muted)] hover:text-[#CF222E] transition-colors cursor-pointer shrink-0 ml-2"
+              className="p-1.5 rounded-sm hover:bg-[var(--diff-del)]/10 text-[var(--text-muted)] hover:text-[var(--diff-del)] transition-colors cursor-pointer shrink-0 ml-2"
               title="Remove File"
             >
               <X className="w-4 h-4" />

@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { useUserProfile, getStoredSkills } from '../lib/userProfile';
 import { 
   Compass, 
   GraduationCap, 
@@ -62,11 +64,22 @@ const ROLE_TAXONOMY_MAP: Record<string, string[]> = {
 };
 
 export const CareerPathPage: React.FC = () => {
-  // Functional Input State
+  const { user } = useAuth();
+  const { setSkills: persistSkills, addSkills: persistAddSkills } = useUserProfile(user?.uid);
+  // Functional Input State — empty-first, hydrated from per-user shared store.
   const [audience, setAudience] = useState<'student' | 'pro'>('student');
   const [targetRole, setTargetRole] = useState('Machine Learning Engineer');
-  const [skills, setSkills] = useState<string[]>(["Python", "FastAPI", "PyTorch", "React"]);
+  const [skills, setSkills] = useState<string[]>([]);
   const [skillInputBuffer, setSkillInputBuffer] = useState('');
+  const hydratedUid = useRef<string | null>(null);
+
+  // Hydrate editor from shared store (resume/JD/career union). Re-run on account switch.
+  useEffect(() => {
+    const uid = user?.uid ?? null;
+    if (hydratedUid.current === (uid ?? 'anon')) return;
+    hydratedUid.current = uid ?? 'anon';
+    setSkills(getStoredSkills(uid));
+  }, [user?.uid]);
   
   // Resume upload state
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -177,14 +190,15 @@ export const CareerPathPage: React.FC = () => {
     requiredSkills: []
   };
 
-  // Tag Input Handlers
+  // Tag Input Handlers — every change also feeds the shared per-user store (dashboard).
   const handleAddSkill = (skillToAdd?: string) => {
     const value = (skillToAdd || skillInputBuffer).trim();
     if (!value) return;
-    
+
     // Prevent duplicates (case-insensitive)
     if (!skills.some(s => s.toLowerCase() === value.toLowerCase())) {
       setSkills(prev => [...prev, value]);
+      persistAddSkills([value]);
     }
     if (!skillToAdd) {
       setSkillInputBuffer('');
@@ -199,7 +213,9 @@ export const CareerPathPage: React.FC = () => {
   };
 
   const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills(prev => prev.filter(s => s !== skillToRemove));
+    const next = skills.filter(s => s !== skillToRemove);
+    setSkills(next);
+    persistSkills(next);
   };
 
   // Resume PDF Auto-Extraction Handler (Uses backend /extract-skills/pdf endpoint)
@@ -217,7 +233,8 @@ export const CareerPathPage: React.FC = () => {
           const newUnique = result.all_skills.filter(s => !existingLower.has(s.toLowerCase()));
           return [...prev, ...newUnique];
         });
-        setExtractStatusMessage(`✓ Successfully extracted ${result.all_skills.length} skills from ${file.name}`);
+        persistAddSkills(result.all_skills);
+        setExtractStatusMessage(`✓ Successfully extracted ${result.all_skills.length} skills from ${file.name} — added to dashboard`);
       } else {
         setExtractStatusMessage(`✓ Attached ${file.name}`);
       }
@@ -227,13 +244,14 @@ export const CareerPathPage: React.FC = () => {
     } finally {
       setIsExtractingResume(false);
     }
-  }, []);
+  }, [persistAddSkills]);
 
-  // Submit / Generate Handler
+  // Submit / Generate Handler — final flush to dashboard store.
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!targetRole.trim() || skills.length === 0) return;
 
+    persistSkills(skills);
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);

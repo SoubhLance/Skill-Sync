@@ -104,11 +104,11 @@ export const ProfilePage: React.FC = () => {
             >
               {theme === 'dark' ? (
                 <>
-                  <Moon className="w-4 h-4 text-amber-400" /> Active: Dark Mode (Comfortable Slate)
+                  <Moon className="w-4 h-4 text-[#6EE7B7]" /> Active: Canopy Mode (Deep Forest)
                 </>
               ) : (
                 <>
-                  <Sun className="w-4 h-4 text-orange-500" /> Active: Light Mode (Warm Canvas)
+                  <Sun className="w-4 h-4 text-[#4D7C0F]" /> Active: Mist Mode (Sage Grove)
                 </>
               )}
             </button>

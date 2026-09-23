@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  auth, 
-  googleProvider, 
-  signInWithPopup, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  firebaseSignOut, 
+import {
+  auth,
+  googleProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  firebaseSignOut,
   onAuthStateChanged,
   isMockAuth,
   AppUser
 } from '../lib/firebase';
+import { setLastUid } from '../lib/userProfile';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -40,9 +41,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...parsed,
             getIdToken: async () => 'mock-dev-token-skillsync-12345',
           });
+          setLastUid(parsed?.uid ?? null);
         } catch (e) {
           setUser(null);
+          setLastUid(null);
         }
+      } else {
+        setLastUid(null);
       }
       setLoading(false);
       return;
@@ -58,8 +63,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             photoURL: fbUser.photoURL,
             getIdToken: () => fbUser.getIdToken(),
           });
+          setLastUid(fbUser.uid);
         } else {
           setUser(null);
+          setLastUid(null);
         }
         setLoading(false);
       });
@@ -82,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: mock.displayName,
         photoURL: mock.photoURL,
       }));
+      setLastUid(mock.uid);
       setUser(mock);
       return;
     }
@@ -93,8 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithEmail = async (email: string, pass: string) => {
     if (isMockAuth) {
+      // Per-user isolation: derive a stable uid from the email so each
+      // account starts with an empty dashboard.
+      const safe = email.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) || 'user';
       const mock: AppUser = {
-        uid: 'mock-email-uid-200',
+        uid: `mock-email-${safe}`,
         email: email,
         displayName: email.split('@')[0] || 'SkillSync User',
         photoURL: null,
@@ -106,6 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: mock.displayName,
         photoURL: mock.photoURL,
       }));
+      setLastUid(mock.uid);
       setUser(mock);
       return;
     }
@@ -129,12 +141,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     if (isMockAuth) {
       sessionStorage.removeItem(MOCK_USER_STORAGE_KEY);
+      setLastUid(null);
       setUser(null);
       return;
     }
 
     if (auth) {
       await firebaseSignOut(auth);
+      setLastUid(null);
     }
   };
 

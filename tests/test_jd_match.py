@@ -287,3 +287,41 @@ def test_extract_profile_request_schema():
     data = resp.json()
     assert "profile_score" in data
 
+
+def test_jd_match_zero_skills_guardrail_prevents_false_positive():
+    """Mismatched candidate with ZERO required skills receives realistic low match (<= 20%), fixing previous 80%+ bug."""
+    resume = "Java Backend Engineer experienced in Spring Boot, Hibernate, Oracle SQL, and Enterprise Microservices."
+    jd = "Machine Learning Engineer required skills: Python, PyTorch, CUDA, FastAPI, Docker."
+
+    resp = client.post("/jd-match", json={"resume_text": resume, "jd_text": jd})
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert data["skill_overlap"] == []
+    assert "python" in data["skill_gap"]
+    assert "pytorch" in data["skill_gap"]
+    # Critical verification: Must NOT be ~80%+ as in the buggy implementation
+    assert data["match_percent"] <= 20.0
+    assert data["match_label"] in ["Low Match", "Skill Pivot Needed"]
+    assert data["skill_score"] == 0.0
+    assert "semantic_score" in data
+    assert "candidate_skills" in data
+    assert "jd_skills" in data
+
+
+def test_jd_match_partial_skills_scales_proportionally():
+    """Candidate matching 3 of 5 skills receives a calibrated moderate-to-good match (50% to 85%)."""
+    resume = "Software Engineer proficient in Python, FastAPI, Docker, and PostgreSQL."
+    jd = "Requirements: Python, FastAPI, Docker, Kubernetes, Terraform."
+
+    resp = client.post("/jd-match", json={"resume_text": resume, "jd_text": jd})
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert set(data["skill_overlap"]) == {"python", "fastapi", "docker"}
+    assert set(data["skill_gap"]) == {"kubernetes", "terraform"}
+    assert 50.0 <= data["match_percent"] <= 85.0
+    assert data["skill_score"] > 0.5
+    assert data["match_label"] in ["Moderate Match", "Good Match"]
+
+

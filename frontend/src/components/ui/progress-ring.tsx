@@ -39,7 +39,7 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
           cy={center}
           r={radius}
           strokeWidth={strokeWidth}
-          className={trackColor || "stroke-neutral-200 dark:stroke-neutral-800"}
+          className={trackColor || "stroke-[var(--bg-elevated)]"}
           fill="transparent"
         />
 

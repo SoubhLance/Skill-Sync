@@ -61,28 +61,10 @@ export const LoginPage: React.FC = () => {
   ];
 
   const floatingSignals = [
-    { icon: GitCommitHorizontal, text: '2,431 commits synced', color: '#FBBF24', delay: '0s' },
-    { icon: ScanText,            text: '768-d resume vectors', color: '#6EE7B7', delay: '1.4s' },
-    { icon: Crosshair,           text: '95% role fit',          color: '#FDBA74', delay: '2.6s' },
+    { icon: GitCommitHorizontal, text: '2,431 commits synced', color: '#6EE7B7', delay: '0s' },
+    { icon: ScanText,            text: '768-d resume vectors', color: '#A7F3D0', delay: '1.4s' },
+    { icon: Crosshair,           text: '95% role fit',          color: '#7FB069', delay: '2.6s' },
   ];
-
-  // Typewriter for the gold headline (runs once, skipped on reduced motion)
-  const [typedCount, setTypedCount] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setTypedCount(TAGLINE.length);
-      return;
-    }
-    let i = 0;
-    let cancelled = false;
-    let id = window.setTimeout(function tick() {
-      if (cancelled) return;
-      i += 1;
-      setTypedCount(i);
-      if (i < TAGLINE.length) id = window.setTimeout(tick, 60 + Math.random() * 70);
-    }, 900);
-    return () => { cancelled = true; window.clearTimeout(id); };
-  }, []);
 
   // Render only the forest instance that's actually visible —
   // the CSS-hidden twin would otherwise burn a second rAF loop.
@@ -116,9 +98,9 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300">
 
-      {/* ── LEFT BRAND PANEL (desktop only) — dark forest cinema ── */}
+      {/* ── LEFT BRAND PANEL (desktop only) — deep forest cinema ── */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] relative overflow-hidden p-12 bg-[#040805]">
-        {/* Rainforest backdrop (login only) — mounted only when visible */}
+        {/* Rainforest backdrop (shared forest engine) — mounted only when visible */}
         {isDesktop && <AmbientForest />}
 
         {/* Logo */}
@@ -126,7 +108,7 @@ export const LoginPage: React.FC = () => {
           <Link to="/" className="flex items-center gap-2.5 group w-fit">
             <img src="/logo.png" alt="SkillSync" className="w-9 h-9 object-contain group-hover:scale-105 transition-transform drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]" />
             <span className="font-extrabold text-lg text-white font-sans drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
-              Skill<span className="text-[#FBBF24]">Sync</span>
+              Skill<span className="text-[#6EE7B7]">Sync</span>
             </span>
           </Link>
         </div>
@@ -135,7 +117,7 @@ export const LoginPage: React.FC = () => {
         <div className="relative z-10 space-y-8 pb-2">
           <div className="space-y-4">
             <div className="animate-fade-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-black/60 text-white/75 text-xs" style={{ animationDelay: '0.1s' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FBBF24] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6EE7B7] animate-pulse" />
               Developer signal platform
             </div>
             <h1 className="animate-fade-up text-[2.6rem] font-extrabold text-white leading-[1.05] tracking-tight font-sans drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]" style={{ animationDelay: '0.18s' }}>
@@ -143,15 +125,14 @@ export const LoginPage: React.FC = () => {
               <span
                 className="headline-pan"
                 style={{
-                  background: 'linear-gradient(135deg, #FDE68A 0%, #F59E0B 40%, #FBBF24 60%, #EA580C 100%)',
+                  background: 'linear-gradient(135deg, #D1FAE5 0%, #6EE7B7 40%, #34D399 60%, #A7F3D0 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                 }}
               >
-                {TAGLINE.slice(0, typedCount)}
+                {TAGLINE}
               </span>
-              {typedCount < TAGLINE.length && <span className="type-caret" aria-hidden="true" />}
             </h1>
             <p className="animate-fade-up text-white/65 text-[15px] leading-relaxed font-sans max-w-xs drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]" style={{ animationDelay: '0.28s' }}>
               Sign in to unlock AI-powered resume scoring, career path roadmaps, and JD match analysis.
@@ -163,8 +144,8 @@ export const LoginPage: React.FC = () => {
             {bullets.map(({ icon: Icon, text }, i) => (
               <li key={text} className="animate-fade-up flex items-center gap-3 text-sm text-white/80" style={{ animationDelay: `${0.36 + i * 0.08}s` }}>
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                     style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(245,158,11,0.35)', boxShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
-                  <Icon className="w-3.5 h-3.5 text-[#FBBF24]" />
+                     style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(52,211,153,0.35)', boxShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
+                  <Icon className="w-3.5 h-3.5 text-[#6EE7B7]" />
                 </div>
                 <span className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{text}</span>
               </li>
@@ -200,9 +181,9 @@ export const LoginPage: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative overflow-hidden">
         {/* Subtle bg gradient for right panel */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'var(--grad-hero)' }} />
-        {/* Warm ambient wash echoing the forest */}
-        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(closest-side, rgba(234,88,12,0.13), transparent)' }} />
-        <div className="absolute -bottom-32 -left-24 h-96 w-96 rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(closest-side, rgba(251,191,36,0.11), transparent)' }} />
+        {/* Forest ambient wash echoing the canopy */}
+        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(closest-side, color-mix(in srgb, var(--accent-color) 14%, transparent), transparent)' }} />
+        <div className="absolute -bottom-32 -left-24 h-96 w-96 rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(closest-side, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent)' }} />
 
         <div className="relative w-full max-w-md space-y-6 animate-fade-up">
           {/* Mobile forest strip (desktop gets the full panel) */}

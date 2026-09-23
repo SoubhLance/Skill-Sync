@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { api, JDMatchResponse, JobMatch } from '../lib/api';
 import { DiffStatDisplay } from '../components/ui/DiffStatDisplay';
 import { FileUpload } from '../components/ui/FileUpload';
+import { evaluateSkillMatch, isTechJob } from '../lib/scoring';
+import { useUserProfile } from '../lib/userProfile';
+import { useAuth } from '../context/AuthContext';
 import { 
   FileCheck2, 
   CheckCircle2, 
@@ -258,6 +261,7 @@ const NON_TECH_PRESET_SKILLS = [
 ];
 
 export const JDMatcherPage: React.FC = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'pairwise' | 'browse'>('pairwise');
 
   // Pairwise JD Matcher state
@@ -274,8 +278,12 @@ export const JDMatcherPage: React.FC = () => {
   const [result, setResult] = useState<JDMatchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { skills: userProfileSkills, setSkills: setUserProfileSkills } = useUserProfile(user?.uid);
+
   // Job Matches Search State
-  const [skillsQuery, setSkillsQuery] = useState('Python, PyTorch, FastAPI, Docker');
+  const [skillsQuery, setSkillsQuery] = useState(() =>
+    userProfileSkills.length > 0 ? userProfileSkills.join(', ') : 'Python, PyTorch, FastAPI, Docker'
+  );
   const [selectedDomain, setSelectedDomain] = useState<string>('All');
   const [trackFilter, setTrackFilter] = useState<'all' | 'technical' | 'general'>('all');
   const [domains, setDomains] = useState<string[]>([]);
@@ -308,23 +316,6 @@ export const JDMatcherPage: React.FC = () => {
     initData();
   }, []);
 
-  // Is job technical vs general classification helper
-  const isTechJob = useCallback((job: { domain?: string; job_role?: string; skills?: string }): boolean => {
-    const d = (job.domain || '').toLowerCase();
-    const r = (job.job_role || '').toLowerCase();
-    const s = (job.skills || '').toLowerCase();
-
-    if (d === 'technical' || d.includes('engineering') || d.includes('ai') || d.includes('web') || d.includes('data') || d.includes('cloud')) {
-      return true;
-    }
-    if (d === 'general' || d.includes('finance') || d.includes('business') || d.includes('healthcare')) {
-      return false;
-    }
-
-    const techKeywords = ['developer', 'engineer', 'architect', 'scientist', 'programmer', 'full stack', 'backend', 'frontend', 'devops', 'cyber', 'qa', 'firmware', 'code', 'python', 'java', 'react'];
-    return techKeywords.some(kw => r.includes(kw) || s.includes(kw));
-  }, []);
-
   // Compute Skill Matches and Skill Gaps dynamically given user skills input across all 415+ jobs
   const processMatchesForQuery = useCallback((queryStr: string, domainFilter?: string, currentTrack?: 'all' | 'technical' | 'general', rawApiMatches?: JobMatch[]): JobMatch[] => {
     const candSkills = queryStr
@@ -332,8 +323,7 @@ export const JDMatcherPage: React.FC = () => {
       .map(s => s.trim())
       .filter(Boolean);
 
-    const candSkillsLower = candSkills.map(s => s.toLowerCase());
-    const hasQuery = candSkillsLower.length > 0;
+    const hasQuery = candSkills.length > 0;
 
     // Use API matches if provided and non-empty, otherwise use backend index or local dataset fallback
     const sourcePool = (rawApiMatches && rawApiMatches.length > 0)
@@ -357,38 +347,7 @@ export const JDMatcherPage: React.FC = () => {
         ? job.skills_list 
         : job.skills.split(',').map(s => s.trim()).filter(Boolean);
 
-      // Calculate Overlapping Skills (case-insensitive & sub-token match)
-      const overlap = reqSkills.filter(req => 
-        candSkillsLower.some(cand => 
-          req.toLowerCase() === cand ||
-          req.toLowerCase().includes(cand) ||
-          cand.includes(req.toLowerCase())
-        )
-      );
-
-      // Calculate Missing Skill Gaps
-      const gap = reqSkills.filter(req => 
-        !candSkillsLower.some(cand => 
-          req.toLowerCase() === cand ||
-          req.toLowerCase().includes(cand) ||
-          cand.includes(req.toLowerCase())
-        )
-      );
-
-      // Alignment Match % calculation just like Career Path prediction
-      let match_pct = 0;
-      if (hasQuery && reqSkills.length > 0) {
-        const rawRatio = overlap.length / reqSkills.length;
-        if (overlap.length > 0) {
-          match_pct = Math.round(rawRatio * 65 + 30);
-        } else {
-          const roleMatch = candSkillsLower.some(cand => job.job_role.toLowerCase().includes(cand));
-          match_pct = roleMatch ? 45 : 0;
-        }
-      } else {
-        match_pct = 75; // default view score
-      }
-      match_pct = Math.min(98, match_pct);
+      const matchRes = evaluateSkillMatch(reqSkills, candSkills, job.job_role, 0.75, 0.80);
 
       return {
         job_id: job.job_id,
@@ -406,11 +365,11 @@ export const JDMatcherPage: React.FC = () => {
         salary_avg: job.salary_avg,
         has_salary_data: true,
         skill_count: reqSkills.length,
-        semantic_score: match_pct / 100,
-        blended_score: match_pct / 100,
-        skill_overlap: overlap,
-        skill_gap: gap,
-        match_pct: match_pct
+        semantic_score: matchRes.semantic_score,
+        blended_score: matchRes.blended_score,
+        skill_overlap: matchRes.overlap,
+        skill_gap: matchRes.gap,
+        match_pct: matchRes.match_pct
       };
     });
 
@@ -507,6 +466,11 @@ export const JDMatcherPage: React.FC = () => {
     const targetTrack = customTrack !== undefined ? customTrack : trackFilter;
     const domainFilter = selectedDomain === 'All' ? undefined : selectedDomain;
 
+    const parsedSkills = targetQuery.split(',').map(s => s.trim()).filter(Boolean);
+    if (parsedSkills.length > 0) {
+      setUserProfileSkills(parsedSkills);
+    }
+
     try {
       const res = await api.recommendSkills(targetQuery, 400, 0.75, domainFilter);
       const processed = processMatchesForQuery(targetQuery, selectedDomain, targetTrack, res.matches);
@@ -518,7 +482,7 @@ export const JDMatcherPage: React.FC = () => {
     } finally {
       setJobsLoading(false);
     }
-  }, [skillsQuery, selectedDomain, trackFilter, processMatchesForQuery]);
+  }, [skillsQuery, selectedDomain, trackFilter, processMatchesForQuery, setUserProfileSkills]);
 
   useEffect(() => {
     if (activeTab === 'browse') {
@@ -673,7 +637,7 @@ export const JDMatcherPage: React.FC = () => {
                       subLabel="PDF, DOCX or TXT"
                       file={jdFile}
                       onFileSelect={setJdFile}
-                      icon={<Briefcase className="w-4 h-4 text-emerald-500" />}
+                      icon={<Briefcase className="w-4 h-4 text-[var(--success)]" />}
                     />
 
                     <p className="caption">
@@ -704,7 +668,36 @@ export const JDMatcherPage: React.FC = () => {
             <div className="space-y-6">
               {result ? (
                 <div className="space-y-6">
-                  <DiffStatDisplay score={result.match_percent} label="Resume and role similarity" />
+                  <div className="relative">
+                    <DiffStatDisplay score={result.match_percent} label="Resume and role similarity" />
+                    {result.match_label && (
+                      <div className="absolute top-5 right-5">
+                        <span className={`chip ${
+                          result.match_percent >= 70 ? 'chip-success' :
+                          result.match_percent >= 50 ? 'chip-accent' : 'chip-danger'
+                        } font-semibold text-[12px]`}>
+                          {result.match_label}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {(result.skill_score !== undefined || result.semantic_score !== undefined) && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="card p-3.5 space-y-1">
+                        <span className="caption block">Skill Coverage</span>
+                        <p className="text-lg font-bold tabular-nums text-[var(--accent-color)]">
+                          {Math.round((result.skill_score ?? 0) * 100)}%
+                        </p>
+                      </div>
+                      <div className="card p-3.5 space-y-1">
+                        <span className="caption block">Semantic Fit</span>
+                        <p className="text-lg font-bold tabular-nums text-[var(--accent-color)]">
+                          {Math.round((result.semantic_score ?? 0) * 100)}%
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="card p-4 space-y-2">

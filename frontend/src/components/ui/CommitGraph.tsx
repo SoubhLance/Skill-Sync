@@ -1,18 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
+import { apiClient } from '../../lib/api';
 
 interface CommitGraphProps {
   username?: string;
   className?: string;
 }
 
-// Green heat levels — level 0 (empty) is rendered via a CSS-var-aware class,
-// levels 1-4 use GitHub-green tones that read on both cream and near-black backgrounds.
+// Forest heat levels — level 0 (empty) is rendered via a CSS-var-aware class,
+// levels 1-4 use forest greens that read on both mist and canopy backgrounds.
 const GREEN_LEVELS_HEX = [
   null,        // level 0: rendered by className, not inline style
-  '#9BE9A8',   // level 1
-  '#40C463',   // level 2
-  '#30A14E',   // level 3
-  '#216E39',   // level 4 (highest)
+  '#B7E4C7',   // level 1 — fog fern
+  '#74C69D',   // level 2 — light fern
+  '#2E7D4F',   // level 3 — pine
+  '#14532D',   // level 4 (highest) — deep pine
 ];
 
 // Hash function to deterministically derive commit activity matrix from username string
@@ -60,23 +61,68 @@ function generateCommitData(username: string = 'tourist') {
   return { matrix, totalCommits, additions, gaps };
 }
 
+interface RealData {
+  weeks: number[][];
+  total: number;
+  counts: number[][];
+}
+
 export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
   username = 'tourist',
   className = '',
 }) => {
-  const { matrix, totalCommits, additions, gaps } = useMemo(
-    () => generateCommitData(username),
-    [username]
-  );
+  const [real, setReal] = useState<RealData | null>(null);
+
+  useEffect(() => {
+    const name = (username || '').trim();
+    if (!name) { setReal(null); return; }
+    let cancelled = false;
+    setReal(null);
+    apiClient.get('/github/contributions', { params: { username: name } })
+      .then((res) => {
+        if (cancelled) return;
+        const weeks: number[][] = res.data?.weeks ?? [];
+        const days: { count: number }[] = res.data?.days ?? [];
+        const total: number = res.data?.total_last_year ?? 0;
+        if (!weeks.length) return;
+        // Align counts to weeks matrix shape for tooltips.
+        const counts: number[][] = [];
+        let di = Math.max(0, days.length - weeks.length * 7);
+        for (let w = 0; w < weeks.length; w++) {
+          const row: number[] = [];
+          for (let d = 0; d < 7; d++) {
+            row.push(days[di]?.count ?? 0);
+            di++;
+          }
+          counts.push(row);
+        }
+        setReal({ weeks, total, counts });
+      })
+      .catch(() => { if (!cancelled) setReal(null); });
+    return () => { cancelled = true; };
+  }, [username]);
+
+  const fallback = useMemo(() => generateCommitData(username), [username]);
+  const matrix = real?.weeks ?? fallback.matrix;
+  // Real GitHub total = last 12 months (matches github.com profile).
+  // Fallback total = simulated 28-week window only.
+  const totalLabel = real
+    ? `${real.total.toLocaleString()} contributions · last year`
+    : `${fallback.totalCommits.toLocaleString()} contributions · 28 weeks (sample)`;
+  const footerRight = real
+    ? 'Live from GitHub'
+    : `${fallback.additions.toLocaleString()} additions · ${fallback.gaps} quiet days`;
 
   return (
     <div className={`p-5 md:p-6 card ${className}`}>
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-4 gap-1">
         <p className="font-semibold text-[14px] tracking-tight truncate">
           @{username}
-          <span className="caption font-normal"> · {totalCommits.toLocaleString()} contributions · 28 weeks</span>
+          <span className="caption font-normal"> · {totalLabel}</span>
         </p>
-        <p className="caption tabular-nums shrink-0">+{Math.round(additions / 10)}% activity</p>
+        <p className="caption tabular-nums shrink-0">
+          {real ? <span className="chip chip-success">Live</span> : `+${Math.round(fallback.additions / 10)}% activity · Sample`}
+        </p>
       </div>
 
       {/* Grid Canvas */}
@@ -84,16 +130,19 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
         <div className="flex gap-1 min-w-max py-1">
           {matrix.map((week, wIdx) => (
             <div key={`week-${wIdx}`} className="flex flex-col gap-1">
-              {week.map((level, dIdx) => (
-                <div
-                  key={`cell-${username}-${wIdx}-${dIdx}`}
-                  style={level > 0 ? { backgroundColor: GREEN_LEVELS_HEX[level]! } : undefined}
-                  className={`w-3 h-3 rounded-[4px] transition-transform duration-150 cursor-pointer hover:scale-125 hover:ring-1 hover:ring-[var(--accent-color)] hover:ring-offset-1 hover:ring-offset-[var(--bg-surface)] ${
-                    level === 0 ? 'bg-[var(--bg-paper)] border border-[var(--border-hairline)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
-                  }`}
-                  title={`Week ${wIdx + 1}, Day ${dIdx + 1}: ${level * 2} commits`}
-                />
-              ))}
+              {week.map((level, dIdx) => {
+                const realCount = real?.counts?.[wIdx]?.[dIdx];
+                return (
+                  <div
+                    key={`cell-${username}-${wIdx}-${dIdx}`}
+                    style={level > 0 ? { backgroundColor: GREEN_LEVELS_HEX[Math.min(4, level)]! } : undefined}
+                    className={`w-3 h-3 rounded-[4px] transition-transform duration-150 cursor-pointer hover:scale-125 hover:ring-1 hover:ring-[var(--accent-color)] hover:ring-offset-1 hover:ring-offset-[var(--bg-surface)] ${
+                      level === 0 ? 'bg-[var(--bg-paper)] border border-[var(--border-hairline)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
+                    }`}
+                    title={realCount !== undefined ? `${realCount} contributions` : `Week ${wIdx + 1}, Day ${dIdx + 1}: ${level * 2} commits`}
+                  />
+                );
+              })}
             </div>
           ))}
         </div>
@@ -111,7 +160,7 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
           <span>More</span>
         </div>
         <p className="caption tabular-nums">
-          {additions.toLocaleString()} additions · {gaps} quiet days
+          {footerRight}
         </p>
       </div>
     </div>

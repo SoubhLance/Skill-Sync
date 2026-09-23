@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard,
   FileCheck2,
+  Target,
   Code2,
   Compass,
   FileText,
@@ -31,6 +32,7 @@ export const Navbar: React.FC = () => {
   const navItems = [
     { label: 'Dashboard',      path: '/dashboard',      icon: LayoutDashboard },
     { label: 'JD Matcher',     path: '/jd-match',       icon: FileCheck2 },
+    { label: 'Job Explorer',   path: '/job-explorer',   icon: Target },
     { label: 'DSA + Code',     path: '/dsa-code',       icon: Code2 },
     { label: 'Career Path',    path: '/career-path',    icon: Compass },
     { label: 'Resume Builder', path: '/resume-builder', icon: FileText },
@@ -54,8 +56,8 @@ export const Navbar: React.FC = () => {
           collapsed ? 'w-[72px]' : 'w-64'
         }`}
       >
-        {/* Animated gradient accent strip — left edge */}
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 accent-strip" />
+        {/* Forest gradient accent strip — left edge */}
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 forest-edge accent-strip" />
 
         {/* Brand Header */}
         <div className="pl-4 pr-3 py-[18px] border-b border-[var(--border-hairline)] flex items-center justify-between">
@@ -144,11 +146,11 @@ export const Navbar: React.FC = () => {
             title="Toggle theme"
           >
             {theme === 'dark'
-              ? <Moon className="w-4 h-4 text-amber-400 shrink-0" />
-              : <Sun className="w-4 h-4 text-orange-500 shrink-0" />}
+              ? <Moon className="w-4 h-4 text-[#6EE7B7] shrink-0" />
+              : <Sun className="w-4 h-4 text-[#4D7C0F] shrink-0" />}
             {!collapsed && (
               <span className="text-[13px] font-medium font-sans">
-                {theme === 'dark' ? 'Dark' : 'Light'}
+                {theme === 'dark' ? 'Canopy' : 'Mist'}
               </span>
             )}
           </button>
@@ -272,9 +274,9 @@ export const Navbar: React.FC = () => {
               className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-paper)] transition-all"
             >
               {theme === 'dark'
-                ? <Moon className="w-4 h-4 text-amber-400" />
-                : <Sun className="w-4 h-4 text-orange-500" />}
-              <span className="font-semibold">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+                ? <Moon className="w-4 h-4 text-[#6EE7B7]" />
+                : <Sun className="w-4 h-4 text-[#4D7C0F]" />}
+              <span className="font-semibold">{theme === 'dark' ? 'Canopy' : 'Mist'}</span>
             </button>
           </div>
         </div>

@@ -129,6 +129,11 @@ export interface JDMatchResponse {
   match_percent: number;
   skill_overlap: string[];
   skill_gap: string[];
+  candidate_skills?: string[];
+  jd_skills?: string[];
+  skill_score?: number;
+  semantic_score?: number;
+  match_label?: string;
 }
 
 export interface HealthResponse {
@@ -148,6 +153,15 @@ export interface ExtractSkillsResponse {
   github_url?: string;
   linkedin_url?: string;
   leetcode_url?: string;
+  emails?: string[];
+  phone_numbers?: string[];
+  achievements?: string[];
+  projects?: any[];
+  name?: string;
+  education?: { school: string; degree: string; year: string; score: string }[];
+  experience?: { role: string; company: string; dates: string; bullets: string[] }[];
+  is_low_confidence?: boolean;
+  warnings?: string[];
 }
 
 export interface LinkedInScoreResponse {
@@ -155,6 +169,21 @@ export interface LinkedInScoreResponse {
   breakdown: Record<string, number>;
   gaps: string[];
   sections_detected: string[];
+}
+
+/** Read error detail from a Blob response (axios returns Blob on error when responseType is 'blob'). */
+async function blobErrorDetail(e: any): Promise<string | null> {
+  try {
+    const blob = e?.response?.data;
+    if (blob instanceof Blob) {
+      const text = await blob.text();
+      const json = JSON.parse(text);
+      return json?.detail || null;
+    }
+    return e?.response?.data?.detail || null;
+  } catch {
+    return null;
+  }
 }
 
 // Backend API Service Functions
@@ -252,6 +281,65 @@ export const api = {
     const res = await apiClient.post<LinkedInScoreResponse>('/api/optimizer/linkedin', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return res.data;
+  },
+
+  resumeLatex: async (template_id: string, data: any): Promise<{ latex: string; template_id: string }> => {
+    const res = await apiClient.post('/resume/latex', { template_id, data });
+    return res.data;
+  },
+
+  resumePdfBlob: async (template_id: string, data: any): Promise<Blob> => {
+    try {
+      const res = await apiClient.post('/resume/export-pdf', { template_id, data }, { responseType: 'blob' });
+      const blob = res.data as Blob;
+      // Backend errors sometimes arrive as JSON blobs with 200 in dev proxies.
+      // Detect and surface them instead of downloading garbage.
+      if (blob?.type?.includes('json')) {
+        const text = await blob.text();
+        try {
+          const json = JSON.parse(text);
+          throw new Error(json?.detail || 'PDF export failed.');
+        } catch (err: any) {
+          if (err?.message && !err.message.includes('Unexpected token') && !err.message.includes('is not valid JSON')) throw err;
+        }
+      }
+      return new Blob([blob], { type: 'application/pdf' });
+    } catch (e: any) {
+      if (e?.message && !e.message.includes('backend running')) throw e;
+      const detail = await blobErrorDetail(e);
+      throw new Error(detail || 'PDF export failed. Is the backend running?');
+    }
+  },
+
+  resumeDocxBlob: async (template_id: string, data: any): Promise<Blob> => {
+    try {
+      const res = await apiClient.post('/resume/export-docx', { template_id, data }, { responseType: 'blob' });
+      const blob = res.data as Blob;
+      if (blob?.type?.includes('json')) {
+        const text = await blob.text();
+        try {
+          const json = JSON.parse(text);
+          throw new Error(json?.detail || 'Word export failed.');
+        } catch (err: any) {
+          if (err?.message && !err.message.includes('Unexpected token') && !err.message.includes('is not valid JSON')) throw err;
+        }
+      }
+      return new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    } catch (e: any) {
+      if (e?.message && !e.message.includes('backend running') && !e.message.includes('Word export failed')) throw e;
+      const detail = await blobErrorDetail(e);
+      throw new Error(detail || 'Word export failed. Is the backend running?');
+    }
+  },
+
+  getGithubContributions: async (username: string): Promise<{
+    username: string;
+    total_last_year: number;
+    weeks: number[][];
+    days: { date: string; count: number; level: number }[];
+  }> => {
+    const res = await apiClient.get('/github/contributions', { params: { username } });
     return res.data;
   },
 };

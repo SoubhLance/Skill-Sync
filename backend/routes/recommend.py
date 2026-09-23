@@ -31,6 +31,7 @@ from ..core.profile_extractor import (
 )
 from ..core.resume_ocr import extract_resume_text, _extract_structured_data
 from ..core.jd_extractor import extract_jd_text
+from ..core.jd_matcher import match_resume_to_jd
 from ..models.schemas import (
     SkillsRequest,
     ResumeTextRequest,
@@ -318,12 +319,15 @@ async def extract_skills_from_pdf(file: UploadFile = File(...)):
             is_low_confidence=ocr_res.is_low_confidence,
             ocr_confidence=ocr_res.avg_ocr_confidence,
             warnings=ocr_res.warnings,
+            name=ocr_res.name,
             github_url=ocr_res.github_url,
             linkedin_url=ocr_res.linkedin_url,
             leetcode_url=ocr_res.leetcode_url,
             emails=ocr_res.emails,
             phone_numbers=ocr_res.phone_numbers,
             achievements=ocr_res.achievements,
+            education=ocr_res.education,
+            experience=ocr_res.experience,
             projects=ocr_res.projects,
             projects_summary=ocr_res.projects_summary,
         )
@@ -381,6 +385,18 @@ async def extract_profile_endpoint(body: ProfileRequest):
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Profile extraction error: {str(exc)}")
+
+
+# ── GET /github/contributions ──────────────────────────────────────────────────
+
+@router.get("/github/contributions", summary="Real GitHub contributions calendar (no token needed)")
+async def github_contributions(username: str = Query(..., description="GitHub username")):
+    """Scrapes the public contributions calendar — total last year + 28-week heatmap."""
+    from ..core.profile_extractor import fetch_github_contributions
+    data = fetch_github_contributions(username)
+    if not data:
+        raise HTTPException(status_code=404, detail=f"GitHub user '{username}' not found or has no public contributions.")
+    return {"username": username.strip(), **data}
 
 
 
@@ -539,31 +555,21 @@ async def match_jd(
 
     try:
         engine = _engine()
-        # Embed resume_text and jd_text separately using the existing BERT encoder
-        embeddings = engine.encode([final_resume_text, final_jd_text], max_length=512)
-        vec_resume = embeddings[0]
-        vec_jd = embeddings[1]
-
-        # Compute cosine similarity directly between embedding vectors
-        cosine_sim = float(np.dot(vec_resume, vec_jd))
-
-        # Convert cosine similarity to match percentage (0-100 scale, rounded to 1 decimal place)
-        match_pct = round(float(np.clip(cosine_sim, 0.0, 1.0)) * 100, 1)
-
-        # Run skill vocabulary extractor on BOTH resume_text and jd_text
-        resume_skills = set(extract_skills(final_resume_text))
-        jd_skills = set(extract_skills(final_jd_text))
-
-        # Skill gap = skills present in jd_text but NOT in resume_text
-        skill_gap = sorted(jd_skills - resume_skills)
-
-        # Skill overlap = intersection of both skill sets
-        skill_overlap = sorted(resume_skills & jd_skills)
+        match_res = match_resume_to_jd(
+            resume_text=final_resume_text,
+            jd_text=final_jd_text,
+            engine=engine,
+        )
 
         return JDMatchOut(
-            match_percent=match_pct,
-            skill_overlap=skill_overlap,
-            skill_gap=skill_gap,
+            match_percent=match_res.match_percent,
+            skill_overlap=match_res.skill_overlap,
+            skill_gap=match_res.skill_gap,
+            candidate_skills=match_res.candidate_skills,
+            jd_skills=match_res.jd_skills,
+            skill_score=match_res.skill_score,
+            semantic_score=match_res.semantic_score,
+            match_label=match_res.match_label,
         )
     except HTTPException:
         raise

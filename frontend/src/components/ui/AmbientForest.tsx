@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
 /*
-  AmbientForest — login-only cinematic backdrop: a lush, rainy, close-up
+  AmbientForest — shared forest atmosphere: a lush, rainy, close-up
   rainforest canopy (think wet cedar fronds filling the frame), with driving
   rain, drifting mist, and a slow drone push-in. Pure canvas + CSS, zero assets.
+  Used on login cinema, landing bands, and the global app shell.
   No HUD, no labels — just footage vibes.
 */
 
@@ -126,12 +127,31 @@ function paintLayer(w: number, h: number, o: LayerOpts): HTMLCanvasElement {
 
 interface Drop { x: number; y: number; len: number; spd: number; op: number }
 
-export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> = ({
+export interface AmbientForestProps {
+  className?: string;
+  compact?: boolean;
+  /** 'cinema' = deep login-grade jungle · 'mist' = brighter sage treatment for light pages */
+  variant?: 'cinema' | 'mist';
+  /** 'storm' = full two-layer rain · 'drizzle' = light far rain only */
+  rainLevel?: 'storm' | 'drizzle';
+  /** mouse parallax (disable for decorative background bands) */
+  interactive?: boolean;
+  /** pause the rAF loop (parent drives via IntersectionObserver) */
+  paused?: boolean;
+}
+
+export const AmbientForest: React.FC<AmbientForestProps> = ({
   className = '',
   compact = false,
+  variant = 'cinema',
+  rainLevel = 'storm',
+  interactive = true,
+  paused = false,
 }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pausedRef = useRef(paused);
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -179,27 +199,29 @@ export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> 
           spd: far ? 9 + Math.random() * 8 : 16 + Math.random() * 9,
           op: far ? 0.08 + Math.random() * 0.2 : 0.05 + Math.random() * 0.09,
         }));
-      drops = mk(compact ? 70 : 160, true);
-      nearDrops = mk(compact ? 14 : 30, false);
+      const drizzle = rainLevel === 'drizzle';
+      drops = mk(compact ? 70 : drizzle ? 90 : 160, true);
+      nearDrops = drizzle ? [] : mk(compact ? 14 : 30, false);
 
+      const mistMode = variant === 'mist';
       const s = Math.max(w, h);
       await sleep(0);
       if (cancelled || g !== gen) return;
       back = paintLayer(w, h, {
-        fronds: compact ? 18 : 32, minLen: s * 0.06, maxLen: s * 0.16, scale: 0.5, alpha: 0.95,
-        palette: ['#06231A', '#0B3D2A', '#166B45'], edgeBias: 0.25, seed: 1234567,
+        fronds: compact ? 18 : mistMode ? 22 : 32, minLen: s * 0.06, maxLen: s * 0.16, scale: 0.5, alpha: mistMode ? 0.5 : 0.95,
+        palette: mistMode ? ['#3E5C4B', '#5B7A63', '#8AA78F'] : ['#06231A', '#0B3D2A', '#166B45'], edgeBias: 0.25, seed: 1234567,
       });
       await sleep(0);
       if (cancelled || g !== gen) return;
       mid = paintLayer(w, h, {
-        fronds: compact ? 14 : 24, minLen: s * 0.12, maxLen: s * 0.3, scale: 1, alpha: 1,
-        palette: ['#07301F', '#14603A', '#2FA05C'], edgeBias: 0.45, seed: 7654321,
+        fronds: compact ? 14 : mistMode ? 16 : 24, minLen: s * 0.12, maxLen: s * 0.3, scale: 1, alpha: mistMode ? 0.55 : 1,
+        palette: mistMode ? ['#2E4A3A', '#4C6B57', '#7C9A83'] : ['#07301F', '#14603A', '#2FA05C'], edgeBias: 0.45, seed: 7654321,
       });
       await sleep(0);
       if (cancelled || g !== gen) return;
       front = paintLayer(w, h, {
-        fronds: compact ? 8 : 12, minLen: s * 0.28, maxLen: s * 0.55, scale: 0.5, alpha: 0.96,
-        palette: ['#020B06', '#0A2E1E', '#1A6B41'], edgeBias: 0.95, seed: 987654,
+        fronds: compact ? 8 : mistMode ? 9 : 12, minLen: s * 0.28, maxLen: s * 0.55, scale: 0.5, alpha: mistMode ? 0.5 : 0.96,
+        palette: mistMode ? ['#1E3329', '#3A5A46', '#66855F'] : ['#020B06', '#0A2E1E', '#1A6B41'], edgeBias: 0.95, seed: 987654,
       });
       // soft mist sprite (painted once, reused)
       mist = document.createElement('canvas');
@@ -281,7 +303,8 @@ export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> 
 
     const tick = () => {
       if (cancelled) return;
-      drawFrame();
+      // paused (e.g. scrolled out of view): skip drawing, keep the cheap heartbeat
+      if (!pausedRef.current) drawFrame();
       raf = requestAnimationFrame(tick);
     };
 
@@ -318,7 +341,7 @@ export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> 
       ro.disconnect();
       document.removeEventListener('visibilitychange', onVis);
     };
-  }, [compact]);
+  }, [compact, variant, rainLevel]);
 
   // Gentle mouse parallax (CSS vars drive canvas layers)
   const onMouse = (e: React.MouseEvent) => {
@@ -334,7 +357,7 @@ export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> 
   return (
     <div
       ref={wrapRef}
-      onMouseMove={onMouse}
+      onMouseMove={interactive ? onMouse : undefined}
       aria-hidden="true"
       className={`absolute inset-0 overflow-hidden bg-[#04120B] ${className}`}
       style={{ ['--px' as string]: '0px', ['--py' as string]: '0px' }}
@@ -351,12 +374,13 @@ export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> 
 
       {/* Slow drone push-in over everything */}
       <div className="absolute -inset-[7%] forest-zoom">
-        {/* Deep jungle grade */}
+        {/* Jungle grade — lifted slightly for the mist variant */}
         <div
           className="absolute inset-0"
           style={{
-            background:
-              'radial-gradient(ellipse 90% 55% at 50% 0%, #0E3A26 0%, #07271A 34%, #04170F 60%, #020D08 100%)',
+            background: variant === 'mist'
+              ? 'radial-gradient(ellipse 90% 60% at 50% 0%, #24473A 0%, #12291F 45%, #071410 100%)'
+              : 'radial-gradient(ellipse 90% 55% at 50% 0%, #0E3A26 0%, #07271A 34%, #04170F 60%, #020D08 100%)',
           }}
         />
         {/* Diffuse overcast canopy light (gradient only — no backdrop cost) */}
@@ -364,10 +388,10 @@ export const AmbientForest: React.FC<{ className?: string; compact?: boolean }> 
           className="absolute left-1/2 top-[-14%] h-[52%] w-[78%] -translate-x-1/2 rounded-full"
           style={{ background: 'radial-gradient(closest-side, rgba(204,242,216,0.20), transparent 70%)' }}
         />
-        {/* Warm ember accent low-left (brand tie-in) */}
+        {/* Moss glow low-left (forest brand tie-in) */}
         <div
           className="absolute -left-[10%] bottom-[-20%] h-[50%] w-[60%] rounded-full opacity-60"
-          style={{ background: 'radial-gradient(closest-side, rgba(245,158,11,0.16), transparent 70%)' }}
+          style={{ background: 'radial-gradient(closest-side, rgba(127,176,105,0.18), transparent 70%)' }}
         />
 
         {/* Foliage + rain + mist canvas */}

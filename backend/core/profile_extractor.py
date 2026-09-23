@@ -84,6 +84,54 @@ REQUEST_TIMEOUT = 10  # seconds for HTTP requests
 # Helper Functions
 # ─────────────────────────────────────────────────────────────────────────────
 
+def fetch_github_contributions(username: str) -> dict[str, Any] | None:
+    """Scrape the public contributions calendar (no token needed).
+
+    Returns { total_last_year, days: [{date, count, level}], weeks: [[level x7]] }
+    or None when the user doesn't exist / page can't be parsed.
+    """
+    if not username or not username.strip():
+        return None
+    username = username.strip()
+    url = f"https://github.com/users/{username}/contributions"
+    try:
+        resp = requests.get(url, headers={"User-Agent": DEFAULT_USER_AGENT}, timeout=REQUEST_TIMEOUT)
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        html = resp.text
+        total_m = re.search(r"([\d,]+)\s+contributions", html)
+        total = int(total_m.group(1).replace(",", "")) if total_m else 0
+        # Each day cell is followed by a <tool-tip> with the real count.
+        pattern = re.compile(
+            r'data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)".*?'
+            r"<tool-tip[^>]*>(.*?)</tool-tip>",
+            re.DOTALL,
+        )
+        days: list[dict[str, Any]] = []
+        for date_s, level_s, tip in pattern.findall(html):
+            tip_t = tip.strip()
+            if tip_t.lower().startswith("no contributions"):
+                count = 0
+            else:
+                cm = re.search(r"([\d,]+)\s+contribution", tip_t)
+                count = int(cm.group(1).replace(",", "")) if cm else 0
+            days.append({"date": date_s, "count": count, "level": int(level_s)})
+        days.sort(key=lambda d: d["date"])
+        # Group into weeks of 7 for the heatmap (last 28 weeks like the UI).
+        weeks: list[list[int]] = []
+        for i in range(0, len(days), 7):
+            chunk = [d["level"] for d in days[i:i + 7]]
+            while len(chunk) < 7:
+                chunk.append(0)
+            weeks.append(chunk)
+        weeks = weeks[-28:] if len(weeks) > 28 else weeks
+        return {"total_last_year": total, "days": days, "weeks": weeks}
+    except Exception as exc:
+        logger.warning("GitHub contributions fetch failed for '%s': %s", username, exc)
+        return None
+
+
 def _min_max_normalize(value: float, min_val: float, max_val: float, invert: bool = False) -> float:
     """Normalize a value to [0.0, 1.0] using min-max scaling with optional inversion."""
     if min_val == max_val:
@@ -198,18 +246,32 @@ def fetch_github_stats(username: str) -> dict[str, Any] | None:
         "User-Agent": DEFAULT_USER_AGENT,
         "Accept": "application/vnd.github.v3+json",
     }
-    token = os.getenv("GITHUB_TOKEN", "").strip()
+    raw_token = os.getenv("GITHUB_TOKEN", "").strip().strip('"').strip("'")
+    # Treat example/placeholder values as "no token" instead of sending them.
+    token = "" if raw_token.lower() in ("", "your_github_token_here", "changeme", "none", "null") else raw_token
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
+    def _get_without_auth_on_401(url: str):
+        """GET with fallback: if our token is bad (401), retry unauthenticated."""
+        resp = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
+        if resp.status_code == 401 and "Authorization" in headers:
+            logger.warning(
+                "GitHub token rejected (401) — retrying '%s' without token. "
+                "Regenerate GITHUB_TOKEN or leave it blank.", url,
+            )
+            headers.pop("Authorization", None)
+            resp = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
+        return resp
+
     try:
         # 1. User profile
-        user_resp = requests.get(
-            f"https://api.github.com/users/{username}",
-            headers=headers, timeout=REQUEST_TIMEOUT,
-        )
+        user_resp = _get_without_auth_on_401(f"https://api.github.com/users/{username}")
         if user_resp.status_code == 404:
             logger.warning("GitHub user '%s' not found (HTTP 404)", username)
+            return None
+        if user_resp.status_code == 401:
+            logger.warning("GitHub auth failed (401) for '%s' — bad/expired GITHUB_TOKEN", username)
             return None
         user_resp.raise_for_status()
         user_data = user_resp.json()
@@ -225,7 +287,7 @@ def fetch_github_stats(username: str) -> dict[str, Any] | None:
 
         # 2. Repos for total stars & language aggregation
         repos_url = f"https://api.github.com/users/{username}/repos?per_page=100&type=owner"
-        repos_resp = requests.get(repos_url, headers=headers, timeout=REQUEST_TIMEOUT)
+        repos_resp = _get_without_auth_on_401(repos_url)
         total_stars = 0
         lang_counts: dict[str, int] = {}
 
@@ -242,9 +304,15 @@ def fetch_github_stats(username: str) -> dict[str, Any] | None:
             lang for lang, _ in sorted(lang_counts.items(), key=lambda x: x[1], reverse=True)[:3]
         ]
 
-        # 3. Pinned repos (GraphQL if token available, else top-starred fallback)
-        if token:
+        # 3. Pinned repos (GraphQL if token still valid, else top-starred fallback)
+        if token and "Authorization" in headers:
             pinned_repos = _fetch_github_pinned_graphql(username, token)
+            if not pinned_repos:
+                # GraphQL may have failed on bad token — REST fallback uses
+                # the (possibly de-authed) headers.
+                fallback = _fetch_top_starred_repos_rest(username, headers)
+                if fallback:
+                    pinned_repos = fallback
         else:
             pinned_repos = _fetch_top_starred_repos_rest(username, headers)
 

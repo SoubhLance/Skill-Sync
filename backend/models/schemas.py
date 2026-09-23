@@ -93,9 +93,15 @@ class JDMatchRequest(BaseModel):
 
 class JDMatchOut(BaseModel):
     """POST /jd-match response schema"""
-    match_percent: float = Field(..., description="Pairwise cosine similarity match percentage (0-100 scale, 1 decimal)")
+    match_percent: float = Field(..., description="Pairwise ATS match percentage (0-100 scale, 1 decimal)")
     skill_overlap: list[str] = Field(..., description="Intersection of skills present in both resume and job description")
     skill_gap: list[str] = Field(..., description="Skills present in job description but missing from resume")
+    candidate_skills: list[str] = Field(default_factory=list, description="All skills detected in candidate resume")
+    jd_skills: list[str] = Field(default_factory=list, description="All skills required by job description")
+    skill_score: Optional[float] = Field(None, description="Normalized skill coverage score (0.0 - 1.0)")
+    semantic_score: Optional[float] = Field(None, description="Calibrated contextual/semantic similarity score (0.0 - 1.0)")
+    match_label: Optional[str] = Field(None, description="Qualitative match label (e.g. Strong Match, Moderate Match)")
+
 
 
 
@@ -152,12 +158,15 @@ class ExtractDetailedOut(BaseModel):
     warnings:           list[str]      = Field(default_factory=list, description="Warnings or notices from extraction process")
 
     # ── Extracted Structured Signals & Project Link Quality ──
+    name:               Optional[str]  = Field(None, description="Extracted candidate name")
     github_url:         Optional[str]  = Field(None, description="Extracted GitHub profile URL")
     linkedin_url:       Optional[str]  = Field(None, description="Extracted LinkedIn profile URL")
     leetcode_url:       Optional[str]  = Field(None, description="Extracted LeetCode profile URL")
     emails:             list[str]      = Field(default_factory=list, description="Extracted email addresses")
     phone_numbers:      list[str]      = Field(default_factory=list, description="Extracted phone numbers")
     achievements:       list[str]      = Field(default_factory=list, description="Extracted achievements & honors")
+    education:          list[dict]     = Field(default_factory=list, description="Extracted education entries with school/degree/year/score")
+    experience:         list[dict]     = Field(default_factory=list, description="Extracted experience entries with role/company/dates/bullets")
     projects:           list[dict]     = Field(default_factory=list, description="Extracted projects with repository/demo link status ('good' vs 'bad')")
     projects_summary:   dict           = Field(default_factory=dict, description="Summary of project link quality evaluation")
 
@@ -185,4 +194,65 @@ class HealthOut(BaseModel):
     jobs_indexed: int
     device:      str
     version:     str
+
+
+# ── Resume Builder ────────────────────────────────────────────────────────────
+
+class ResumeBasics(BaseModel):
+    fullName: str = ""
+    email: str = ""
+    phone: str = ""
+    location: str = ""
+    linkedin: str = ""
+    github: str = ""
+    portfolio: str = ""
+
+
+class ResumeEducation(BaseModel):
+    school: str = ""
+    degree: str = ""
+    year: str = ""
+    score: str = ""
+
+
+class ResumeExperience(BaseModel):
+    role: str = ""
+    company: str = ""
+    dates: str = ""
+    bullets: list[str] = Field(default_factory=list)
+
+
+class ResumeProject(BaseModel):
+    name: str = ""
+    link: str = ""
+    tech: str = ""
+    bullets: list[str] = Field(default_factory=list)
+
+
+class ResumeSkills(BaseModel):
+    languages: str = ""
+    frameworks: str = ""
+    tools: str = ""
+    other: str = ""
+
+
+class ResumeData(BaseModel):
+    basics: ResumeBasics = Field(default_factory=ResumeBasics)
+    summary: str = ""
+    education: list[ResumeEducation] = Field(default_factory=list)
+    experience: list[ResumeExperience] = Field(default_factory=list)
+    projects: list[ResumeProject] = Field(default_factory=list)
+    skills: ResumeSkills = Field(default_factory=ResumeSkills)
+    achievements: list[str] = Field(default_factory=list)
+    certifications: list[str] = Field(default_factory=list)
+
+
+class ResumeRenderRequest(BaseModel):
+    template_id: str = Field("classic-jake", description="classic-jake | two-col-photo | academic-cv | minimal-ats")
+    data: ResumeData = Field(default_factory=ResumeData)
+
+
+class ResumeLatexOut(BaseModel):
+    latex: str
+    template_id: str
 

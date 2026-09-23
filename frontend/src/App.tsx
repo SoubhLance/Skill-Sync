@@ -4,6 +4,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { Navbar } from './components/layout/Navbar';
+import { RainOverlay } from './components/atmosphere/RainOverlay';
+import { ForestBand } from './components/atmosphere/ForestBand';
 import { setAuthTokenGetter } from './lib/api';
 
 // Route Lazy Loading to optimize bundle size
@@ -11,6 +13,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ defaul
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const JDMatcherPage = lazy(() => import('./pages/JDMatcherPage').then(m => ({ default: m.JDMatcherPage })));
+const JobExplorerPage = lazy(() => import('./pages/JobExplorerPage').then(m => ({ default: m.JobExplorerPage })));
 const DSACodePage = lazy(() => import('./pages/DSACodePage').then(m => ({ default: m.DSACodePage })));
 const CareerPathPage = lazy(() => import('./pages/CareerPathPage').then(m => ({ default: m.CareerPathPage })));
 const ResumeBuilderPage = lazy(() => import('./pages/ResumeBuilderPage').then(m => ({ default: m.ResumeBuilderPage })));
@@ -44,6 +47,10 @@ const AppLayout: React.FC = () => {
     <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300 antialiased">
       <Navbar />
       <main className="flex-1 overflow-x-hidden min-h-screen min-w-0 animate-fade-in relative">
+        {/* Global forest canopy — shared atmosphere behind every protected page */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[460px] overflow-hidden" aria-hidden="true">
+          <ForestBand veil="soft" className="!absolute" />
+        </div>
         {/* Subtle top fade for depth, theme-aware */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-40" style={{ background: 'var(--grad-hero)' }} />
         <div className="relative">
@@ -59,6 +66,8 @@ const AppLayout: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
+      {/* Site-wide forest rain — one canvas, zero interaction */}
+      <RainOverlay />
       <AuthProvider>
         <Router>
           <Suspense fallback={<PageFallback />}>
@@ -77,6 +86,7 @@ export const App: React.FC = () => {
               >
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/jd-match" element={<JDMatcherPage />} />
+                <Route path="/job-explorer" element={<JobExplorerPage />} />
                 <Route path="/dsa-code" element={<DSACodePage />} />
                 <Route path="/career-path" element={<CareerPathPage />} />
                 <Route path="/resume-builder" element={<ResumeBuilderPage />} />
