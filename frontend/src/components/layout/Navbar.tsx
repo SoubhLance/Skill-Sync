@@ -109,16 +109,16 @@ export const Navbar: React.FC = () => {
                 to={item.path}
                 id={`nav-${item.path.replace('/', '')}`}
                 title={collapsed ? item.label : undefined}
-                className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 border border-transparent ${
+                className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 border border-transparent shadow-none drop-shadow-none ${
                   active
                     ? 'bg-[var(--badge-bg)] border-[var(--accent-color)]/25 text-[var(--text-main)] shadow-[var(--shadow-xs)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hairline)]'
+                    : 'text-[var(--text-muted)] dark:text-slate-400 hover:text-[var(--text-main)] dark:hover:text-slate-100 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hairline)]'
                 } ${collapsed ? 'justify-center' : ''}`}
               >
                 {active && !collapsed && (
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full" style={{ background: 'var(--grad-accent)' }} />
                 )}
-                <Icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${active ? 'text-[var(--accent-color)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-main)]'}`} />
+                <Icon className={`w-[18px] h-[18px] shrink-0 transition-colors drop-shadow-none ${active ? 'text-[var(--accent-color)]' : 'text-[var(--text-muted)] dark:text-[#6B7280] group-hover:text-[var(--text-main)] dark:group-hover:text-slate-200'}`} />
                 {!collapsed && (
                   <span className="truncate flex-1 font-sans text-[13px] tracking-tight">
                     {item.label}
@@ -140,10 +140,12 @@ export const Navbar: React.FC = () => {
           <button
             onClick={toggleTheme}
             id="nav-theme-toggle"
+            aria-label={theme === 'dark' ? 'Switch to Mist (light) mode' : 'Switch to Canopy (dark) mode'}
+            aria-pressed={theme === 'dark'}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--accent-color)]/50 hover:shadow-[var(--shadow-xs)] transition-all ${
               collapsed ? 'justify-center' : ''
             }`}
-            title="Toggle theme"
+            title={theme === 'dark' ? 'Canopy mode — switch to Mist' : 'Mist mode — switch to Canopy'}
           >
             {theme === 'dark'
               ? <Moon className="w-4 h-4 text-[#6EE7B7] shrink-0" />
@@ -252,11 +254,11 @@ export const Navbar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium border border-transparent transition-all ${
-                  active ? 'bg-[var(--badge-bg)] text-[var(--text-main)] border border-[var(--accent-color)]/25' : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-elevated)]'
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium border border-transparent transition-all shadow-none drop-shadow-none ${
+                  active ? 'bg-[var(--badge-bg)] text-[var(--text-main)] border border-[var(--accent-color)]/25' : 'text-[var(--text-muted)] dark:text-slate-400 hover:text-[var(--text-main)] dark:hover:text-slate-100 hover:bg-[var(--bg-elevated)]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-[var(--accent-color)]' : 'text-[var(--text-muted)]'}`} />
+                <Icon className={`w-4 h-4 drop-shadow-none ${active ? 'text-[var(--accent-color)]' : 'text-[var(--text-muted)] dark:text-[#6B7280]'}`} />
                 {item.label}
                 {item.badge && (
                   <span className="ml-auto px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--badge-bg)] text-[var(--badge-text)] rounded-md">
@@ -271,6 +273,8 @@ export const Navbar: React.FC = () => {
           <div className="pt-2 border-t border-[var(--border-hairline)] mt-2">
             <button
               onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to Mist (light) mode' : 'Switch to Canopy (dark) mode'}
+              aria-pressed={theme === 'dark'}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-paper)] transition-all"
             >
               {theme === 'dark'

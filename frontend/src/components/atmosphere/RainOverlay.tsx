@@ -106,7 +106,7 @@ export const RainOverlay: React.FC = () => {
       ctx.lineCap = 'round';
       ctx.lineWidth = 1;
       const isDark = document.documentElement.classList.contains('dark');
-      ctx.strokeStyle = isDark ? 'rgba(190,212,198,0.34)' : 'rgba(46,94,70,0.30)';
+      ctx.strokeStyle = isDark ? 'rgba(190,212,198,0.20)' : 'rgba(46,94,70,0.30)';
       ctx.beginPath();
       for (const d of drops) {
         d.y += d.spd;

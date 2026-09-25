@@ -48,7 +48,7 @@ export const ForestBand: React.FC<ForestBandProps> = ({ className = '', veil = '
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 90% 60% at 50% 0%, #224434 0%, #10231B 48%, #060F0B 100%)',
+            'radial-gradient(ellipse 90% 60% at 50% 0%, #1E3329 0%, #101E17 48%, #0C1310 100%)',
         }}
       />
       {/* Mist foliage + drizzle — canvas pauses itself offscreen */}

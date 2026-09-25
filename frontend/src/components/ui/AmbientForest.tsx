@@ -208,20 +208,20 @@ export const AmbientForest: React.FC<AmbientForestProps> = ({
       await sleep(0);
       if (cancelled || g !== gen) return;
       back = paintLayer(w, h, {
-        fronds: compact ? 18 : mistMode ? 22 : 32, minLen: s * 0.06, maxLen: s * 0.16, scale: 0.5, alpha: mistMode ? 0.5 : 0.95,
-        palette: mistMode ? ['#3E5C4B', '#5B7A63', '#8AA78F'] : ['#06231A', '#0B3D2A', '#166B45'], edgeBias: 0.25, seed: 1234567,
+        fronds: compact ? 18 : mistMode ? 22 : 32, minLen: s * 0.06, maxLen: s * 0.16, scale: 0.5, alpha: mistMode ? 0.5 : 0.72,
+        palette: mistMode ? ['#3E5C4B', '#5B7A63', '#8AA78F'] : ['#0E2018', '#1A3A2B', '#2A6B4A'], edgeBias: 0.25, seed: 1234567,
       });
       await sleep(0);
       if (cancelled || g !== gen) return;
       mid = paintLayer(w, h, {
-        fronds: compact ? 14 : mistMode ? 16 : 24, minLen: s * 0.12, maxLen: s * 0.3, scale: 1, alpha: mistMode ? 0.55 : 1,
-        palette: mistMode ? ['#2E4A3A', '#4C6B57', '#7C9A83'] : ['#07301F', '#14603A', '#2FA05C'], edgeBias: 0.45, seed: 7654321,
+        fronds: compact ? 14 : mistMode ? 16 : 24, minLen: s * 0.12, maxLen: s * 0.3, scale: 1, alpha: mistMode ? 0.55 : 0.78,
+        palette: mistMode ? ['#2E4A3A', '#4C6B57', '#7C9A83'] : ['#10251B', '#1E4A33', '#35855A'], edgeBias: 0.45, seed: 7654321,
       });
       await sleep(0);
       if (cancelled || g !== gen) return;
       front = paintLayer(w, h, {
-        fronds: compact ? 8 : mistMode ? 9 : 12, minLen: s * 0.28, maxLen: s * 0.55, scale: 0.5, alpha: mistMode ? 0.5 : 0.96,
-        palette: mistMode ? ['#1E3329', '#3A5A46', '#66855F'] : ['#020B06', '#0A2E1E', '#1A6B41'], edgeBias: 0.95, seed: 987654,
+        fronds: compact ? 8 : mistMode ? 9 : 12, minLen: s * 0.28, maxLen: s * 0.55, scale: 0.5, alpha: mistMode ? 0.5 : 0.75,
+        palette: mistMode ? ['#1E3329', '#3A5A46', '#66855F'] : ['#0A1712', '#162E23', '#255A3E'], edgeBias: 0.95, seed: 987654,
       });
       // soft mist sprite (painted once, reused)
       mist = document.createElement('canvas');
@@ -359,7 +359,7 @@ export const AmbientForest: React.FC<AmbientForestProps> = ({
       ref={wrapRef}
       onMouseMove={interactive ? onMouse : undefined}
       aria-hidden="true"
-      className={`absolute inset-0 overflow-hidden bg-[#04120B] ${className}`}
+      className={`absolute inset-0 overflow-hidden bg-[#0C1310] ${className}`}
       style={{ ['--px' as string]: '0px', ['--py' as string]: '0px' }}
     >
       <style>{`
@@ -380,18 +380,18 @@ export const AmbientForest: React.FC<AmbientForestProps> = ({
           style={{
             background: variant === 'mist'
               ? 'radial-gradient(ellipse 90% 60% at 50% 0%, #24473A 0%, #12291F 45%, #071410 100%)'
-              : 'radial-gradient(ellipse 90% 55% at 50% 0%, #0E3A26 0%, #07271A 34%, #04170F 60%, #020D08 100%)',
+              : 'radial-gradient(ellipse 90% 55% at 50% 0%, #162E23 0%, #101E17 34%, #0C1310 60%, #080F0C 100%)',
           }}
         />
         {/* Diffuse overcast canopy light (gradient only — no backdrop cost) */}
         <div
           className="absolute left-1/2 top-[-14%] h-[52%] w-[78%] -translate-x-1/2 rounded-full"
-          style={{ background: 'radial-gradient(closest-side, rgba(204,242,216,0.20), transparent 70%)' }}
+          style={{ background: 'radial-gradient(closest-side, rgba(204,242,216,0.14), transparent 70%)' }}
         />
         {/* Moss glow low-left (forest brand tie-in) */}
         <div
           className="absolute -left-[10%] bottom-[-20%] h-[50%] w-[60%] rounded-full opacity-60"
-          style={{ background: 'radial-gradient(closest-side, rgba(127,176,105,0.18), transparent 70%)' }}
+          style={{ background: 'radial-gradient(closest-side, rgba(127,176,105,0.12), transparent 70%)' }}
         />
 
         {/* Foliage + rain + mist canvas */}
@@ -399,15 +399,15 @@ export const AmbientForest: React.FC<AmbientForestProps> = ({
       </div>
 
       {/* Cinematic finish: vignette, film grain, legibility grades */}
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 105% 92% at 50% 45%, transparent 50%, rgba(1,8,5,0.6) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 105% 92% at 50% 45%, transparent 50%, rgba(4,10,8,0.42) 100%)' }} />
       <div
         className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
         }}
       />
-      <div className="absolute inset-x-0 top-0 h-[36%]" style={{ background: 'linear-gradient(180deg, rgba(1,7,4,0.55), transparent)' }} />
-      <div className="absolute inset-x-0 bottom-0 h-[44%]" style={{ background: 'linear-gradient(0deg, rgba(1,7,4,0.6), transparent)' }} />
+      <div className="absolute inset-x-0 top-0 h-[36%]" style={{ background: 'linear-gradient(180deg, rgba(4,10,8,0.38), transparent)' }} />
+      <div className="absolute inset-x-0 bottom-0 h-[44%]" style={{ background: 'linear-gradient(0deg, rgba(4,10,8,0.42), transparent)' }} />
     </div>
   );
 };

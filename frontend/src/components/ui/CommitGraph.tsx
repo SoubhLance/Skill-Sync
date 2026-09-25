@@ -135,9 +135,9 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
                 return (
                   <div
                     key={`cell-${username}-${wIdx}-${dIdx}`}
-                    style={level > 0 ? { backgroundColor: GREEN_LEVELS_HEX[Math.min(4, level)]! } : undefined}
+                    style={level > 0 ? { backgroundColor: GREEN_LEVELS_HEX[Math.min(4, level)]! } : { backgroundColor: 'var(--heatmap-empty)' }}
                     className={`w-3 h-3 rounded-[4px] transition-transform duration-150 cursor-pointer hover:scale-125 hover:ring-1 hover:ring-[var(--accent-color)] hover:ring-offset-1 hover:ring-offset-[var(--bg-surface)] ${
-                      level === 0 ? 'bg-[var(--bg-paper)] border border-[var(--border-hairline)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
+                      level === 0 ? 'border border-[var(--border-hairline)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
                     }`}
                     title={realCount !== undefined ? `${realCount} contributions` : `Week ${wIdx + 1}, Day ${dIdx + 1}: ${level * 2} commits`}
                   />
@@ -152,7 +152,7 @@ export const CommitGraph: React.FC<CommitGraphProps> = React.memo(({
         <div className="flex items-center gap-2 caption">
           <span>Less</span>
           <div className="flex gap-1">
-            <div className="w-2.5 h-2.5 rounded-[3px] bg-[var(--bg-elevated)] border border-[var(--border-hairline)]" />
+            <div className="w-2.5 h-2.5 rounded-[3px] border border-[var(--border-hairline)]" style={{ backgroundColor: 'var(--heatmap-empty)' }} />
             {GREEN_LEVELS_HEX.slice(1).map((col, i) => (
               <div key={`legend-${i}`} style={{ backgroundColor: col! }} className="w-2.5 h-2.5 rounded-[3px]" />
             ))}

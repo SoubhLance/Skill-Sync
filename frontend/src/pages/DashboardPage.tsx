@@ -180,8 +180,8 @@ export const DashboardPage: React.FC = () => {
             <div key={label} className="card card-lift p-5 flex flex-col justify-between gap-3">
               <div>
                 <p className="caption">{label}</p>
-                <p className="text-[1.4rem] font-bold tracking-tight tabular-nums mt-1">{value}</p>
-                <p className="caption mt-0.5 truncate">{hint}</p>
+                <p className="text-[1.4rem] font-bold tracking-tight tabular-nums mt-1 text-[var(--text-main)] dark:text-[#F9FAFB]">{value}</p>
+                <p className="caption mt-0.5 truncate text-xs dark:text-[#94A3B8]">{hint}</p>
               </div>
               <Sparkline data={data} stroke={stroke} width={150} height={38} />
             </div>

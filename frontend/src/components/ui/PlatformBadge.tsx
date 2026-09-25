@@ -33,7 +33,11 @@ export const PlatformBadge: React.FC<PlatformBadgeProps> = React.memo(({
       </div>
 
       {metric && (
-        <span className="caption shrink-0 tabular-nums bg-[var(--bg-elevated)] px-2 py-1 rounded-lg">
+        <span className={`shrink-0 tabular-nums px-2 py-1 rounded-lg text-[12px] font-semibold border ${
+          isPassed
+            ? 'bg-[#ECFDF5] text-[#065F46] border-[#6EE7B7]/60 dark:bg-[var(--success-bg)] dark:text-[var(--success)] dark:border-transparent'
+            : 'caption bg-[var(--bg-elevated)] border-transparent'
+        }`}>
           {metric}
         </span>
       )}

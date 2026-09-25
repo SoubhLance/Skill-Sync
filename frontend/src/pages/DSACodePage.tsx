@@ -362,10 +362,10 @@ export const DSACodePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
                 hasPortfolio
-                  ? 'bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30'
-                  : 'bg-[var(--bg-paper)] text-[var(--text-muted)]'
+                  ? 'bg-[#ECFDF5] text-[#065F46] border-[#6EE7B7]/60 dark:bg-[var(--diff-add-bg)] dark:text-[var(--diff-add)] dark:border-[var(--diff-add)]/30'
+                  : 'bg-[var(--bg-paper)] text-[var(--text-muted)] border-transparent'
               }`}>
                 {hasPortfolio ? '✓ +3% BOOST' : 'OPTIONAL'}
               </span>

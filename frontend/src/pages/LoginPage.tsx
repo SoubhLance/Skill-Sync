@@ -99,7 +99,7 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen flex bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300">
 
       {/* ── LEFT BRAND PANEL (desktop only) — deep forest cinema ── */}
-      <div className="hidden lg:flex flex-col justify-between w-[46%] relative overflow-hidden p-12 bg-[#040805]">
+      <div className="hidden lg:flex flex-col justify-between w-[46%] relative overflow-hidden p-12 bg-[var(--bg-paper)]">
         {/* Rainforest backdrop (shared forest engine) — mounted only when visible */}
         {isDesktop && <AmbientForest />}
 
@@ -158,7 +158,7 @@ export const LoginPage: React.FC = () => {
           {floatingSignals.map(({ icon: Icon, text, color, delay }) => (
             <div
               key={text}
-              className="float-y flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[#0A120D]/90 px-3.5 py-2.5 text-[13px] font-medium text-white/85"
+              className="float-y flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[var(--bg-surface)]/90 px-3.5 py-2.5 text-[13px] font-medium text-white/85"
               style={{ animationDelay: delay, boxShadow: '0 8px 28px rgba(0,0,0,0.5)' }}
             >
               <span
