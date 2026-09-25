@@ -35,7 +35,7 @@
 
 ## 🌐 Overview
 
-**SkillSync** is a full-stack career intelligence platform engineered for students, early-career professionals, and recruiters. It bridges candidate qualifications with job market expectations by combining **dense vector semantic search (BERT + FAISS)**, multi-format resume signal extraction (digital PDFs, scanned document OCR, image uploads), multi-platform coding profile aggregation (GitHub, LeetCode, CodeChef, HackerRank), and detailed skill gap diagnostics.
+**SkillSync** is a full-stack career intelligence platform engineered for students, early-career professionals, and recruiters. It bridges candidate qualifications with job market expectations by combining **dense vector semantic search (BERT + FAISS)**, multi-format resume signal extraction (digital PDFs, scanned document OCR, image uploads), multi-platform coding profile aggregation (GitHub, LeetCode, CodeChef, Codeforces, HackerRank), and detailed skill gap diagnostics.
 
 The React frontend is a per-user workspace behind Firebase auth (email + Google, with a mock mode for local development), styled with a **Mist (light) / Canopy (dark) dual theme** and a signature forest atmosphere. Every tool — JD matching, job exploration, DSA analysis, career roadmaps, resume building, LinkedIn optimization — reads and writes the same live backend, so the dashboard stays in sync everywhere.
 
@@ -51,7 +51,7 @@ The React frontend is a per-user workspace behind Firebase auth (email + Google,
 - 📊 **Dashboard (`/dashboard`)** — Per-user hub with a profile-readiness ring, skills / platforms / best-fit stat cards, live GitHub activity graph, platform verification badges, and shortcuts into every tool.
 - 🎯 **JD Matcher (`/jd-match`)** — Pairwise ATS match (paste or upload a JD via drag-and-drop, falls back to your saved resume) with match %, skill overlap / gap cards, plus a browse mode that ranks all 405 roles against your skills with domain/track filters.
 - 🔎 **Job Explorer (`/job-explorer`)** — Browsable 405-role taxonomy (bundled metadata merged with live `GET /recommend/jobs`), keyword + domain + technical/general filters, 24-per-page pagination, and single-expand accordions scored against your skills.
-- 💻 **DSA + Code (`/dsa-code`)** — GitHub / LeetCode / CodeChef / HackerRank handle analyzer with debounced inputs, portfolio + hackathon + paper score bonuses, per-account persistence, live contribution heatmap, and per-platform stat cards.
+- 💻 **DSA + Code (`/dsa-code`)** — GitHub / LeetCode / CodeChef / Codeforces / HackerRank handle analyzer with debounced inputs, portfolio + hackathon + paper score bonuses, per-account persistence, live contribution heatmap, and per-platform stat cards.
 - 🧭 **Career Path (`/career-path`)** — Target-role + skill-chip editor producing a ranked top-5 role list (alignment % + gaps) plus student/pro milestone roadmaps; imports skills straight from your resume PDF.
 - 📝 **Resume Builder (`/resume-builder`)** — Form editor (basics, education, experience, projects, skills, achievements, certs) with live preview across 4 templates (`classic-jake`, `two-col-photo`, `academic-cv`, `minimal-ats`); exports PDF / DOCX / LaTeX and enriches from your coding profiles.
 - ⚡ **Optimizer (`/optimizer`)** — LinkedIn Save-to-PDF dropzone scored against a 100-point rubric (headline, about, experience, skills, education, projects, recs, certs) with section breakdown, gaps, and an explicit 422 path for scanned PDFs.
@@ -73,8 +73,9 @@ The React frontend is a per-user workspace behind Firebase auth (email + Google,
   - **Digital PDFs**: High-speed text and embedded hyperlink extraction (`mailto:`, GitHub, LinkedIn, live demo links) via `pdfplumber`.
   - **Scanned PDFs & Photos**: Robust OCR processing pipeline using `pdf2image` and `pytesseract` for scanned documents or image uploads (PNG/JPG/WEBP).
 - 🔗 **Project Link Quality Analysis**: Automatically evaluates candidate project links for repository quality (`good` vs `bad` link status) and provides actionable feedback.
-- 📊 **Multi-Platform Profile Aggregation**: Automatically fetches stats from GitHub, LeetCode, CodeChef, and HackerRank to calculate a unified candidate **Profile Score**.
+- 📊 **Multi-Platform Profile Aggregation**: Automatically fetches stats from GitHub, LeetCode, CodeChef, Codeforces (official API), and HackerRank to calculate a unified candidate **Profile Score**. Missing or nonexistent accounts resolve to null and are excluded from scoring — never zero-filled, never an error.
 - 🧮 **Blended Recommendation Scoring**: Combines semantic skill similarity ($60\%$) with candidate profile metrics ($40\%$) to rank matches accurately.
+- 📉 **Coverage-Adjusted Scoring**: The profile average is renormalized over connected platforms only, then scaled by $(0.7 + 0.3 \times coverage)$ where $coverage$ = connected / 4 core platforms — broader verified proof outranks a lone strong profile.
 - 🔍 **Skill Gap Diagnostics**: Provides line-item analysis of candidate skill overlaps, missing skills, and overall percentage readiness per job match.
 
 ---
@@ -93,7 +94,7 @@ flowchart TD
         B1 & B2 & B3 --> C1[Canonical Skill Extractor]
         C1 -->|Skill Vocabulary Mapping| D1[Candidate Skill Vector]
 
-        P1[GitHub / LeetCode / CodeChef Stats] -->|Aggregator| P2[Profile Score 0.0 - 1.0]
+        P1[GitHub / LeetCode / CodeChef / Codeforces Stats] -->|Aggregator| P2[Profile Score 0.0 - 1.0]
     end
 
     subgraph BERT + FAISS Search Engine
@@ -129,7 +130,7 @@ flowchart TD
 | **Resume Exports** | PDF / DOCX / LaTeX | ✅ **Completed** | Single `ResumeData` source → ReportLab PDF, python-docx, Overleaf LaTeX across 4 templates (`backend/routes/resume.py`). |
 | **LinkedIn Optimizer** | 100-pt PDF Scorer | ✅ **Completed** | PyMuPDF span/header detection with section breakdown + gaps; 422 on scanned PDFs (`backend/core/linkedin_scorer.py`, `POST /api/optimizer/linkedin`). |
 | **Validation Suite**| Notebook Test Suite | ✅ **Completed** | 12-test suite (`T1`–`T8`) verifying single skill, multi-skill, noisy input, domain filtering, and edge cases. All assertions passing. |
-| **API Test Suite** | pytest (`tests/`) | ✅ **Completed** | JD-match paths/guards + LinkedIn optimizer valid/invalid/scanned cases. |
+| **API Test Suite** | pytest (`tests/`) | ✅ **Completed** | JD-match paths/guards, LinkedIn optimizer valid/invalid/scanned cases, plus profile-extraction null-safety, Codeforces shape, and coverage-math tests. |
 | **Frontend UI** | React 19 + TypeScript App | ✅ **Completed** | 11 routed pages (landing, login, dashboard, JD Matcher, Job Explorer, DSA/Code, Career Path, Resume Builder, Optimizer, InterroX placeholder, Profile) with Firebase auth, Mist/Canopy themes, and forest atmosphere (`frontend/`). |
 
 ---
@@ -143,7 +144,7 @@ Skill-Sync/
 │   │   ├── __init__.py
 │   │   ├── engine.py              # Singleton loading BERT model, FAISS index & matching logic
 │   │   ├── extractor.py           # Skill vocabulary (100+ canonical skills) & section-aware parser
-│   │   ├── profile_extractor.py   # Aggregates stats from GitHub, LeetCode, CodeChef, HackerRank
+│   │   ├── profile_extractor.py   # Aggregates stats from GitHub, LeetCode, CodeChef, Codeforces, HackerRank
 │   │   ├── resume_ocr.py          # PDF text/hyperlink extraction & Tesseract OCR for scanned docs
 │   │   ├── jd_matcher.py          # Pairwise ATS scoring (skill coverage + calibrated cosine)
 │   │   ├── jd_extractor.py        # JD text extraction wrapper (PDF/DOCX/TXT)
@@ -251,7 +252,7 @@ To produce balanced job recommendations, candidate scores are calculated using a
 $$\text{Blended Score} = 0.60 \times \text{Semantic Sim} + 0.40 \times \text{Profile Score}$$
 
 - **Semantic Similarity ($60\%$ weight):** L2-normalized Inner Product Cosine Similarity between candidate vector and indexed FAISS job vectors.
-- **Profile Score ($40\%$ weight):** Aggregated readiness score from GitHub activity, LeetCode problem breakdown, CodeChef rating, and HackerRank badges.
+- **Profile Score ($40\%$ weight):** Aggregated readiness score from GitHub activity, LeetCode problem breakdown, CodeChef/Codeforces ratings, and HackerRank badges — averaged over connected platforms only, then coverage-adjusted: $\text{final} = \text{base} \times (0.7 + 0.3 \times coverage) + \text{bonuses}$. Near-empty profiles count at a dampened $0.3\times$ weight (never zero-filled, never excluded), and a monotonicity floor guarantees disclosing a weak platform never scores below omitting it.
 
 ---
 
@@ -269,7 +270,7 @@ The FastAPI backend runs on `http://localhost:8000`. Interactive OpenAPI documen
 | `POST` | `/recommend/pdf` | PDF/Image file upload → PDF text/OCR extraction → Ranked job matches |
 | `POST` | `/extract-skills` | Extract canonical skills from text (returns `primary_skills` and `secondary_skills`) |
 | `POST` | `/extract-skills/pdf` | Upload PDF/Image → Extract canonical skills and structural metadata |
-| `POST` | `/extract-profile` | Fetch GitHub/LeetCode/CodeChef/HackerRank stats & calculate `profile_score` |
+| `POST` | `/extract-profile` | Fetch GitHub/LeetCode/CodeChef/Codeforces/HackerRank stats & calculate `profile_score` (missing accounts → null, coverage-adjusted) |
 | `GET` | `/github/contributions` | Scrape a public GitHub heatmap (`total_last_year`, 28-week matrix) |
 | `POST` | `/jd-match` | Pairwise resume ↔ JD match (JSON or file upload, session-resume fallback) |
 | `GET` | `/recommend/jobs` | Search & filter 405 indexed jobs by keyword, domain, or experience level |

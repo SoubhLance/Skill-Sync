@@ -293,7 +293,7 @@ export const JobExplorerPage: React.FC = () => {
               value={customSkillsInput}
               onChange={(e) => setCustomSkillsInput(e.target.value)}
               placeholder="e.g. Python, React, TypeScript, Docker, SQL, AWS…"
-              className="input-glow px-3 py-2 text-xs flex-1"
+              className="input-glow px-3 py-2 text-sm flex-1"
             />
             <button type="submit" className="btn-primary text-xs py-2 px-4">
               Apply skills
@@ -427,12 +427,12 @@ export const JobExplorerPage: React.FC = () => {
                     {/* ── Collapsed preview (always visible) ── */}
                     <div className="p-4 sm:p-5 space-y-3">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="chip text-[11px] py-0.5 px-2 truncate max-w-[62%]">
+                        <span className="chip chip-xs truncate max-w-[62%]">
                           {job.domain}
                         </span>
                         {hasSkillsOnFile && matchPct !== undefined ? (
                           <span
-                            className={`chip text-[11px] font-bold tabular-nums px-2.5 py-0.5 shrink-0 ${
+                            className={`chip chip-xs font-semibold tabular-nums shrink-0 ${
                               matchPct >= 70
                                 ? 'chip-success'
                                 : matchPct >= 40
@@ -443,7 +443,7 @@ export const JobExplorerPage: React.FC = () => {
                             {matchPct}% match
                           </span>
                         ) : (
-                          <span className="text-[11px] font-mono text-[var(--text-subtle)] bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-hairline)] shrink-0">
+                          <span className="chip chip-xs tabular-nums shrink-0">
                             {job.skills_list.length} skills
                           </span>
                         )}
@@ -461,12 +461,12 @@ export const JobExplorerPage: React.FC = () => {
 
                       <div className="flex flex-wrap gap-1.5">
                         {previewSkills.map((skill, idx) => (
-                          <span key={idx} className="chip text-[11px] py-0.5 px-2.5">
+                          <span key={idx} className="chip chip-xs">
                             {skill}
                           </span>
                         ))}
                         {remainingSkills > 0 && (
-                          <span className="chip chip-accent text-[11px] py-0.5 px-2.5">
+                          <span className="chip chip-accent chip-xs">
                             +{remainingSkills} more
                           </span>
                         )}
@@ -490,7 +490,7 @@ export const JobExplorerPage: React.FC = () => {
                     {isExpanded && (
                       <div
                         id={`role-detail-${job.job_id}`}
-                        className="col-span-full card p-5 sm:p-6 md:p-7 space-y-5 animate-fade-in !border-[var(--accent-color)] ring-1 ring-[var(--accent-color)]/30 shadow-[var(--shadow-md)]"
+                        className="col-span-full card p-5 sm:p-6 md:p-7 space-y-5 animate-fade-in shadow-[var(--shadow-md)]"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <h3 className="text-lg md:text-xl font-bold tracking-tight text-[var(--text-main)]">
@@ -509,10 +509,10 @@ export const JobExplorerPage: React.FC = () => {
                           <div className="flex items-start justify-between gap-3 pb-4 border-b border-[var(--border-hairline)]">
                             <div className="space-y-1.5 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="chip text-[11px] font-medium uppercase tracking-wider py-0.5 px-2">
-                                  Role Blueprint
+                                <span className="chip chip-xs font-medium">
+                                  Role blueprint
                                 </span>
-                                <span className="chip text-[11px] py-0.5 px-2">
+                                <span className="chip chip-xs">
                                   {job.experience_label}
                                 </span>
                               </div>
@@ -532,26 +532,26 @@ export const JobExplorerPage: React.FC = () => {
                               <div className="text-right shrink-0">
                                 <span
                                   id="role-match-score-badge"
-                                  className={`chip ${
+                                  className={`chip chip-xs font-semibold tabular-nums ${
                                     evaluatedMatch.match_pct >= 70
                                       ? 'chip-success'
                                       : evaluatedMatch.match_pct >= 40
                                       ? 'chip-accent'
                                       : 'chip-danger'
-                                  } text-sm font-bold tabular-nums px-3 py-1`}
+                                  }`}
                                 >
                                   {evaluatedMatch.match_pct}% match
                                 </span>
-                                <span className="caption block text-[10px] mt-1">
+                                <span className="block text-[10px] text-[var(--text-muted)] mt-1">
                                   Blended ATS fit
                                 </span>
                               </div>
                             ) : (
                               <div className="text-right shrink-0">
-                                <span className="chip text-xs font-semibold py-1 px-2.5">
-                                  Requirements View
+                                <span className="chip chip-xs font-semibold">
+                                  Requirements view
                                 </span>
-                                <span className="caption block text-[10px] mt-1">
+                                <span className="block text-[10px] text-[var(--text-muted)] mt-1">
                                   {job.skills_list.length} target skills
                                 </span>
                               </div>
@@ -562,9 +562,9 @@ export const JobExplorerPage: React.FC = () => {
                           {!hasSkillsOnFile && (
                             <div className="space-y-4">
                               <div className="space-y-1">
-                                <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                                <p className="caption font-semibold flex items-center gap-1.5">
                                   <BookOpen className="w-3.5 h-3.5 text-[var(--accent-color)]" />
-                                  Required Core Skills ({job.skills_list.length})
+                                  Required core skills ({job.skills_list.length})
                                 </p>
                                 <p className="caption text-[11.5px]">
                                   Full baseline competencies demanded by enterprise job
@@ -579,14 +579,14 @@ export const JobExplorerPage: React.FC = () => {
                                 {job.skills_list.map((skill, idx) => (
                                   <span
                                     key={idx}
-                                    className="chip bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:border-[var(--border-strong)] transition-colors py-1 px-3 text-xs"
+                                    className="chip"
                                   >
                                     {skill}
                                   </span>
                                 ))}
                               </div>
 
-                              <div className="p-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs mt-2">
+                              <div className="p-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs mt-2">
                                 <div className="space-y-0.5">
                                   <p className="font-semibold text-[var(--text-main)] flex items-center gap-1.5">
                                     <Sparkles className="w-3.5 h-3.5 text-[var(--accent-color)]" />
@@ -621,26 +621,26 @@ export const JobExplorerPage: React.FC = () => {
                           {/* ── RENDER STATE B: Resume/skills on file ──────────────── */}
                           {isExpanded && hasSkillsOnFile && evaluatedMatch && (
                             <div className="space-y-4">
-                              <div className="grid grid-cols-3 gap-2.5 p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center text-xs">
+                              <div className="grid grid-cols-3 gap-2.5 p-3 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] text-center text-xs">
                                 <div>
-                                  <span className="caption block text-[10px] uppercase">
-                                    Semantic Cosine
+                                  <span className="caption block text-[11px]">
+                                    Semantic cosine
                                   </span>
                                   <strong className="text-[13px] font-mono text-[var(--text-main)]">
                                     {Math.round(evaluatedMatch.semantic_score * 100)}%
                                   </strong>
                                 </div>
                                 <div className="border-x border-[var(--border-hairline)]">
-                                  <span className="caption block text-[10px] uppercase">
-                                    Profile Signal
+                                  <span className="caption block text-[11px]">
+                                    Profile signal
                                   </span>
                                   <strong className="text-[13px] font-mono text-[var(--accent-color)]">
                                     {Math.round(profileScore * 100)}%
                                   </strong>
                                 </div>
                                 <div>
-                                  <span className="caption block text-[10px] uppercase">
-                                    DSA Code Signal
+                                  <span className="caption block text-[11px]">
+                                    DSA code signal
                                   </span>
                                   <strong className="text-[13px] font-mono text-[var(--accent-2)]">
                                     {Math.round(dsaScore * 100)}%
@@ -659,7 +659,7 @@ export const JobExplorerPage: React.FC = () => {
                                     {evaluatedMatch.overlap.map((skill, sIdx) => (
                                       <span
                                         key={sIdx}
-                                        className="chip chip-success text-xs py-1 px-3 flex items-center gap-1"
+                                        className="chip chip-success chip-xs"
                                       >
                                         ✓ {skill}
                                       </span>
@@ -683,7 +683,7 @@ export const JobExplorerPage: React.FC = () => {
                                     {evaluatedMatch.gap.map((gap, gIdx) => (
                                       <span
                                         key={gIdx}
-                                        className="chip chip-danger text-xs py-1 px-3 flex items-center gap-1"
+                                        className="chip chip-danger chip-xs"
                                       >
                                         + {gap}
                                       </span>
@@ -715,15 +715,15 @@ export const JobExplorerPage: React.FC = () => {
                           <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                             <div>
                               <span className="caption block">
-                                Estimated Compensation Range
+                                Estimated compensation
                               </span>
-                              <p className="text-sm font-bold text-[var(--text-main)] font-mono mt-0.5">
+                              <p className="text-sm font-bold text-[var(--text-main)] tabular-nums mt-0.5">
                                 {job.salary_range}
                               </p>
                             </div>
 
                             <div className="sm:text-right sm:max-w-[45%]">
-                              <span className="caption block">Target Hiring Companies</span>
+                              <span className="caption block">Hiring companies</span>
                               <p className="text-xs text-[var(--text-muted)] font-sans mt-0.5">
                                 {job.companies || 'Tech Tier 1 / Startups / Enterprise'}
                               </p>
@@ -770,7 +770,7 @@ export const JobExplorerPage: React.FC = () => {
             )}
           </>
         ) : (
-          <div className="card p-8 text-center space-y-2">
+          <div className="card p-6 md:p-8 text-center space-y-2">
             <Search className="w-8 h-8 text-[var(--text-subtle)] mx-auto" />
             <p className="font-semibold text-sm">No job titles found</p>
             <p className="caption max-w-xs mx-auto">

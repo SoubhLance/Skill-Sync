@@ -314,7 +314,7 @@ export const CareerPathPage: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 text-[var(--text-main)] animate-fade-in">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 md:space-y-10 text-[var(--text-main)] animate-fade-in">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="h-section text-2xl md:text-3xl">
@@ -347,7 +347,7 @@ export const CareerPathPage: React.FC = () => {
       {/* ========================================================================= */}
       {!hasGenerated ? (
         <form onSubmit={handleGenerate} className="space-y-8">
-          <div className="card p-6 md:p-8 space-y-7">
+          <div className="card p-6 md:p-8 space-y-6">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="font-semibold text-lg tracking-tight">
@@ -382,7 +382,7 @@ export const CareerPathPage: React.FC = () => {
                     onClick={() => setTargetRole(role)}
                     className={`px-2.5 py-1 rounded-full text-[12px] font-medium border transition-all cursor-pointer ${
                       targetRole === role
-                        ? 'bg-[var(--text-main)] text-[var(--bg-paper)] border-transparent'
+                        ? 'bg-[var(--badge-bg)] text-[var(--badge-text)] border-[var(--accent-color)]/25'
                         : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-main)] hover:border-[var(--border-strong)]'
                     }`}
                   >
@@ -468,7 +468,7 @@ export const CareerPathPage: React.FC = () => {
                     {skills.map((skill) => (
                       <span
                         key={skill}
-                        className="chip !text-[12.5px] !py-1 !bg-[var(--bg-surface)] !text-[var(--text-main)]"
+                        className="chip text-[var(--text-main)]"
                       >
                         {skill}
                         <button
@@ -534,7 +534,7 @@ export const CareerPathPage: React.FC = () => {
         /* ========================================================================= */
         /* STEP 2: GENERATED RECOMMENDATION ROADMAP VIEW */
         /* ========================================================================= */
-        <div className="space-y-10">
+        <div className="space-y-8">
           {/* Header Action Bar: Reconfigure Inputs Button */}
           <div className="card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
@@ -542,11 +542,11 @@ export const CareerPathPage: React.FC = () => {
                 <span className="font-semibold text-[14px] tracking-tight">
                   Your top roles
                 </span>
-                <span className="chip">
+                <span className="chip chip-xs">
                   5 ranked options
                 </span>
               </div>
-              <p className="text-xs font-bold text-[var(--text-main)]">
+              <p className="caption font-medium">
                 Target: <span className="text-[var(--accent-color)]">{targetRole}</span> • Track: <span className="capitalize">{audience === 'student' ? 'College Student' : 'Working Professional'}</span> • Skills: {skills.length} provided
               </p>
             </div>
@@ -579,7 +579,7 @@ export const CareerPathPage: React.FC = () => {
                 </p>
               </div>
 
-              <span className="px-3 py-1 rounded-lg caption self-start sm:self-auto">
+              <span className="chip chip-xs self-start sm:self-auto">
                 5 evaluated
               </span>
             </div>
@@ -606,10 +606,10 @@ export const CareerPathPage: React.FC = () => {
                         <div className="flex items-center gap-2.5 flex-wrap">
                           {/* Rank Badge */}
                           <span
-                            className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold flex items-center gap-1 ${
+                            className={`chip chip-xs font-bold ${
                               isTop1
-                                ? 'text-white border border-transparent'
-                                : 'bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border-hairline)]'
+                                ? 'text-white border-transparent'
+                                : ''
                             }`}
                             style={isTop1 ? { background: 'var(--grad-accent)' } : undefined}
                           >
@@ -622,14 +622,14 @@ export const CareerPathPage: React.FC = () => {
                           </h3>
 
                           {isSelected && (
-                            <span className="chip chip-success">
+                            <span className="chip chip-success chip-xs">
                               <CheckCircle2 className="w-3 h-3" /> Showing roadmap
                             </span>
                           )}
                         </div>
 
                         {/* Why this fits line */}
-                        <div className="text-[11px] font-sans text-[var(--text-muted)] flex items-center gap-1.5 pt-0.5">
+                        <div className="caption flex items-center gap-1.5 pt-0.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[var(--diff-add)] shrink-0" />
                           <span className="font-semibold">
                             {role.whyItFits}
@@ -637,7 +637,7 @@ export const CareerPathPage: React.FC = () => {
                         </div>
 
                         {/* Critical Skill Gaps */}
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
+                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
                           <span className="caption font-medium">
                             Gaps ({role.skillGaps.length}):
                           </span>
@@ -645,18 +645,18 @@ export const CareerPathPage: React.FC = () => {
                             role.skillGaps.slice(0, 4).map((gap, gIdx) => (
                               <span
                                 key={gIdx}
-                                className="px-2 py-0.5 rounded-md bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold text-[10px]"
+                                className="chip chip-danger chip-xs font-semibold"
                               >
                                 - {gap}
                               </span>
                             ))
                           ) : (
-                            <span className="text-[10px] text-[var(--diff-add)] font-bold">
+                            <span className="caption font-semibold text-[var(--diff-add)]">
                               ✓ All baseline skills present
                             </span>
                           )}
                           {role.skillGaps.length > 4 && (
-                            <span className="text-[10px] text-[var(--text-muted)] font-mono">
+                            <span className="caption">
                               +{role.skillGaps.length - 4} more
                             </span>
                           )}
@@ -664,7 +664,7 @@ export const CareerPathPage: React.FC = () => {
                       </div>
 
                       <div className="flex md:flex-col items-center md:items-end justify-between gap-2 shrink-0 pt-2 md:pt-0">
-                        <span className="chip chip-success tabular-nums">
+                        <span className="chip chip-success chip-xs font-semibold tabular-nums">
                           {role.alignmentPercent}% fit
                         </span>
 
@@ -693,7 +693,7 @@ export const CareerPathPage: React.FC = () => {
 
               <div className="flex items-center gap-3">
                 <span className="caption">{audience === 'student' ? 'Skill building' : 'Career transition'}</span>
-                <span className="chip chip-success tabular-nums">
+                <span className="chip chip-success chip-xs font-semibold tabular-nums">
                   {activeRole.alignmentPercent}% fit
                 </span>
               </div>
@@ -756,7 +756,7 @@ export const CareerPathPage: React.FC = () => {
                       <p className="caption font-medium">Focus</p>
                       <div className="flex flex-wrap gap-1">
                         {step.skillsToLearn.map((skill, sIdx) => (
-                          <span key={sIdx} className="chip chip-success">
+                          <span key={sIdx} className="chip chip-success chip-xs">
                             {skill}
                           </span>
                         ))}

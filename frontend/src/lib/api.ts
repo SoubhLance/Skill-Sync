@@ -106,6 +106,18 @@ export interface ProfileExtractResponse {
     country_rank?: number;
     has_cp_signal?: boolean;
   } | null;
+  codeforces?: {
+    username?: string;
+    rating?: number | null;
+    max_rating?: number | null;
+    rank?: string | null;
+    max_rank?: string | null;
+    contribution?: number;
+    problems_solved?: number;
+    hard_solved?: number;
+    contests_attended?: number;
+    has_cp_signal?: boolean;
+  } | null;
   hackerrank?: {
     username?: string;
     badges_count?: number;
@@ -254,6 +266,7 @@ export const api = {
     github?: string;
     leetcode?: string;
     codechef?: string;
+    codeforces?: string;
     hackerrank?: string;
     portfolio_url?: string;
     hackathon_wins?: number;

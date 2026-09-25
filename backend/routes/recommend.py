@@ -26,6 +26,7 @@ from ..core.profile_extractor import (
     fetch_github_stats,
     fetch_leetcode_stats,
     fetch_codechef_stats,
+    fetch_codeforces_stats,
     fetch_hackerrank_stats,
     compute_profile_score,
 )
@@ -342,22 +343,26 @@ async def extract_skills_from_pdf(file: UploadFile = File(...)):
 # ── POST /extract-profile ────────────────────────────────────────────────────────────
 
 @router.post("/extract-profile", response_model=ProfileOut,
-             summary="Extract signals from GitHub, LeetCode, CodeChef, HackerRank & compute profile_score")
+             summary="Extract signals from GitHub, LeetCode, CodeChef, Codeforces, HackerRank & compute profile_score")
 async def extract_profile_endpoint(body: ProfileRequest):
     """
-    Pass usernames for GitHub, LeetCode, CodeChef, and/or HackerRank plus self-reported bonuses.
+    Pass usernames for GitHub, LeetCode, CodeChef, Codeforces, and/or HackerRank
+    plus self-reported bonuses. Missing or nonexistent accounts resolve to null
+    and are excluded from scoring (never zero-filled, never an error).
     Fetches public profile stats and computes normalized profile_score (0.0 to 1.0).
     """
     try:
-        gh = fetch_github_stats(body.github) if body.github else None
-        lc = fetch_leetcode_stats(body.leetcode) if body.leetcode else None
-        cc = fetch_codechef_stats(body.codechef) if body.codechef else None
-        hr = fetch_hackerrank_stats(body.hackerrank) if body.hackerrank else None
+        gh = fetch_github_stats(body.github) if body.github and body.github.strip() else None
+        lc = fetch_leetcode_stats(body.leetcode) if body.leetcode and body.leetcode.strip() else None
+        cc = fetch_codechef_stats(body.codechef) if body.codechef and body.codechef.strip() else None
+        cf = fetch_codeforces_stats(body.codeforces) if body.codeforces and body.codeforces.strip() else None
+        hr = fetch_hackerrank_stats(body.hackerrank) if body.hackerrank and body.hackerrank.strip() else None
 
         score_res = compute_profile_score(
             github=gh,
             leetcode=lc,
             codechef=cc,
+            codeforces=cf,
             hackerrank=hr,
             portfolio_url=body.portfolio_url,
             hackathon_wins=body.hackathon_wins,
@@ -369,6 +374,7 @@ async def extract_profile_endpoint(body: ProfileRequest):
         if gh: active.append("github")
         if lc: active.append("leetcode")
         if cc: active.append("codechef")
+        if cf: active.append("codeforces")
         if hr: active.append("hackerrank")
         if score_res.get("portfolio", {}).get("has_portfolio"): active.append("portfolio")
 
@@ -376,10 +382,14 @@ async def extract_profile_endpoint(body: ProfileRequest):
             github=gh,
             leetcode=lc,
             codechef=cc,
+            codeforces=cf,
             hackerrank=hr,
             portfolio=score_res.get("portfolio"),
             profile_score=score_res["profile_score"],
             base_score=score_res["base_score"],
+            coverage=score_res.get("coverage", 0.0),
+            coverage_factor=score_res.get("coverage_factor", 0.7),
+            platforms_used=score_res.get("platforms_used", active),
             bonus_applied=score_res["bonus_applied"],
             active_platforms=active,
         )

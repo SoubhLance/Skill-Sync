@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, Mail, Shield, Moon, Sun, Save, LogOut } from 'lucide-react';
+import { Mail, Shield, Moon, Sun, Save, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage: React.FC = () => {
@@ -27,22 +27,20 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto space-y-8 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Header */}
-      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
+      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-hairline)]">
         <div>
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5 mb-1">
-            <User className="w-3.5 h-3.5 text-[var(--accent-color)]" /> $ skillsync user --settings
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-sans">
+          <p className="eyebrow mb-1">Account</p>
+          <h1 className="h-section text-2xl md:text-3xl">
             User Account Settings
           </h1>
         </div>
 
-        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 border border-[var(--border-hairline)] rounded-lg">
-          direct PFP destination: /profile
+        <span className="chip shrink-0">
+          /profile
         </span>
       </div>
 
-      <div className="p-8 rounded-2xl glass-card space-y-6 font-mono text-xs">
+      <div className="p-6 md:p-8 card space-y-6 text-[13px]">
         {/* User Avatar & Basic Metadata Header */}
         <div className="flex items-center gap-4 pb-6 border-b border-[var(--border-hairline)]">
           {user?.photoURL ? (
@@ -57,9 +55,9 @@ export const ProfilePage: React.FC = () => {
             <h2 className="text-lg font-extrabold text-[var(--text-main)] font-sans leading-tight">
               {displayName}
             </h2>
-            <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">{email}</p>
-            <span className="inline-block px-2.5 py-0.5 mt-1.5 rounded-md bg-[var(--badge-bg)] text-[var(--badge-text)] font-bold text-[10px] border border-[var(--border-hairline)]">
-              VERIFIED DEVELOPER
+            <p className="caption mt-0.5">{email}</p>
+            <span className="chip chip-accent chip-xs mt-1.5">
+              Verified developer
             </span>
           </div>
         </div>
@@ -67,48 +65,48 @@ export const ProfilePage: React.FC = () => {
         {/* Profile Settings Form */}
         <form onSubmit={handleSave} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1">
-                Display Name
+            <div className="field">
+              <label className="field-label">
+                Display name
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-main)] input-glow focus:outline-none"
+                className="input-glow px-3.5 py-2.5"
               />
             </div>
 
-            <div>
-              <label className="block text-[11px] font-bold text-[var(--text-muted)] uppercase mb-1">
-                Primary Email
+            <div className="field">
+              <label className="field-label">
+                Primary email
               </label>
               <input
                 type="email"
                 value={email}
                 disabled
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] text-xs font-mono text-[var(--text-muted)] opacity-70 cursor-not-allowed"
+                className="input-glow px-3.5 py-2.5 opacity-70 cursor-not-allowed"
               />
             </div>
           </div>
 
           {/* Theme Preferences */}
           <div className="pt-4 border-t border-[var(--border-hairline)] space-y-2">
-            <span className="block text-[11px] font-bold text-[var(--text-muted)] uppercase">
-              Theme Mode Preference
+            <span className="field-label">
+              Theme preference
             </span>
             <button
               type="button"
               onClick={toggleTheme}
-              className="px-4 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] hover:bg-[var(--bg-elevated)] text-[var(--text-main)] font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
+              className="btn-secondary px-4 py-2.5 text-[13px]"
             >
               {theme === 'dark' ? (
                 <>
-                  <Moon className="w-4 h-4 text-[#6EE7B7]" /> Active: Canopy Mode (Deep Forest)
+                  <Moon className="w-4 h-4 text-[#6EE7B7]" /> Canopy mode active
                 </>
               ) : (
                 <>
-                  <Sun className="w-4 h-4 text-[#4D7C0F]" /> Active: Mist Mode (Sage Grove)
+                  <Sun className="w-4 h-4 text-[#4D7C0F]" /> Mist mode active
                 </>
               )}
             </button>
@@ -118,14 +116,14 @@ export const ProfilePage: React.FC = () => {
           <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               type="submit"
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl btn-accent font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md"
+              className="w-full sm:w-auto px-6 py-2.5 btn-accent text-[13px]"
             >
-              <Save className="w-4 h-4" /> Save Profile Preferences
+              <Save className="w-4 h-4" /> Save preferences
             </button>
 
             {saved && (
-              <span className="text-[var(--diff-add)] font-bold text-xs">
-                ✓ Preferences updated!
+              <span className="caption font-semibold text-[var(--diff-add)]">
+                ✓ Preferences updated
               </span>
             )}
 

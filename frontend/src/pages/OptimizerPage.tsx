@@ -3,7 +3,6 @@ import { api, LinkedInScoreResponse } from '../lib/api';
 import { DiffStatDisplay } from '../components/ui/DiffStatDisplay';
 import { GithubIcon, LinkedinIcon } from '../components/ui/icons';
 import { 
-  Sparkles, 
   UploadCloud, 
   RefreshCw, 
   AlertCircle, 
@@ -41,31 +40,29 @@ export const OptimizerPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 md:space-y-10 font-sans text-[var(--text-main)] animate-fade-in">
       {/* Header */}
-      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono border-b border-[var(--border-hairline)]">
+      <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-hairline)]">
         <div>
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase flex items-center gap-1.5 mb-1">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--accent-color)]" /> $ skillsync optimizer --profile
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-sans">
+          <p className="eyebrow mb-1">Profile optimizer</p>
+          <h1 className="h-section text-2xl md:text-3xl">
             LinkedIn & GitHub Profile Optimizer
           </h1>
         </div>
 
-        <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] px-3 py-1 border border-[var(--border-hairline)] rounded-lg">
+        <span className="chip shrink-0">
           target: developer signals
         </span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Section 1: LinkedIn PDF Export Upload & Live Backend Rating */}
-        <div className="space-y-6 font-mono text-xs">
-          <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider block">
-            [01. LINKEDIN PROFILE PDF EXPORT OPTIMIZER]
+        <div className="space-y-6">
+          <span className="eyebrow">
+            01 · LinkedIn profile PDF optimizer
           </span>
 
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
+          <div className="p-6 md:p-8 card space-y-5">
             <div className="space-y-1 font-sans">
               <h3 className="font-extrabold text-base text-[var(--text-main)] flex items-center gap-2">
                 <LinkedinIcon className="w-5 h-5 text-[var(--accent-color)]" /> Upload LinkedIn Profile PDF Export
@@ -105,7 +102,7 @@ export const OptimizerPage: React.FC = () => {
 
             {/* 422 Scanned PDF / Image Error State */}
             {isScannedPdfError && (
-              <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] space-y-2 font-mono text-xs">
+              <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] space-y-2 text-[13px]">
                 <div className="font-extrabold flex items-center gap-2 text-sm">
                   <AlertTriangle className="w-4 h-4 text-[var(--diff-del)] shrink-0" />
                   <span>PDF Has No Extractable Text</span>
@@ -121,7 +118,7 @@ export const OptimizerPage: React.FC = () => {
 
             {/* Generic non-422 Error State */}
             {error && !isScannedPdfError && (
-              <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] flex items-center gap-2 font-mono text-xs">
+              <div className="p-4 rounded-xl bg-[var(--diff-del-bg)] border border-[var(--diff-del)]/40 text-[var(--diff-del)] flex items-center gap-2 text-[13px]">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -129,18 +126,18 @@ export const OptimizerPage: React.FC = () => {
 
             {/* Real API Score Result */}
             {scoreResult && (
-              <div className="space-y-6 pt-2 font-mono">
+              <div className="space-y-6 pt-2">
                 <DiffStatDisplay score={scoreResult.score / 100} label="LinkedIn Profile Optimization Score" />
 
                 {/* Detected Sections Badges */}
                 {scoreResult.sections_detected.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                      Detected Profile Sections ({scoreResult.sections_detected.length}):
+                    <div className="caption font-semibold">
+                      Detected profile sections ({scoreResult.sections_detected.length})
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {scoreResult.sections_detected.map((sec, idx) => (
-                        <span key={idx} className="px-2.5 py-1 rounded-md bg-[var(--diff-add-bg)] text-[var(--diff-add)] border border-[var(--diff-add)]/30 text-[10px] font-bold">
+                        <span key={idx} className="chip chip-success chip-xs">
                           ✓ {sec}
                         </span>
                       ))}
@@ -151,8 +148,8 @@ export const OptimizerPage: React.FC = () => {
                 {/* Breakdown Metrics */}
                 {Object.keys(scoreResult.breakdown).length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                      Category Breakdown Ratings:
+                    <div className="caption font-semibold">
+                      Category breakdown
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(scoreResult.breakdown).map(([key, val]) => (
@@ -168,10 +165,10 @@ export const OptimizerPage: React.FC = () => {
                 {/* Critical Gaps & Recommendations */}
                 {scoreResult.gaps.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-[10px] font-bold text-[var(--diff-del)] uppercase tracking-wider">
-                      Optimization Gaps to Fix ({scoreResult.gaps.length}):
+                    <div className="caption font-semibold text-[var(--diff-del)]">
+                      Gaps to fix ({scoreResult.gaps.length})
                     </div>
-                    <div className="space-y-1.5 font-mono text-[11px]">
+                    <div className="space-y-1.5 text-[12px]">
                       {scoreResult.gaps.map((gap, idx) => (
                         <div key={idx} className="p-2.5 rounded-lg bg-[var(--diff-del-bg)] text-[var(--diff-del)] border border-[var(--diff-del)]/30 font-semibold flex items-start gap-2">
                           <span className="shrink-0">-</span>
@@ -187,12 +184,12 @@ export const OptimizerPage: React.FC = () => {
         </div>
 
         {/* Section 2: GitHub Optimization Guide & Static Checklist (Frontend-only) */}
-        <div className="space-y-6 font-mono text-xs">
-          <span className="text-xs font-bold text-[var(--accent-color)] uppercase tracking-wider block">
-            [02. GITHUB REPOSITORY OPTIMIZATION CHECKLIST]
+        <div className="space-y-6">
+          <span className="eyebrow">
+            02 · GitHub repository checklist
           </span>
 
-          <div className="p-6 md:p-8 rounded-2xl glass-card space-y-5">
+          <div className="p-6 md:p-8 card space-y-5">
             <div className="space-y-1 font-sans border-b border-[var(--border-hairline)] pb-3">
               <h3 className="font-extrabold text-base text-[var(--text-main)] flex items-center gap-2">
                 <GithubIcon className="w-5 h-5 text-[var(--text-main)]" /> GitHub Recruiter Signal Guide
@@ -202,7 +199,7 @@ export const OptimizerPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="space-y-3 font-mono">
+            <div className="space-y-3">
               <div className="p-4 rounded-xl bg-[var(--bg-paper)] border border-[var(--border-hairline)] flex items-start gap-3 card-lift">
                 <CheckSquare className="w-4 h-4 text-[var(--diff-add)] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">

@@ -21,7 +21,7 @@ class SkillsRequest(BaseModel):
         examples=["Python, Machine Learning, PyTorch, FastAPI, Docker"],
     )
     top_k: int = Field(10, ge=1, le=30, description="Number of results to return")
-    profile_score: float = Field(0.0, ge=0.0, le=1.0, description="Aggregated profile score from GitHub/LeetCode/CodeChef/HackerRank (0-1)")
+    profile_score: float = Field(0.0, ge=0.0, le=1.0, description="Aggregated profile score from GitHub/LeetCode/CodeChef/Codeforces/HackerRank (0-1)")
     domain_filter: Optional[str] = Field(
         None,
         description="Return only jobs from this domain  e.g. 'Technical', 'Finance', 'Medical'",
@@ -66,6 +66,7 @@ class ProfileRequest(BaseModel):
     github:           Optional[str] = Field(None, description="GitHub username", example="tourist")
     leetcode:         Optional[str] = Field(None, description="LeetCode username", example="tourist")
     codechef:         Optional[str] = Field(None, description="CodeChef username", example="tourist")
+    codeforces:       Optional[str] = Field(None, description="Codeforces handle", example="tourist")
     hackerrank:       Optional[str] = Field(None, description="HackerRank username", example="tourist")
     portfolio_url:    Optional[str] = Field(None, description="Candidate portfolio website link", example="https://myportfolio.dev")
     hackathon_wins:   int           = Field(0, ge=0, description="Self-reported hackathon wins (+0.05 bonus)")
@@ -178,10 +179,14 @@ class ProfileOut(BaseModel):
     github:           Optional[dict] = Field(None, description="GitHub stats or null if failed/not provided")
     leetcode:         Optional[dict] = Field(None, description="LeetCode stats or null if failed/not provided")
     codechef:         Optional[dict] = Field(None, description="CodeChef stats or null if failed/not provided")
+    codeforces:       Optional[dict] = Field(None, description="Codeforces stats or null if failed/not provided")
     hackerrank:       Optional[dict] = Field(None, description="HackerRank stats or null if failed/not provided")
     portfolio:        Optional[dict] = Field(None, description="Portfolio link details and bonus applied")
     profile_score:    float          = Field(..., description="Normalized profile readiness score in [0.0, 1.0]")
-    base_score:       float          = Field(0.0, description="Base score prior to self-reported bonuses")
+    base_score:       float          = Field(0.0, description="Weighted average over connected platforms, pre-coverage")
+    coverage:         float          = Field(0.0, description="Connected platforms / 4 core platforms, capped at 1.0")
+    coverage_factor:  float          = Field(0.7, description="Multiplier applied: 0.7 + 0.3 * coverage")
+    platforms_used:   list[str]      = Field(default_factory=list, description="Platforms that contributed to the score")
     bonus_applied:    dict           = Field(default_factory=dict, description="Bonuses applied (self_reported: True)")
     active_platforms: list[str]      = Field(..., description="List of platform names successfully extracted")
 

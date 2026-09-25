@@ -529,7 +529,7 @@ export const JDMatcherPage: React.FC = () => {
     : [...TECH_PRESET_SKILLS, ...NON_TECH_PRESET_SKILLS.slice(0, 4)];
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 text-[var(--text-main)] animate-fade-in">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 md:space-y-10 text-[var(--text-main)] animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -566,7 +566,7 @@ export const JDMatcherPage: React.FC = () => {
       {activeTab === 'pairwise' ? (
         <div className="space-y-8">
           {/* Two-Panel Pairwise Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Panel: inputs */}
             <div className="space-y-6">
               <div className="card p-6 md:p-8 space-y-5">
@@ -672,10 +672,10 @@ export const JDMatcherPage: React.FC = () => {
                     <DiffStatDisplay score={result.match_percent} label="Resume and role similarity" />
                     {result.match_label && (
                       <div className="absolute top-5 right-5">
-                        <span className={`chip ${
+                        <span className={`chip chip-xs font-semibold ${
                           result.match_percent >= 70 ? 'chip-success' :
                           result.match_percent >= 50 ? 'chip-accent' : 'chip-danger'
-                        } font-semibold text-[12px]`}>
+                        }`}>
                           {result.match_label}
                         </span>
                       </div>
@@ -706,7 +706,7 @@ export const JDMatcherPage: React.FC = () => {
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {result.skill_overlap.map((skill, idx) => (
-                          <span key={idx} className="chip chip-success">
+                          <span key={idx} className="chip chip-success chip-xs">
                             {skill}
                           </span>
                         ))}
@@ -719,7 +719,7 @@ export const JDMatcherPage: React.FC = () => {
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {result.skill_gap.map((skill, idx) => (
-                          <span key={idx} className="chip chip-danger">
+                          <span key={idx} className="chip chip-danger chip-xs">
                             {skill}
                           </span>
                         ))}
@@ -728,7 +728,7 @@ export const JDMatcherPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="card p-8 text-center min-h-[350px] flex flex-col items-center justify-center">
+                <div className="card p-6 md:p-8 text-center min-h-[350px] flex flex-col items-center justify-center">
                   <GitCompare className="w-8 h-8 text-[var(--text-subtle)] mx-auto" />
                   <p className="font-semibold text-[15px] mt-3">
                     No comparison yet
@@ -762,7 +762,7 @@ export const JDMatcherPage: React.FC = () => {
                         <h4 className="font-semibold text-sm tracking-tight">{job.job_role}</h4>
                         <p className="caption mt-0.5">{job.domain} • {job.experience_label}</p>
                       </div>
-                      <span className="chip chip-success shrink-0 tabular-nums">
+                      <span className="chip chip-success chip-xs font-semibold shrink-0 tabular-nums">
                         {job.match_pct}%
                       </span>
                     </div>
@@ -865,7 +865,7 @@ export const JDMatcherPage: React.FC = () => {
                     onClick={() => handlePresetClick(preset)}
                     className={`px-2.5 py-1 rounded-full text-[12px] font-medium border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[var(--text-main)] text-[var(--bg-paper)] border-transparent'
+                        ? 'bg-[var(--badge-bg)] text-[var(--badge-text)] border-[var(--accent-color)]/25'
                         : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-main)] hover:border-[var(--border-strong)]'
                     }`}
                   >
@@ -904,7 +904,7 @@ export const JDMatcherPage: React.FC = () => {
                         </p>
                       </div>
 
-                      <span className="chip chip-success shrink-0 tabular-nums">
+                      <span className="chip chip-success chip-xs font-semibold shrink-0 tabular-nums">
                         {job.match_pct}%
                       </span>
                     </div>
@@ -916,7 +916,7 @@ export const JDMatcherPage: React.FC = () => {
                       {job.skill_overlap.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {job.skill_overlap.map((skill, sIdx) => (
-                            <span key={sIdx} className="chip chip-success">
+                            <span key={sIdx} className="chip chip-success chip-xs">
                               {skill}
                             </span>
                           ))}
@@ -935,7 +935,7 @@ export const JDMatcherPage: React.FC = () => {
                       {job.skill_gap.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {job.skill_gap.slice(0, 5).map((gap, gIdx) => (
-                            <span key={gIdx} className="chip chip-danger">
+                            <span key={gIdx} className="chip chip-danger chip-xs">
                               {gap}
                             </span>
                           ))}
@@ -960,7 +960,7 @@ export const JDMatcherPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="card p-10 text-center">
+            <div className="card p-6 md:p-8 text-center">
               <Search className="w-8 h-8 text-[var(--text-subtle)] mx-auto" />
               <p className="font-semibold text-[15px] mt-3">
                 No matches for “{skillsQuery}”

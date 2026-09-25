@@ -46,7 +46,7 @@ const AppLayout: React.FC = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-paper)] text-[var(--text-main)] transition-colors duration-300 antialiased">
       <Navbar />
-      <main className="flex-1 overflow-x-hidden min-h-screen min-w-0 animate-fade-in relative">
+      <main className="workspace flex-1 overflow-x-hidden min-h-screen min-w-0 animate-fade-in relative">
         {/* Global forest canopy — shared atmosphere behind every protected page */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[460px] overflow-hidden" aria-hidden="true">
           <ForestBand veil="soft" className="!absolute" />

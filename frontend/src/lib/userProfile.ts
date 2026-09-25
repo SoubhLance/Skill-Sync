@@ -34,6 +34,7 @@ export interface DsaHandles {
   github?: string;
   leetcode?: string;
   codechef?: string;
+  codeforces?: string;
   hackerrank?: string;
   portfolioUrl?: string;
 }

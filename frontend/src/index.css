@@ -345,9 +345,22 @@ select.input-glow, select.input { cursor: pointer; }
 .card-lift { transition: transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s ease, border-color 0.22s ease; }
 .card-lift:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent-color) 30%, var(--border-hairline)); box-shadow: var(--shadow-md); }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-hairline); background: var(--bg-elevated); color: var(--text-muted); }
+.chip-xs { font-size: 11px; padding: 3px 9px; gap: 5px; }
 .chip-accent { background: var(--badge-bg); color: var(--badge-text); border-color: transparent; }
 .chip-success { background: var(--success-bg); color: var(--success); border-color: transparent; }
 .chip-danger { background: var(--diff-del-bg); color: var(--diff-del); border-color: transparent; }
+
+/* ---------- Workspace separation: inputs sit one surface deeper inside cards.
+   Scoped to .workspace so public pages (login) keep their own treatment. --- */
+.workspace .card .input-glow, .workspace .card .input,
+.workspace .glass-card .input-glow, .workspace .glass-card .input {
+  background-color: var(--bg-paper);
+}
+html[data-forest="mist"] .workspace .card .input-glow,
+html[data-forest="mist"] .workspace .card .input {
+  background-color: #EDF3EC;
+  border-color: #D2DCD1;
+}
 
 /* ---------- Light "Mist" structural polish (canopy untouched) ---------- */
 html[data-forest="mist"] .card {
@@ -367,6 +380,87 @@ html[data-forest="mist"] .chip-success {
   color: #065F46;
   border: 1px solid rgba(110, 231, 183, 0.6);
 }
+
+/* ---------- Status pills: semantic color system (both themes) ---------- */
+.chip-warn { background: var(--warning-bg); color: var(--warning); border-color: transparent; }
+.chip-neutral { background: var(--bg-elevated); color: var(--text-muted); border-color: transparent; }
+
+/* ============================================================
+   DSA + CODE PREMIUM LAYER — page-scoped art direction
+   Scope: .dsa-scope (DSACodePage root). Token-driven, no raw
+   colors in JSX. Forest/rain/neural layers untouched.
+   ============================================================ */
+/* Hero: elevated focal surface with emerald crown + ambient wash */
+.dsa-scope .dsa-hero {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--accent-color) 24%, var(--border-hairline));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-color) 8%, transparent), transparent 44%),
+    var(--bg-surface);
+  box-shadow: var(--shadow-md), 0 0 44px -18px color-mix(in srgb, var(--accent-color) 45%, transparent);
+}
+.dsa-scope .dsa-hero::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: var(--grad-accent); opacity: 0.9;
+}
+html[data-forest="mist"] .dsa-scope .dsa-hero {
+  background:
+    linear-gradient(180deg, rgba(27, 122, 75, 0.07), transparent 44%),
+    #FBFDFB;
+  border-color: rgba(27, 122, 75, 0.28);
+  box-shadow: 0 18px 48px rgba(20, 35, 27, 0.12), 0 2px 6px rgba(20, 35, 27, 0.06);
+}
+/* Hero CTA: premium glow (pairs with .btn-shine sweep in JSX) */
+.dsa-scope .dsa-cta {
+  box-shadow: 0 8px 28px rgba(20, 83, 45, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.dark .dsa-scope .dsa-cta {
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+/* Score gauge: emerald→teal gradient numeral + ambient wash */
+.dsa-scope .dsa-gauge {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in srgb, var(--accent-color) 10%, transparent), transparent 70%),
+    var(--bg-surface);
+  border-color: color-mix(in srgb, var(--accent-color) 20%, var(--border-hairline));
+  box-shadow: var(--shadow-md);
+}
+.dsa-scope .dsa-gauge .text-4xl {
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-blue));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* Platform cards: restrained base, stronger hover elevation */
+.dsa-scope .dsa-plat:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent-color) 32%, var(--border-hairline));
+  box-shadow: var(--shadow-lg);
+}
+/* Platform icon tile: neutral at rest, emerald-tinted when connected */
+.dsa-scope .dsa-icon {
+  width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-elevated); border: 1px solid var(--border-hairline);
+  color: var(--text-subtle);
+}
+.dsa-scope .dsa-icon.on {
+  background: var(--badge-bg); border-color: transparent; color: var(--accent-color);
+}
+/* KPI: mono numerals only; labels stay sans */
+.dsa-scope .dsa-kpi {
+  font-family: var(--font-mono); font-weight: 800; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.dsa-scope .dsa-kpi-lg { font-size: 20px; line-height: 1.2; }
+.dsa-scope .dsa-kpi-emerald { color: var(--success); }
+.dsa-scope .dsa-kpi-teal { color: var(--accent-blue); }
+.dsa-scope .dsa-kpi-ink { color: var(--text-main); }
+.dsa-scope .dsa-kpi-label {
+  font-size: 11px; line-height: 1.5; color: var(--text-muted);
+}
+/* Field icons rest inside the hero: quiet until it matters */
+.dsa-scope .dsa-hero .field-label svg { color: var(--text-subtle); }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--text-subtle) 55%, transparent); border-radius: 99px; border: 2px solid var(--bg-paper); }
